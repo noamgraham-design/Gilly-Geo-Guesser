@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <title>Gilly Israel Quiz</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -523,6 +523,241 @@
     width: 20px; height: 20px;
     top: -8px; left: 30px;
   }
+
+  /* MOBILE RESPONSIVE STYLES */
+  @media (max-width: 768px) {
+    /* Hide desktop town-card on mobile */
+    #town-card {
+      display: none !important;
+    }
+    
+    /* Show mobile menu button */
+    #mobile-menu-btn {
+      display: block !important;
+      font-size: 1.2rem;
+      padding: 8px 14px;
+      margin-left: auto;
+    }
+    
+    /* Mobile dropdown styling */
+    #mobile-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      z-index: 5000;
+      min-width: 280px;
+      padding: 12px;
+    }
+    #mobile-dropdown.show {
+      display: block !important;
+    }
+    
+    #mobile-town-info {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 12px;
+    }
+    #mobile-town-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    #mobile-town-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    
+    #mobile-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    #mobile-actions button {
+      width: 100%;
+      justify-content: center;
+    }
+    #mobile-hint-badge {
+      font-size: 0.85rem;
+      color: var(--gold);
+      font-weight: 600;
+      display: none;
+      text-align: center;
+      padding: 4px;
+    }
+    
+    /* Topbar adjustments */
+    #topbar h1 {
+      font-size: 1.3rem;
+    }
+    #topbar h1 img {
+      width: 32px !important;
+      height: 32px !important;
+    }
+    
+    /* HUD blocks smaller */
+    .hud-block {
+      min-width: 70px;
+    }
+    .hud-label {
+      font-size: 0.7rem;
+    }
+    .hud-value {
+      font-size: 1.3rem;
+    }
+    
+    /* Town card adjustments */
+    #town-card {
+      padding: 8px 12px;
+      font-size: 0.9rem;
+    }
+    #town-name {
+      font-size: 1.3rem;
+    }
+    #town-desc {
+      font-size: 0.85rem;
+    }
+    #town-actions {
+      gap: 6px;
+    }
+    
+    /* Buttons more touch-friendly */
+    .btn {
+      padding: 10px 18px;
+      font-size: 0.95rem;
+      min-height: 44px; /* Apple's minimum touch target */
+    }
+    .btn-hint {
+      padding: 8px 14px;
+      font-size: 0.85rem;
+    }
+    #btn-back {
+      padding: 8px 14px;
+      font-size: 0.85rem;
+    }
+    
+    /* Menu card smaller */
+    .card {
+      max-width: 95%;
+      padding: 16px 20px 20px;
+    }
+    .card h2 {
+      font-size: 1.5rem;
+    }
+    .card p {
+      font-size: 0.95rem;
+    }
+    
+    /* Menu logo smaller on mobile */
+    #menu-card img {
+      width: 180px !important;
+      height: 180px !important;
+    }
+    
+    /* Difficulty buttons more compact */
+    .diff-btn {
+      padding: 8px 16px;
+      font-size: 0.9rem;
+    }
+    
+    /* Results panel wider on mobile */
+    #results-panel {
+      width: 85%;
+      max-width: 320px;
+    }
+    #results-card h2 {
+      font-size: 1.3rem;
+    }
+    #score-display {
+      font-size: 2rem;
+    }
+    
+    /* Streak banner smaller */
+    .streak-main {
+      font-size: 2.2rem;
+    }
+    .streak-hebrew {
+      font-size: 1.5rem;
+    }
+    .streak-flames {
+      font-size: 2.8rem;
+    }
+    
+    /* Easy mode banner smaller */
+    #easy-mode-banner {
+      font-size: 1.8rem;
+      padding: 18px 36px 22px;
+    }
+    
+    /* Fact modal more mobile-friendly */
+    #fact-modal-content {
+      max-width: 90%;
+      padding: 20px;
+    }
+    #fact-modal-title {
+      font-size: 1.5rem;
+    }
+    #fact-modal-body {
+      font-size: 0.95rem;
+    }
+  }
+  
+  /* EXTRA SMALL MOBILE (phones in portrait) */
+  @media (max-width: 480px) {
+    #topbar h1 {
+      font-size: 1.1rem;
+    }
+    #topbar h1 img {
+      width: 28px !important;
+      height: 28px !important;
+    }
+    
+    .hud-block {
+      min-width: 60px;
+    }
+    .hud-label {
+      font-size: 0.65rem;
+    }
+    .hud-value {
+      font-size: 1.1rem;
+    }
+    
+    #town-name {
+      font-size: 1.1rem;
+    }
+    #town-desc {
+      font-size: 0.8rem;
+    }
+    
+    .card h2 {
+      font-size: 1.3rem;
+    }
+    
+    #menu-card img {
+      width: 140px !important;
+      height: 140px !important;
+    }
+    
+    #results-panel {
+      width: 90%;
+    }
+    
+    .streak-main {
+      font-size: 1.8rem;
+    }
+    .streak-hebrew {
+      font-size: 1.2rem;
+    }
+    
+    #easy-mode-banner {
+      font-size: 1.5rem;
+      padding: 16px 28px 18px;
+    }
+  }
 </style>
 </head>
 <body>
@@ -538,6 +773,21 @@
       <span class="hud-label" id="lbl-round">Round</span>
       <span class="hud-value" id="round-val">1/—</span>
     </div>
+    <button class="btn btn-hint" id="mobile-menu-btn" onclick="toggleMobileMenu()" style="display:none">☰</button>
+  </div>
+</div>
+
+<!-- Mobile-only dropdown menu -->
+<div id="mobile-dropdown" style="display:none">
+  <div id="mobile-town-info">
+    <div id="mobile-town-name">—</div>
+    <div id="mobile-town-desc">בחר/י רמת קושי והתחל/י את המשחק</div>
+  </div>
+  <div id="mobile-actions">
+    <button class="btn btn-hint" id="mobile-btn-back" onclick="showMenu()" style="display:none">← תפריט</button>
+    <span id="mobile-hint-badge">📍 האזור מסומן על המפה</span>
+    <button class="btn btn-hint" id="mobile-btn-hint" onclick="useHint()">💡 Hint (−10 pts) · 3 left</button>
+    <button class="btn btn-hint" id="mobile-btn-layer" onclick="toggleMapLayer()">🗺️ מפת רחוב</button>
   </div>
 </div>
 
@@ -943,6 +1193,10 @@ function applyLang() {
   document.getElementById('btn-play-again').textContent = t('play_again');
   document.getElementById('btn-menu').textContent      = t('menu_btn');
   document.getElementById('btn-back').textContent      = t('back_btn');
+  // Update mobile elements
+  document.getElementById('mobile-hint-badge').textContent = t('hint_badge');
+  document.getElementById('mobile-btn-back').textContent = t('back_btn');
+  document.getElementById('mobile-btn-layer').innerHTML = currentLayer === 'satellite' ? t('layer_street') : t('layer_satellite');
   // Update lang toggle button styles
   document.getElementById('lang-he').className = `diff-btn${lang === 'he' ? ' active-region' : ''}`;
   document.getElementById('lang-en').className = `diff-btn${lang === 'en' ? ' active-region' : ''}`;
@@ -996,6 +1250,7 @@ function toggleMapLayer(suppressBanner = false) {
     streetLayer.addTo(map);
     currentLayer = 'street';
     document.getElementById('btn-layer').innerHTML = t('layer_satellite');
+    document.getElementById('mobile-btn-layer').innerHTML = t('layer_satellite');
     // Reset streak when switching to street view (labels make it too easy)
     streak = 0;
     // Show funny "easy mode" banner (unless suppressed for auto-switches)
@@ -1007,8 +1262,24 @@ function toggleMapLayer(suppressBanner = false) {
     satelliteLayer.addTo(map);
     currentLayer = 'satellite';
     document.getElementById('btn-layer').innerHTML = t('layer_street');
+    document.getElementById('mobile-btn-layer').innerHTML = t('layer_street');
   }
 }
+
+function toggleMobileMenu() {
+  const dropdown = document.getElementById('mobile-dropdown');
+  dropdown.classList.toggle('show');
+}
+
+// Close mobile menu when clicking outside
+document.addEventListener('click', function(e) {
+  const dropdown = document.getElementById('mobile-dropdown');
+  const menuBtn = document.getElementById('mobile-menu-btn');
+  if (dropdown && dropdown.classList.contains('show') && 
+      !dropdown.contains(e.target) && e.target !== menuBtn) {
+    dropdown.classList.remove('show');
+  }
+});
 
 // ── COUNTRY BORDERS — fetched from Natural Earth via public CDN ──────────────
 // Loads accurate world country polygons; filters to just the region around Israel.
@@ -1222,7 +1493,11 @@ function loadTown() {
   const t = sequence[currentIdx];
   document.getElementById('town-name').textContent = lang === 'he' ? t.nameHe : t.name;
   document.getElementById('town-desc').textContent = lang === 'he' ? t.descHe : t.desc;
+  // Also update mobile versions
+  document.getElementById('mobile-town-name').textContent = lang === 'he' ? t.nameHe : t.name;
+  document.getElementById('mobile-town-desc').textContent = lang === 'he' ? t.descHe : t.desc;
   document.getElementById('hint-badge').style.display = 'none';
+  document.getElementById('mobile-hint-badge').style.display = 'none';
   hintUsed = false;
   updateHintBtn();
   updateHUD();
@@ -1230,12 +1505,17 @@ function loadTown() {
 
 function updateHintBtn() {
   const btn = document.getElementById('btn-hint');
+  const mobileBtn = document.getElementById('mobile-btn-hint');
   if (hintsLeft <= 0 || hintUsed || waiting) {
     btn.disabled = true;
+    mobileBtn.disabled = true;
   } else {
     btn.disabled = false;
+    mobileBtn.disabled = false;
   }
-  btn.textContent = STRINGS[lang].hint_btn(hintsLeft);
+  const text = STRINGS[lang].hint_btn(hintsLeft);
+  btn.textContent = text;
+  mobileBtn.textContent = text;
 }
 
 function setDiff(d) {
@@ -1273,6 +1553,7 @@ function useHint() {
   hintUsed = true;
   hintsLeft--;
   document.getElementById('hint-badge').style.display = 'inline';
+  document.getElementById('mobile-hint-badge').style.display = 'block';
   updateHintBtn();
 
   const town = sequence[currentIdx];
@@ -1328,6 +1609,7 @@ function showMenu() {
   document.getElementById('menu-card').style.display = 'flex';
   document.getElementById('results-panel').className = '';
   document.getElementById('btn-back').style.display = 'none';
+  document.getElementById('mobile-btn-back').style.display = 'none';
   clearAllMarkers();
 }
 
@@ -1352,6 +1634,7 @@ function startGame() {
   document.getElementById('overlay').style.display = 'none';
   document.getElementById('results-panel').className = '';
   document.getElementById('btn-back').style.display = 'inline-block';
+  document.getElementById('mobile-btn-back').style.display = 'block';
   const v = REGION_VIEWS[region];
   map.setView(v.center, v.zoom);
   loadTown();
