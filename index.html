@@ -531,48 +531,74 @@
       display: none !important;
     }
     
-    /* Reorganize topbar for mobile */
+    /* Reorganize topbar for mobile — town left, stats+menu right */
     #topbar {
       padding: 8px 12px;
       justify-content: space-between;
+      align-items: center;
       gap: 8px;
+      flex-wrap: nowrap;
     }
-    
-    /* Show mobile town name in topbar */
+
+    /* Town name — left side, styled beautifully */
     #mobile-topbar-town {
-      display: block !important;
-      font-family: 'Playfair Display', serif;
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--text);
+      display: flex !important;
+      flex-direction: column;
+      justify-content: center;
       flex: 1;
       min-width: 0;
       overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
     }
-    
-    /* HUD more compact */
+    #mobile-topbar-town .mob-find-label {
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 1.8px;
+      color: var(--muted);
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 2px;
+    }
+    #mobile-topbar-town .mob-town-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      font-weight: 900;
+      line-height: 1.1;
+      background: linear-gradient(90deg, #1a6fd4, #7c3aed);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* HUD — override desktop absolute positioning, sit on the right */
     #hud {
+      position: static !important;
+      transform: none !important;
       display: flex;
-      gap: 8px;
+      align-items: center;
+      gap: 4px;
       flex-shrink: 0;
     }
-    
+
     /* Hide desktop town-card on mobile */
     #town-card {
       display: none !important;
     }
-    
-    /* Show mobile menu button */
+
+    /* Show mobile menu button — right of HUD */
     #mobile-menu-btn {
-      display: block !important;
-      font-size: 1.4rem;
-      padding: 6px 12px;
-      margin-left: 8px;
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      padding: 6px 10px;
+      margin-left: 4px;
       background: var(--surface);
       border: 1px solid var(--border);
+      border-radius: 8px;
       cursor: pointer;
+      flex-shrink: 0;
     }
     #mobile-menu-btn:active {
       background: var(--bg);
@@ -641,7 +667,12 @@
     
     /* HUD blocks smaller */
     .hud-block {
-      min-width: 70px;
+      min-width: 44px;
+      text-align: center;
+      padding: 2px 6px;
+      background: rgba(26,111,212,0.06);
+      border-radius: 8px;
+      border: 1px solid rgba(26,111,212,0.12);
     }
     .hud-label {
       font-size: 0.7rem;
@@ -694,8 +725,8 @@
     
     /* Menu logo smaller on mobile */
     #menu-card img {
-      width: 180px !important;
-      height: 180px !important;
+      width: 260px !important;
+      height: 260px !important;
     }
     
     /* Difficulty buttons more compact */
@@ -704,16 +735,75 @@
       font-size: 0.9rem;
     }
     
-    /* Results panel wider on mobile */
+    /* Results panel — compact top bar on mobile */
     #results-panel {
-      width: 85%;
-      max-width: 320px;
+      width: 100% !important;
+      max-width: 100% !important;
+      top: 0; left: 0; right: 0;
+      bottom: auto !important;
+      height: auto !important;
     }
+    #results-panel.show {
+      animation: slideInTop 0.35s cubic-bezier(.34,1.2,.64,1);
+    }
+    @keyframes slideInTop {
+      from { transform: translateY(-100%); opacity: 0; }
+      to   { transform: translateY(0);     opacity: 1; }
+    }
+    #results-card {
+      flex-direction: row !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      flex-wrap: nowrap !important;
+      gap: 6px !important;
+      padding: 10px 14px !important;
+      height: auto !important;
+      border-right: none !important;
+      border-bottom: 1px solid var(--border) !important;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.13) !important;
+      overflow: visible !important;
+    }
+    /* Hide things we don't need in compact mode */
+    #result-emoji,
+    #results-list,
     #results-card h2 {
-      font-size: 1.3rem;
+      display: none !important;
     }
     #score-display {
-      font-size: 2rem;
+      font-size: 1.5rem !important;
+      line-height: 1 !important;
+      margin: 0 !important;
+    }
+    #result-title {
+      font-size: 0.9rem !important;
+      display: block !important;
+      line-height: 1.2 !important;
+    }
+    #result-sub {
+      font-size: 0.75rem !important;
+      margin: 2px 0 0 !important;
+    }
+    #results-summary-block {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+    }
+    .btn-row {
+      flex-wrap: nowrap !important;
+      margin-top: 0 !important;
+      gap: 6px !important;
+    }
+    #btn-play-again {
+      font-size: 0.85rem !important;
+      padding: 8px 14px !important;
+      animation: none !important;
+      white-space: nowrap;
+    }
+    #btn-menu {
+      font-size: 0.85rem !important;
+      padding: 8px 14px !important;
+      white-space: nowrap;
     }
     
     /* Streak banner smaller */
@@ -778,8 +868,8 @@
     }
     
     #menu-card img {
-      width: 140px !important;
-      height: 140px !important;
+      width: 220px !important;
+      height: 220px !important;
     }
     
     #results-panel {
@@ -804,7 +894,7 @@
 
 <div id="topbar">
   <h1><img src="logo.png" width="38" height="38" style="vertical-align:middle;margin-right:2px;flex-shrink:0" alt="Gilly Geo Guesser"> <span id="title-text">Gilly Israel Quiz</span></h1>
-  <div id="mobile-topbar-town" style="display:none">—</div>
+  <div id="mobile-topbar-town" style="display:none"><span class="mob-find-label">📍 Find</span><span class="mob-town-text">—</span></div>
   <div id="hud">
     <div class="hud-block">
       <span class="hud-label" id="lbl-score">Score</span>
@@ -814,8 +904,8 @@
       <span class="hud-label" id="lbl-round">Round</span>
       <span class="hud-value" id="round-val">1/—</span>
     </div>
-    <button class="btn btn-hint" id="mobile-menu-btn" onclick="toggleMobileMenu()" style="display:none">☰</button>
   </div>
+  <button class="btn btn-hint" id="mobile-menu-btn" onclick="toggleMobileMenu()" style="display:none">☰</button>
 </div>
 
 <!-- Mobile-only dropdown menu -->
@@ -931,8 +1021,10 @@
   <div id="results-card">
     <div id="result-emoji" style="font-size:2.4rem;margin-bottom:4px">🏆</div>
     <h2 id="result-title">Excellent!</h2>
-    <div id="score-display" style="color:#1a6fd4">0 pts</div>
-    <div style="color:var(--muted);font-size:0.8rem;margin-bottom:4px" id="result-sub">0/8 correct</div>
+    <div id="results-summary-block">
+      <div id="score-display" style="color:#1a6fd4">0 pts</div>
+      <div style="color:var(--muted);font-size:0.8rem;margin-bottom:4px" id="result-sub">0/8 correct</div>
+    </div>
     <div id="results-list"></div>
     <div class="btn-row">
       <button id="btn-play-again" class="btn btn-primary" onclick="startGame()">▶ שחק שוב</button>
@@ -1285,7 +1377,12 @@ const streetLayer = L.tileLayer(
 satelliteLayer.addTo(map);
 let currentLayer = 'satellite';
 
+function closeMobileDropdown() {
+  document.getElementById('mobile-dropdown').classList.remove('show');
+}
+
 function toggleMapLayer(suppressBanner = false) {
+  closeMobileDropdown();
   if (currentLayer === 'satellite') {
     map.removeLayer(satelliteLayer);
     streetLayer.addTo(map);
@@ -1547,7 +1644,7 @@ function loadTown() {
   // Also update mobile versions
   document.getElementById('mobile-town-name').textContent = townName;
   document.getElementById('mobile-town-desc').textContent = townDesc;
-  document.getElementById('mobile-topbar-town').textContent = townName;
+  document.querySelector('#mobile-topbar-town .mob-town-text').textContent = townName;
   document.getElementById('hint-badge').style.display = 'none';
   document.getElementById('mobile-hint-badge').style.display = 'none';
   hintUsed = false;
@@ -1602,6 +1699,7 @@ function setRegion(r) {
 
 function useHint() {
   if (hintUsed || waiting || hintsLeft <= 0) return;
+  closeMobileDropdown();
   hintUsed = true;
   hintsLeft--;
   document.getElementById('hint-badge').style.display = 'inline';
