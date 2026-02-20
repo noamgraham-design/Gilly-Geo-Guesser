@@ -538,20 +538,18 @@
       align-items: center;
       gap: 8px;
       flex-wrap: nowrap;
-      position: relative;
     }
 
-    /* Town name — absolutely centered */
+    /* Town name — centered between HUD and ☰ */
     #mobile-topbar-town {
       display: flex !important;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      pointer-events: none;
-      max-width: 42%;
+      flex: 1;
+      min-width: 0;
+      text-align: center;
+      overflow: hidden;
     }
     #mobile-topbar-town .mob-find-label {
       font-size: 0.6rem;
