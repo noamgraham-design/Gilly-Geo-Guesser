@@ -1326,8 +1326,8 @@ function calcPts(distKm, diff, hintUsed, tier) {
     ? diff.maxPts
     : Math.max(0, Math.round(diff.maxPts * (1 - (distKm - perfectKm) / (diff.maxKm - perfectKm))));
   const afterHint = hintUsed ? Math.max(0, raw - 10) : raw;
-  // Cap at 20 points if using street view (labels give too much away)
-  return currentLayer === 'street' ? Math.min(20, afterHint) : afterHint;
+  // Cap at 20 points if street view was used at any point this round
+  return streetUsedThisRound ? Math.min(20, afterHint) : afterHint;
 }
 
 
@@ -1448,7 +1448,7 @@ function applyLang() {
 
 let lang = "he";
 let difficulty = "medium", region = "all", sequence = [], currentIdx = 0, score = 0, roundCount = 8;
-let streak = 0, hintUsed = false, results = [], waiting = false;
+let streak = 0, hintUsed = false, streetUsedThisRound = false, results = [], waiting = false;
 let correctMarkers = [], clickMarker = null, circle = null, hintCircle = null;
 let hintsLeft = 3, hintAnimFrame = null;
 
@@ -1916,6 +1916,7 @@ function toggleMapLayer(suppressBanner = false) {
     map.removeLayer(satelliteLayer);
     streetLayer.addTo(map);
     currentLayer = 'street';
+    streetUsedThisRound = true;
     document.getElementById('btn-layer').innerHTML = t('layer_satellite');
     document.getElementById('mobile-btn-layer').innerHTML = t('layer_satellite');
     // Reset streak when switching to street view (labels make it too easy)
@@ -2208,6 +2209,7 @@ function loadTown() {
   document.getElementById('hint-badge').style.display = 'none';
   document.getElementById('mobile-hint-badge').style.display = 'none';
   hintUsed = false;
+  streetUsedThisRound = false;
   updateHintBtn();
   updateHUD();
 }
