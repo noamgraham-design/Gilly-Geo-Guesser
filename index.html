@@ -1357,6 +1357,7 @@ function applyLang() {
   // Update mobile elements
   document.getElementById('mobile-hint-badge').textContent = t('hint_badge');
   document.getElementById('mobile-btn-back').textContent = t('back_btn');
+  document.querySelector('#mobile-topbar-town .mob-find-label').textContent = lang === 'he' ? '📍 מצא' : '📍 Find';
   document.getElementById('mobile-btn-layer').innerHTML = currentLayer === 'satellite' ? t('layer_street') : t('layer_satellite');
   // Update lang toggle button styles
   document.getElementById('lang-he').className = `diff-btn${lang === 'he' ? ' active-region' : ''}`;
