@@ -59,7 +59,13 @@
     left: 50%;
     transform: translateX(-50%);
   }
-  .hud-block { text-align: center; }
+  .hud-block {
+    text-align: center;
+    padding: 0px 14px 9px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 10px;
+    border: 1px solid rgba(0,0,0,0.08);
+  }
   .hud-label { font-size: 1rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); display: block; font-weight: 600; }
   .hud-value { font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 900; line-height: 1; }
   #progress-bar-wrap { min-width: 140px; }
@@ -219,6 +225,38 @@
     direction: rtl;
     text-shadow: 0 2px 6px rgba(0,0,0,0.2);
   }
+  /* Score bump — intensity set via CSS custom property --bump-scale */
+  @keyframes scorePop {
+    0%   { transform: scale(1); }
+    35%  { transform: scale(var(--bump-scale, 1.32)); }
+    65%  { transform: scale(calc((var(--bump-scale, 1.32) - 1) * 0.3 + 1)); }
+    100% { transform: scale(1); }
+  }
+  @keyframes scoreGlow {
+    0%   { text-shadow: none; }
+    40%  { text-shadow: 0 0 var(--glow-size, 8px) currentColor,
+                        0 0 calc(var(--glow-size, 8px) * 2) currentColor; }
+    100% { text-shadow: none; }
+  }
+  @keyframes scoreShake {
+    0%,100% { transform: scale(var(--bump-scale, 1.32)) rotate(0deg); }
+    25%      { transform: scale(var(--bump-scale, 1.32)) rotate(-4deg); }
+    75%      { transform: scale(var(--bump-scale, 1.32)) rotate(4deg); }
+  }
+  #score-val {
+    display: inline-block;
+    transition: color 0.8s ease;
+  }
+  #score-val.score-bump {
+    animation: scorePop 0.5s cubic-bezier(.34,1.56,.64,1),
+               scoreGlow 0.7s ease;
+  }
+  #score-val.score-bump-epic {
+    animation: scorePop 0.35s cubic-bezier(.34,1.56,.64,1) forwards,
+               scoreShake 0.25s ease 0.35s,
+               scoreGlow 0.9s ease;
+  }
+
   #map { width:100%; height:100%; cursor: crosshair !important; }
   #map .leaflet-container { cursor: crosshair !important; }
   .city-label {
@@ -717,25 +755,57 @@
     /* Menu card smaller */
     .card {
       max-width: 95%;
-      padding: 16px 20px 20px;
+      padding: 10px 16px 14px;
+      gap: 6px;
     }
     .card h2 {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
+      margin-bottom: 4px;
     }
     .card p {
-      font-size: 0.95rem;
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+      line-height: 1.5;
     }
-    
+
     /* Menu logo smaller on mobile */
     #menu-card img {
-      width: 260px !important;
-      height: 260px !important;
+      width: 180px !important;
+      height: 180px !important;
     }
-    
+
+    /* Tighten dividers */
+    #menu-card > div[style*="border-top"] {
+      margin: 2px 0 !important;
+    }
+
+    /* Language / section labels smaller */
+    #menu-card > div[style*="font-size:0.82rem"] {
+      margin-bottom: 1px !important;
+    }
+
     /* Difficulty buttons more compact */
     .diff-btn {
-      padding: 8px 16px;
-      font-size: 0.9rem;
+      padding: 6px 13px;
+      font-size: 0.85rem;
+    }
+
+    /* Tighten diff-row gaps */
+    .diff-row {
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    /* Diff note smaller */
+    .diff-note {
+      font-size: 0.82rem;
+      margin-bottom: 10px;
+    }
+
+    /* Start button tighter */
+    #start-btn {
+      padding: 10px 32px !important;
+      font-size: 1rem !important;
     }
     
     /* Results panel — compact top bar on mobile */
@@ -1993,10 +2063,41 @@ function showFeedback(msg, color) {
 }
 
 function updateHUD() {
-  const d = DIFF[difficulty];
-  document.getElementById('score-val').textContent = score;
-  document.getElementById('score-val').style.color = d.color;
+  const scoreEl = document.getElementById('score-val');
+  const prevScore = parseInt(scoreEl.textContent) || 0;
+
+  // Color: interpolate blue→teal→green based on score (0=blue, 600+=green)
+  const maxScore = roundCount * (DIFF[difficulty].maxPts || 150);
+  const pct = Math.min(score / maxScore, 1);
+  // Blue #1a6fd4 → teal #0ea5a0 → green #1a7f37
+  const r = Math.round(26  + (26  - 26)  * pct);   // stays ~26
+  const g = Math.round(111 + (127 - 111) * pct);    // 111→127
+  const b = Math.round(212 + (55  - 212) * pct);    // 212→55
+  // More vivid: use HSL — hue 213 (blue) → 134 (green)
+  const hue = Math.round(213 - (213 - 134) * pct);
+  const sat = Math.round(75  + (52  - 75)  * pct);
+  const lit = Math.round(47  + (33  - 47)  * pct);
+  scoreEl.style.color = `hsl(${hue}, ${sat}%, ${lit}%)`;
+
+  scoreEl.textContent = score;
   document.getElementById('round-val').textContent = `${currentIdx + 1}/${roundCount}`;
+
+  // Animate bump — intensity scales with score progress
+  if (score > prevScore) {
+    // pct already computed above (0→1 as score fills max)
+    const bumpScale = 1.18 + pct * 0.72;        // 1.18 at 0% → 1.90 at 100%
+    const glowSize  = Math.round(6 + pct * 22);  // 6px → 28px
+    scoreEl.style.setProperty('--bump-scale', bumpScale.toFixed(2));
+    scoreEl.style.setProperty('--glow-size', glowSize + 'px');
+
+    const cls = pct >= 0.7 ? 'score-bump-epic' : 'score-bump';
+    scoreEl.classList.remove('score-bump', 'score-bump-epic');
+    void scoreEl.offsetWidth;
+    scoreEl.classList.add(cls);
+    scoreEl.addEventListener('animationend', () => {
+      scoreEl.classList.remove('score-bump', 'score-bump-epic');
+    }, { once: true });
+  }
 }
 
 const HEBREW_PHRASES = [
