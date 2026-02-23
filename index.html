@@ -261,6 +261,14 @@
   #pts-popup.show-miss    { animation: ptsMiss    1.8s cubic-bezier(.4,0,.6,1) forwards; }
   #pts-popup.show-good    { animation: ptsGood    2.2s cubic-bezier(.34,1.2,.64,1) forwards; }
   #pts-popup.show-perfect { animation: ptsPerfect 2.6s cubic-bezier(.34,1.56,.64,1) forwards; }
+
+  /* City polygon highlight — Leaflet layer gets this class via className */
+  @keyframes cityPolyIn {
+    0%   { opacity: 0; }
+    20%  { opacity: 1; }
+    60%  { opacity: 1; }
+    100% { opacity: 0; }
+  }
   #pts-popup.show-perfect .pts-number {
     animation: ptsPulseGlow 0.7s ease-in-out 0.3s 3;
   }
@@ -1403,6 +1411,97 @@ const DIFF = {
 // Perfect radius by tier: bigger places are easier to hit for full points
 const PERFECT_RADIUS_KM = { 1: 5, 2: 3, 3: 2, 4: 1 };
 
+// ── POLYGON-BASED PERFECT SCORE ───────────────────────────────────────────────
+// Maps quiz city names → folder slugs in idoivri/israel-municipalities-polygons
+const CITY_POLYGON_SLUG = {
+  "Abu Ghosh": "abu_gosh", "Afula": "afula", "Akko": "acre_ako",
+  "Arad": "arad", "Ariel": "ariel", "Arrabe": "arabe",
+  "Ashdod": "ashdod", "Ashkelon": "ashkelon",
+  "Baqa al-Gharbiyye": "baka_al_rarbiya", "Bat Yam": "bat_yam",
+  "Beer Sheva": "beer_sheva", "Beit Dagan": "beit_dagan",
+  "Beit She'an": "bet_shean", "Beit Shemesh": "beit_shemesh",
+  "Beitar Illit": "beitar_ilit", "Binyamina": "binyamina_givat_ada",
+  "Bnei Brak": "bnei_brak", "Daliyat al-Karmel": "dalyat_al_carmel",
+  "Dimona": "dimona", "Efrat": "efrat", "Eilat": "eilat",
+  "Even Yehuda": "even_yehuda", "Fureidis": "furaydis",
+  "Gan Yavne": "gan_yavne", "Ganei Tikva": "gane_tikva",
+  "Gedera": "gedera", "Giv'at Shmuel": "givaat_shmuel",
+  "Givat Ze'ev": "givat_zeev", "Givatayim": "givatayim",
+  "Hadera": "hadera", "Haifa": "haifa", "Harish": "harish",
+  "Herzliya": "hertseliya", "Hod HaSharon": "hod_hasharon",
+  "Holon": "holon", "Kafr Qasim": "kafr_qasim",
+  "Kafr Yasif": "kafr_yasif", "Karmiel": "karmiel",
+  "Katzrin": "katzrin", "Kfar Saba": "kfar_saba",
+  "Kiryat Ata": "kiryat_ata", "Kiryat Bialik": "kiryat_bialik",
+  "Kiryat Gat": "kiryat_gat", "Kiryat Malachi": "kiryat_malachi",
+  "Kiryat Motzkin": "kiryat_motzkin", "Kiryat Ono": "kiryat_ono",
+  "Kiryat Shmona": "kiryat_shmona", "Kiryat Yam": "kiryat_yam",
+  "Lod": "lod", "Ma'ale Adumim": "maale_adumim",
+  "Ma'alot-Tarshiha": "maalot_tarshiha", "Maghar": "maghar",
+  "Migdal HaEmek": "migdal_haemek", "Mitzpe Ramon": "mitzpe_ramon",
+  "Modi'in": "modiin", "Nahariya": "nahariya",
+  "Nazareth": "nazareth", "Nes Ziona": "nes_ziona",
+  "Nesher": "nesher", "Netanya": "netanya", "Netivot": "netivot",
+  "Nof HaGalil": "nof_hagalil", "Nazareth Illit": "nof_hagalil",
+  "Ofakim": "ofakim", "Omer": "omer", "Or Akiva": "or_akiva",
+  "Or Yehuda": "or_yehuda", "Petah Tikva": "petah_tikva",
+  "Ra'anana": "raanana", "Rahat": "rahat", "Ramat Gan": "ramat_gan",
+  "Ramat HaSharon": "ramat_hasharon", "Ramla": "ramla",
+  "Rehovot": "rehovot", "Rishon LeZion": "rishon_lezion",
+  "Rosh HaAyin": "rosh_haain", "Rosh Pinna": "rosh_pinna",
+  "Safed": "safed", "Sakhnin": "sakhnin", "Sderot": "sderot",
+  "Shfar'am": "shfaram", "Shoham": "shoham", "Tamra": "tamra",
+  "Tayibe": "tayibe", "Tel Aviv": "tel_aviv", "Tel Mond": "tel_mond",
+  "Tiberias": "tiberias", "Tira": "tira", "Tirat Carmel": "tirat_carmel",
+  "Umm al-Fahm": "umm_al_fahm", "Yavne": "yavne", "Yehud": "yehud",
+  "Yokneam": "yokneam", "Yoqne'am Illit": "yokneam",
+  "Zichron Ya'akov": "zichron_yaakov",
+};
+
+const POLY_BASE = "https://raw.githubusercontent.com/idoivri/israel-municipalities-polygons/master";
+const polyCache = {}; // name → GeoJSON Feature | null (null = no polygon available)
+
+async function fetchCityPolygon(name) {
+  if (name in polyCache) return polyCache[name];
+  const slug = CITY_POLYGON_SLUG[name];
+  if (!slug) { polyCache[name] = null; return null; }
+  try {
+    const res = await fetch(`${POLY_BASE}/${slug}/${slug}.geojson`);
+    if (!res.ok) { polyCache[name] = null; return null; }
+    const geojson = await res.json();
+    // Could be FeatureCollection or a single Feature
+    const feature = geojson.type === 'FeatureCollection'
+      ? geojson.features[0]
+      : geojson;
+    polyCache[name] = feature ?? null;
+    return polyCache[name];
+  } catch { polyCache[name] = null; return null; }
+}
+
+// Ray-casting point-in-polygon for GeoJSON (handles Polygon & MultiPolygon)
+function pointInGeoJSONFeature(lat, lng, feature) {
+  if (!feature?.geometry) return false;
+  const { type, coordinates } = feature.geometry;
+  const rings = type === 'Polygon' ? coordinates : coordinates.flat(1);
+  for (const ring of rings) {
+    if (pointInRing(lat, lng, ring)) return true;
+  }
+  return false;
+}
+
+function pointInRing(lat, lng, ring) {
+  // GeoJSON coords are [lng, lat]
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const xi = ring[i][0], yi = ring[i][1];
+    const xj = ring[j][0], yj = ring[j][1];
+    const intersect = ((yi > lat) !== (yj > lat)) &&
+      (lng < (xj - xi) * (lat - yi) / (yj - yi) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
+
 // Distance-based scoring: full points within perfectKm, linear falloff to 0 at maxKm
 function calcPts(distKm, diff, hintUsed, tier) {
   const perfectKm = PERFECT_RADIUS_KM[tier] ?? 1;
@@ -2128,6 +2227,7 @@ function clearMapFeedback() {
   // Keep correctMarkers (city pins) on map — only clear hint/click/scoring layers
   [clickMarker, circle, hintCircle].forEach(l => l && map.removeLayer(l));
   clickMarker = circle = hintCircle = null;
+  if (cityPolyLayer) { map.removeLayer(cityPolyLayer); cityPolyLayer = null; }
 }
 
 function clearAllMarkers() {
@@ -2136,6 +2236,7 @@ function clearAllMarkers() {
   correctMarkers = [];
   [clickMarker, circle, hintCircle].forEach(l => l && map.removeLayer(l));
   clickMarker = circle = hintCircle = null;
+  if (cityPolyLayer) { map.removeLayer(cityPolyLayer); cityPolyLayer = null; }
 }
 
 function showPtsPopup(pts, pct, perfect, distKm) {
@@ -2173,6 +2274,77 @@ function showPtsPopup(pts, pct, perfect, distKm) {
   const cls = perfect ? 'show-perfect' : isClose ? 'show-good' : 'show-miss';
   el.classList.add(cls);
   el.addEventListener('animationend', () => { el.className = ''; }, { once: true });
+}
+
+let cityPolyLayer = null;
+
+function showCityPolygon(feature, perfect) {
+  // Remove any previous highlight
+  if (cityPolyLayer) { map.removeLayer(cityPolyLayer); cityPolyLayer = null; }
+  if (!feature?.geometry) return;
+
+  const duration = perfect ? 2600 : 2200; // match popup animation ms
+
+  // Two-layer effect: filled body + glowing thick stroke on top
+  const fillColor   = perfect ? '#58a6ff' : '#6cb6ff';
+  const strokeColor = perfect ? '#1f6feb' : '#388bfd';
+
+  cityPolyLayer = L.geoJSON(feature, {
+    style: {
+      color:       strokeColor,
+      weight:      perfect ? 3.5 : 2.5,
+      opacity:     0.9,
+      fillColor:   fillColor,
+      fillOpacity: perfect ? 0.28 : 0.18,
+      dashArray:   null,
+      lineCap:     'round',
+      lineJoin:    'round',
+    },
+    className: 'city-poly-highlight',
+  }).addTo(map);
+
+  // Animate fill opacity: pulse up then fade
+  const el = cityPolyLayer.getLayers()[0]?._path;
+  if (el) {
+    // Initial fade-in
+    el.style.transition = 'none';
+    el.style.opacity = '0';
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        el.style.transition = `opacity 0.35s ease`;
+        el.style.opacity = '1';
+
+        // Pulse (for perfect only)
+        if (perfect) {
+          setTimeout(() => {
+            el.style.transition = 'opacity 0.25s ease';
+            el.style.opacity = '0.6';
+            setTimeout(() => {
+              el.style.transition = 'opacity 0.25s ease';
+              el.style.opacity = '1';
+            }, 250);
+          }, 600);
+        }
+
+        // Fade out in sync with popup end
+        setTimeout(() => {
+          el.style.transition = `opacity 0.5s ease`;
+          el.style.opacity = '0';
+          setTimeout(() => {
+            if (cityPolyLayer) { map.removeLayer(cityPolyLayer); cityPolyLayer = null; }
+          }, 500);
+        }, duration - 500);
+      });
+    });
+
+    // Animate all paths if MultiPolygon (multiple SVG paths)
+    cityPolyLayer.getLayers().slice(1).forEach(l => {
+      const p = l._path;
+      if (!p) return;
+      p.style.transition = el.style.transition;
+      p.style.opacity = el.style.opacity;
+    });
+  }
 }
 
 function showFeedback(msg, color) {
@@ -2326,6 +2498,10 @@ function loadTown() {
   const t = sequence[currentIdx];
   const townName = lang === 'he' ? t.nameHe : t.name;
   const townDesc = lang === 'he' ? t.descHe : t.desc;
+
+  // Prefetch polygon for this town (and the next one) so it's ready by the time user clicks
+  fetchCityPolygon(t.name);
+  if (currentIdx + 1 < sequence.length) fetchCityPolygon(sequence[currentIdx + 1].name);
   
   document.getElementById('town-name').textContent = townName;
   document.getElementById('town-desc').textContent = townDesc;
@@ -2489,9 +2665,13 @@ function onMapClick(e) {
   const town = sequence[currentIdx];
   const d = DIFF[difficulty];
   const distKm = haversineKm(e.latlng.lat, e.latlng.lng, town.lat, town.lng);
-  const pts = calcPts(distKm, d, hintUsed, town.tier);
   const perfectKm = PERFECT_RADIUS_KM[town.tier] ?? 1;
-  const perfect = distKm <= perfectKm;
+  const polyFeature = polyCache[town.name] ?? null;
+  const perfect = polyFeature
+    ? pointInGeoJSONFeature(e.latlng.lat, e.latlng.lng, polyFeature)
+    : distKm <= perfectKm;
+  // When a polygon is available, award full points for any click inside it
+  const pts = (polyFeature && perfect) ? d.maxPts : calcPts(distKm, d, hintUsed, town.tier);
   const closeEnough = distKm < 10;
   const newStreak = perfect ? streak + 1 : 0;
 
@@ -2502,6 +2682,7 @@ function onMapClick(e) {
   const color = pct >= 0.7 ? '#1a7f37' : pct >= 0.3 ? '#d29922' : '#cf2316';
 
   showPtsPopup(pts, pct, perfect, distKm);
+  showCityPolygon(polyFeature, perfect);
 
   waiting = true;
   streak = newStreak;
