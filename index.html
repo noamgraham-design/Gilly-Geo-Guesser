@@ -2264,10 +2264,16 @@ const EASY_MODE_MESSAGES = {
   ]
 };
 
+// Haptic feedback (Android/supported browsers only; silently ignored elsewhere)
+function haptic(pattern) {
+  if (navigator.vibrate) navigator.vibrate(pattern);
+}
+
 let streakTimeout = null;
 
 function showStreakBanner(n) {
   if (n < 3) return;
+  haptic([80, 60, 80, 60, 120]); // celebratory triple pulse
   const phrase = HEBREW_PHRASES[Math.floor(Math.random() * HEBREW_PHRASES.length)];
   const banner = document.getElementById('streak-banner');
 
@@ -2478,6 +2484,8 @@ function startGame() {
 function onMapClick(e) {
   if (waiting || factModalOpen || document.getElementById('overlay').style.display !== 'none') return;
 
+  haptic(30); // subtle tap on pin placement
+
   const town = sequence[currentIdx];
   const d = DIFF[difficulty];
   const distKm = haversineKm(e.latlng.lat, e.latlng.lng, town.lat, town.lng);
@@ -2486,6 +2494,8 @@ function onMapClick(e) {
   const perfect = distKm <= perfectKm;
   const closeEnough = distKm < 10;
   const newStreak = perfect ? streak + 1 : 0;
+
+  if (perfect) haptic([60, 40, 100]); // short satisfying pulse for correct answer
 
   // Color: green for close, yellow for ok, red for far
   const pct = pts / d.maxPts;
