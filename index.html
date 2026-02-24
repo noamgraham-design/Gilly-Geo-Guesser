@@ -3618,7 +3618,7 @@ async function loadScoreboard(myScore) {
     list.innerHTML = html;
   } catch(e) {
     console.error('Scoreboard failed:', e);
-    list.innerHTML = `<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:8px 0">${lang === 'he' ? 'שגיאה בטעינה' : 'Could not load'}</div>`;
+    list.innerHTML = `<div style="color:var(--red);font-size:0.82rem;text-align:center;padding:8px 0">${e.code || e.message || JSON.stringify(e)}</div>`;
   }
 }
 const _origShowResults = showResults;
