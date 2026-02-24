@@ -210,6 +210,57 @@
     cursor: pointer; color: var(--muted); line-height: 1;
   }
 
+  /* ── SETTINGS MODAL ───────────────────────────────────────────────────── */
+  #settings-modal {
+    display: none; position: fixed; inset: 0; z-index: 3000;
+    background: rgba(0,0,0,0.55); backdrop-filter: blur(4px);
+    align-items: center; justify-content: center;
+  }
+  #settings-modal.open { display: flex; }
+  #settings-card {
+    background: var(--surface); border-radius: 20px;
+    padding: 36px 32px 28px; width: min(400px, 92vw);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+    display: flex; flex-direction: column; gap: 18px;
+    animation: loginPop 0.28s cubic-bezier(.34,1.4,.64,1);
+    position: relative;
+  }
+  #settings-card h2 {
+    font-family: 'Playfair Display', serif; font-size: 1.6rem;
+    font-weight: 900; text-align: center;
+    background: linear-gradient(90deg,#1a6fd4,#7c3aed);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .settings-field { display: flex; flex-direction: column; gap: 6px; }
+  .settings-label {
+    font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1.2px; color: var(--muted);
+  }
+  .gender-options {
+    display: flex; gap: 8px;
+  }
+  .gender-btn {
+    flex: 1; padding: 9px 6px; border-radius: 10px;
+    border: 1.5px solid var(--border); background: var(--bg);
+    font-family: 'Source Serif 4', serif; font-size: 0.9rem;
+    font-weight: 600; color: var(--text); cursor: pointer;
+    transition: all 0.15s; text-align: center;
+  }
+  .gender-btn:hover { border-color: #1a6fd4; background: #fff; }
+  .gender-btn.selected {
+    border-color: #1a6fd4; background: rgba(26,111,212,0.08);
+    color: #1a6fd4;
+  }
+  #settings-save-msg {
+    text-align: center; font-size: 0.85rem; font-weight: 600;
+    color: var(--green); min-height: 1.2em; margin-top: -8px;
+  }
+  #settings-modal-close {
+    position: absolute; top: 14px; right: 18px;
+    background: none; border: none; font-size: 1.4rem;
+    cursor: pointer; color: var(--muted); line-height: 1;
+  }
+
   /* ── SCORE HISTORY ─────────────────────────────────────────────────────── */
   #history-section {
     margin-top: 12px; border-top: 1px solid var(--border);
@@ -1314,6 +1365,10 @@
         <div id="auth-dropdown-email"></div>
       </div>
       <div class="auth-dropdown-divider"></div>
+      <button class="auth-dropdown-item" onclick="openSettingsModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span id="auth-dd-settings">Settings</span>
+      </button>
       <button class="auth-dropdown-item" onclick="switchAccount()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         <span id="auth-dd-switch">Switch account</span>
@@ -1855,8 +1910,19 @@ function applyLang() {
     document.getElementById('auth-label').textContent = lang === 'he' ? 'התחברות' : 'Log in';
   }
   if (document.getElementById('auth-dd-switch')) {
-    document.getElementById('auth-dd-switch').textContent  = lang === 'he' ? 'החלף חשבון' : 'Switch account';
-    document.getElementById('auth-dd-signout').textContent = lang === 'he' ? 'התנתקות' : 'Sign out';
+    document.getElementById('auth-dd-switch').textContent   = lang === 'he' ? 'החלף חשבון'  : 'Switch account';
+    document.getElementById('auth-dd-signout').textContent  = lang === 'he' ? 'התנתקות'     : 'Sign out';
+    document.getElementById('auth-dd-settings').textContent = lang === 'he' ? 'הגדרות'      : 'Settings';
+  }
+  if (document.getElementById('settings-title')) {
+    document.getElementById('settings-title').textContent        = lang === 'he' ? '⚙️ הגדרות'   : '⚙️ Settings';
+    document.getElementById('settings-lbl-nickname').textContent = lang === 'he' ? 'כינוי'       : 'Nickname';
+    document.getElementById('settings-lbl-gender').textContent   = lang === 'he' ? 'מין'         : 'Gender';
+    document.getElementById('settings-nickname').placeholder     = lang === 'he' ? 'הכינוי שלך…' : 'Your nickname…';
+    document.getElementById('gender-male').innerHTML   = lang === 'he' ? '👨 זכר'   : '👨 Male';
+    document.getElementById('gender-female').innerHTML = lang === 'he' ? '👩 נקבה'  : '👩 Female';
+    document.getElementById('gender-other').innerHTML  = lang === 'he' ? '🧑 אחר'   : '🧑 Other';
+    document.getElementById('settings-save-btn').textContent = lang === 'he' ? 'שמור' : 'Save';
   }
   // Update live town name/desc if a game is in progress
   const overlayVisible = document.getElementById('overlay').style.display !== 'none';
@@ -3144,16 +3210,27 @@ async function saveScore(scoreData) {
   if (!window._fbUser) return;
   const { collection, addDoc, serverTimestamp } = window._fbFns;
   try {
+    // Save the game record
     await addDoc(collection(window._fbDb, 'scores'), {
-      uid:        window._fbUser.uid,
+      uid:         window._fbUser.uid,
       displayName: window._fbUser.displayName || '',
-      score:      scoreData.score,
-      difficulty: scoreData.difficulty,
-      region:     scoreData.region,
-      rounds:     scoreData.rounds,
-      hits:       scoreData.hits,
-      timestamp:  serverTimestamp(),
+      score:       scoreData.score,
+      difficulty:  scoreData.difficulty,
+      region:      scoreData.region,
+      rounds:      scoreData.rounds,
+      hits:        scoreData.hits,
+      timestamp:   serverTimestamp(),
     });
+
+    // Update highest_score in users doc if this score beats it
+    const { getDoc, setDoc, doc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const userRef  = doc(window._fbDb, 'users', window._fbUser.uid);
+    const userSnap = await getDoc(userRef);
+    const current  = userSnap.exists() ? (userSnap.data().highest_score || 0) : 0;
+    if (scoreData.score > current) {
+      await setDoc(userRef, { highest_score: scoreData.score }, { merge: true });
+    }
+
     return true;
   } catch (e) { console.error('Save score failed:', e); return false; }
 }
@@ -3213,8 +3290,100 @@ showResults = async function() {
     document.getElementById('history-section').classList.remove('show');
   }
 };
+
+// ── SETTINGS ──────────────────────────────────────────────────────────────
+
+let _selectedGender = null;
+
+function selectGender(g) {
+  _selectedGender = g;
+  ['male','female','other'].forEach(opt => {
+    document.getElementById(`gender-${opt}`).classList.toggle('selected', opt === g);
+  });
+}
+
+async function openSettingsModal() {
+  closeAuthDropdown();
+  document.getElementById('settings-save-msg').textContent = '';
+  document.getElementById('settings-modal').classList.add('open');
+
+  // Load existing settings from Firestore
+  if (window._fbUser) {
+    const { collection, getDocs, query, where, limit } = window._fbFns;
+    try {
+      const { getDoc, doc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      const snap = await getDoc(doc(window._fbDb, 'users', window._fbUser.uid));
+      if (snap.exists()) {
+        const data = snap.data();
+        document.getElementById('settings-nickname').value = data.nickname || '';
+        if (data.gender) selectGender(data.gender);
+      } else {
+        document.getElementById('settings-nickname').value = '';
+        _selectedGender = null;
+        ['male','female','other'].forEach(opt =>
+          document.getElementById(`gender-${opt}`).classList.remove('selected'));
+      }
+    } catch(e) { console.error('Load settings failed:', e); }
+  }
+}
+
+function closeSettingsModal() {
+  document.getElementById('settings-modal').classList.remove('open');
+}
+document.getElementById('settings-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('settings-modal')) closeSettingsModal();
+});
+
+async function saveSettings() {
+  if (!window._fbUser) return;
+  const nickname = document.getElementById('settings-nickname').value.trim();
+  const msgEl = document.getElementById('settings-save-msg');
+  msgEl.style.color = 'var(--muted)';
+  msgEl.textContent = lang === 'he' ? 'שומר…' : 'Saving…';
+
+  try {
+    const { setDoc, doc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    await setDoc(doc(window._fbDb, 'users', window._fbUser.uid), {
+      nickname:    nickname,
+      gender:      _selectedGender || null,
+      updatedAt:   new Date(),
+    }, { merge: true });
+    msgEl.style.color = 'var(--green)';
+    msgEl.textContent = lang === 'he' ? '✅ נשמר!' : '✅ Saved!';
+    setTimeout(() => { msgEl.textContent = ''; }, 2500);
+  } catch(e) {
+    msgEl.style.color = 'var(--red)';
+    msgEl.textContent = lang === 'he' ? '⚠️ שגיאה בשמירה' : '⚠️ Could not save.';
+    console.error('Save settings failed:', e);
+  }
+}
 </script>
-<!-- ── LOGIN MODAL ──────────────────────────────────────────────────────── -->
+<!-- ── SETTINGS MODAL ─────────────────────────────────────────────────────── -->
+<div id="settings-modal">
+  <div id="settings-card">
+    <button id="settings-modal-close" onclick="closeSettingsModal()">✕</button>
+    <h2 id="settings-title">⚙️ Settings</h2>
+
+    <div class="settings-field">
+      <label class="settings-label" id="settings-lbl-nickname">Nickname</label>
+      <input class="login-input" id="settings-nickname" type="text" placeholder="Your nickname…" maxlength="30"/>
+    </div>
+
+    <div class="settings-field">
+      <label class="settings-label" id="settings-lbl-gender">Gender</label>
+      <div class="gender-options">
+        <button class="gender-btn" data-gender="male"   onclick="selectGender('male')"  id="gender-male">👨 Male</button>
+        <button class="gender-btn" data-gender="female" onclick="selectGender('female')" id="gender-female">👩 Female</button>
+        <button class="gender-btn" data-gender="other"  onclick="selectGender('other')"  id="gender-other">🧑 Other</button>
+      </div>
+    </div>
+
+    <div id="settings-save-msg"></div>
+    <button class="btn-auth-submit" onclick="saveSettings()" id="settings-save-btn">Save</button>
+  </div>
+</div>
+
+</body>
 <div id="login-modal">
   <div id="login-card" style="position:relative">
     <button id="login-modal-close" onclick="closeLoginModal()">✕</button>
