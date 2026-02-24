@@ -1919,6 +1919,7 @@ function applyLang() {
     document.getElementById('settings-title').textContent        = lang === 'he' ? '⚙️ הגדרות'   : '⚙️ Settings';
     document.getElementById('settings-lbl-nickname').textContent = lang === 'he' ? 'כינוי'       : 'Nickname';
     document.getElementById('settings-lbl-gender').textContent   = lang === 'he' ? 'מין'         : 'Gender';
+    document.getElementById('settings-lbl-language').textContent = lang === 'he' ? 'שפה'         : 'Language';
     document.getElementById('settings-nickname').placeholder     = lang === 'he' ? 'הכינוי שלך…' : 'Your nickname…';
     document.getElementById('gender-male').innerHTML   = lang === 'he' ? '👨 זכר'   : '👨 Male';
     document.getElementById('gender-female').innerHTML = lang === 'he' ? '👩 נקבה'  : '👩 Female';
@@ -3112,6 +3113,15 @@ window._onAuthChange = function(user) {
     }
     document.getElementById('auth-dropdown-name').textContent  = user.displayName || '—';
     document.getElementById('auth-dropdown-email').textContent = user.email || '';
+
+    // Load language preference from Firestore and apply it
+    import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js').then(({ getDoc, doc }) => {
+      getDoc(doc(window._fbDb, 'users', user.uid)).then(snap => {
+        if (snap.exists() && snap.data().language) {
+          setLang(snap.data().language);
+        }
+      });
+    });
   } else {
     avatar.innerHTML = ''; avatar.textContent = '👤';
     label.textContent = lang === 'he' ? 'התחברות' : 'Log in';
@@ -3303,9 +3313,17 @@ function selectGender(g) {
   });
 }
 
+function selectSettingsLang(l) {
+  ['he','en'].forEach(opt => {
+    document.getElementById(`settings-lang-${opt}`).classList.toggle('selected', opt === l);
+  });
+}
+
 async function openSettingsModal() {
   closeAuthDropdown();
   document.getElementById('settings-save-msg').textContent = '';
+  // Sync language buttons to current language
+  selectSettingsLang(lang);
   document.getElementById('settings-modal').classList.add('open');
 
   // Load existing settings from Firestore
@@ -3318,9 +3336,11 @@ async function openSettingsModal() {
         const data = snap.data();
         document.getElementById('settings-nickname').value = data.nickname || '';
         if (data.gender) selectGender(data.gender);
+        if (data.language) selectSettingsLang(data.language);
       } else {
         document.getElementById('settings-nickname').value = '';
         selectGender('male');
+        selectSettingsLang(lang);
       }
     } catch(e) { console.error('Load settings failed:', e); }
   }
@@ -3336,6 +3356,7 @@ document.getElementById('settings-modal').addEventListener('click', e => {
 async function saveSettings() {
   if (!window._fbUser) return;
   const nickname = document.getElementById('settings-nickname').value.trim();
+  const selectedLang = document.getElementById('settings-lang-he').classList.contains('selected') ? 'he' : 'en';
   const msgEl = document.getElementById('settings-save-msg');
   msgEl.style.color = 'var(--muted)';
   msgEl.textContent = lang === 'he' ? 'שומר…' : 'Saving…';
@@ -3345,10 +3366,15 @@ async function saveSettings() {
     await setDoc(doc(window._fbDb, 'users', window._fbUser.uid), {
       nickname:    nickname,
       gender:      _selectedGender || null,
+      language:    selectedLang,
       updatedAt:   new Date(),
     }, { merge: true });
+
+    // Apply language change immediately
+    if (selectedLang !== lang) setLang(selectedLang);
+
     msgEl.style.color = 'var(--green)';
-    msgEl.textContent = lang === 'he' ? '✅ נשמר!' : '✅ Saved!';
+    msgEl.textContent = selectedLang === 'he' ? '✅ נשמר!' : '✅ Saved!';
     setTimeout(() => { msgEl.textContent = ''; }, 2500);
   } catch(e) {
     msgEl.style.color = 'var(--red)';
@@ -3374,6 +3400,14 @@ async function saveSettings() {
         <button class="gender-btn" data-gender="male"   onclick="selectGender('male')"  id="gender-male">👨 Male</button>
         <button class="gender-btn" data-gender="female" onclick="selectGender('female')" id="gender-female">👩 Female</button>
         <button class="gender-btn" data-gender="other"  onclick="selectGender('other')"  id="gender-other">🧑 Other</button>
+      </div>
+    </div>
+
+    <div class="settings-field">
+      <label class="settings-label" id="settings-lbl-language">Language</label>
+      <div class="gender-options">
+        <button class="gender-btn" onclick="selectSettingsLang('he')" id="settings-lang-he">🇮🇱 עברית</button>
+        <button class="gender-btn" onclick="selectSettingsLang('en')" id="settings-lang-en">🇬🇧 English</button>
       </div>
     </div>
 
