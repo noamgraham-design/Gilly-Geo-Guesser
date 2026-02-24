@@ -274,6 +274,29 @@
     cursor: pointer; color: var(--muted); line-height: 1;
   }
 
+  /* ── NEW RECORD BANNER ────────────────────────────────────────────────── */
+  #new-record-banner {
+    display: none; text-align: center;
+    padding: 10px 16px; margin: 8px 0 4px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(26,111,212,0.1), rgba(124,58,237,0.1));
+    border: 1.5px solid rgba(124,58,237,0.3);
+    animation: recordPop 0.5s cubic-bezier(.34,1.56,.64,1);
+  }
+  #new-record-banner.show { display: block; }
+  @keyframes recordPop {
+    from { opacity: 0; transform: scale(0.85); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  #new-record-banner .record-title {
+    font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 900;
+    background: linear-gradient(90deg, #1a6fd4, #7c3aed);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  #new-record-banner .record-sub {
+    font-size: 0.85rem; color: var(--muted); margin-top: 2px;
+  }
+
   /* ── SCORE HISTORY ─────────────────────────────────────────────────────── */
   #history-section {
     margin-top: 12px; border-top: 1px solid var(--border);
@@ -1524,6 +1547,10 @@
     <div class="btn-row">
       <button id="btn-play-again" class="btn btn-primary" onclick="startGame()">▶ שחק שוב</button>
       <button id="btn-menu" class="btn-secondary" onclick="showMenu()">תפריט</button>
+    </div>
+    <div id="new-record-banner">
+      <div class="record-title">🏅 New Personal Best!</div>
+      <div class="record-sub" id="new-record-sub"></div>
     </div>
     <div id="history-save-msg"></div>
     <div id="history-section">
@@ -3346,12 +3373,13 @@ async function saveScore(scoreData) {
     const userRef  = doc(window._fbDb, 'users', window._fbUser.uid);
     const userSnap = await getDoc(userRef);
     const current  = userSnap.exists() ? (userSnap.data().highest_score || 0) : 0;
-    if (scoreData.score > current) {
+    const isNewRecord = scoreData.score > current;
+    if (isNewRecord) {
       await setDoc(userRef, { highest_score: scoreData.score }, { merge: true });
     }
 
-    return true;
-  } catch (e) { console.error('Save score failed:', e); return false; }
+    return { ok: true, isNewRecord };
+  } catch (e) { console.error('Save score failed:', e); return { ok: false, isNewRecord: false }; }
 }
 
 // ── LOAD PERSONAL HISTORY ─────────────────────────────────────────────────
@@ -3391,21 +3419,92 @@ async function loadHistory() {
   } catch (e) { console.error('Load history failed:', e); }
 }
 
+// ── CONFETTI ──────────────────────────────────────────────────────────────
+function launchConfetti() {
+  const canvas = document.createElement('canvas');
+  canvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999;';
+  document.body.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const colors = ['#1a6fd4','#7c3aed','#f0883e','#1a7f37','#cf2316','#f4c430','#58a6ff'];
+  const pieces = Array.from({ length: 120 }, () => ({
+    x:     Math.random() * canvas.width,
+    y:     -10 - Math.random() * 200,
+    r:     4 + Math.random() * 5,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    vx:    (Math.random() - 0.5) * 3,
+    vy:    2 + Math.random() * 4,
+    angle: Math.random() * Math.PI * 2,
+    spin:  (Math.random() - 0.5) * 0.2,
+    shape: Math.random() > 0.5 ? 'rect' : 'circle',
+  }));
+
+  let frame;
+  const start = Date.now();
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const elapsed = Date.now() - start;
+    pieces.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.angle += p.spin;
+      p.vy += 0.05; // gravity
+      const alpha = Math.max(0, 1 - elapsed / 3000);
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = p.color;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.angle);
+      if (p.shape === 'rect') {
+        ctx.fillRect(-p.r, -p.r / 2, p.r * 2, p.r);
+      } else {
+        ctx.beginPath();
+        ctx.arc(0, 0, p.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    });
+    ctx.globalAlpha = 1;
+    if (elapsed < 3500) {
+      frame = requestAnimationFrame(draw);
+    } else {
+      canvas.remove();
+    }
+  }
+  frame = requestAnimationFrame(draw);
+}
+
 // ── HOOK INTO showResults ─────────────────────────────────────────────────
 const _origShowResults = showResults;
 showResults = async function() {
   _origShowResults();
   const hits = results.filter(r => r.pts >= 90).length;
-  const saveMsg = document.getElementById('history-save-msg');
+  const saveMsg   = document.getElementById('history-save-msg');
+  const recBanner = document.getElementById('new-record-banner');
+  const recSub    = document.getElementById('new-record-sub');
+  recBanner.classList.remove('show');
 
   if (window._fbUser) {
-    saveMsg.textContent = '💾 Saving…';
-    const ok = await saveScore({ score, difficulty, region, rounds: roundCount, hits });
-    saveMsg.textContent = ok ? '✅ Score saved!' : '⚠️ Could not save score.';
+    saveMsg.textContent = lang === 'he' ? '💾 שומר…' : '💾 Saving…';
+    const result = await saveScore({ score, difficulty, region, rounds: roundCount, hits });
+    if (result?.ok) {
+      saveMsg.textContent = lang === 'he' ? '✅ נשמר!' : '✅ Score saved!';
+      if (result.isNewRecord) {
+        recSub.textContent = lang === 'he'
+          ? `השגת שיא חדש עם ${score} נקודות!`
+          : `You beat your best with ${score} pts!`;
+        recBanner.classList.add('show');
+        launchConfetti();
+      }
+    } else {
+      saveMsg.textContent = result?.ok === false
+        ? (lang === 'he' ? '⚠️ שגיאה בשמירה' : '⚠️ Could not save score.')
+        : '';
+    }
     setTimeout(() => { saveMsg.textContent = ''; }, 3000);
     loadHistory();
   } else {
-    saveMsg.innerHTML = `<a style="cursor:pointer;color:#1a6fd4;text-decoration:underline" onclick="openLoginModal()">Sign in</a> to save your scores`;
+    saveMsg.innerHTML = `<a style="cursor:pointer;color:#1a6fd4;text-decoration:underline" onclick="openLoginModal()">${lang === 'he' ? 'התחברות' : 'Sign in'}</a> ${lang === 'he' ? 'כדי לשמור את הניקוד' : 'to save your scores'}`;
     document.getElementById('history-section').classList.remove('show');
   }
 };
