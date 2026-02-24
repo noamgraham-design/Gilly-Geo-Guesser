@@ -3451,7 +3451,7 @@ async function saveSettings() {
     setTimeout(() => { msgEl.textContent = ''; }, 2500);
   } catch(e) {
     msgEl.style.color = 'var(--red)';
-    msgEl.textContent = lang === 'he' ? '⚠️ שגיאה בשמירה' : '⚠️ Could not save.';
+    msgEl.textContent = e.code || e.message || 'Unknown error';
     console.error('Save settings failed:', e);
   }
 }
