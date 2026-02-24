@@ -7,6 +7,46 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+<script type="module">
+  import { initializeApp }                          from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut,
+           GoogleAuthProvider, signInWithPopup,
+           createUserWithEmailAndPassword,
+           signInWithEmailAndPassword,
+           updateProfile }                          from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, collection, addDoc,
+           query, where, orderBy, limit,
+           getDocs, serverTimestamp }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyC9bbLFNqAu5elsiWEmuFC_f4tZiPIRtLA",
+    authDomain:        "gillygeoguesser.firebaseapp.com",
+    projectId:         "gillygeoguesser",
+    storageBucket:     "gillygeoguesser.firebasestorage.app",
+    messagingSenderId: "1079594025377",
+    appId:             "1:1079594025377:web:2071caaa6d1e562aa80be0",
+    measurementId:     "G-QVGCFLQE9W"
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  // ── Expose to window so the rest of the (non-module) script can call these ──
+  window._fbAuth = auth;
+  window._fbDb   = db;
+  window._fbFns  = {
+    signOut, GoogleAuthProvider, signInWithPopup,
+    createUserWithEmailAndPassword, signInWithEmailAndPassword,
+    updateProfile, collection, addDoc, query, where,
+    orderBy, limit, getDocs, serverTimestamp
+  };
+
+  onAuthStateChanged(auth, user => {
+    window._fbUser = user || null;
+    if (window._onAuthChange) window._onAuthChange(user);
+  });
+</script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -26,6 +66,122 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+  }
+
+  /* ── AUTH BUTTON ─────────────────────────────────────────────────────── */
+  #auth-btn {
+    display: flex; align-items: center; gap: 8px;
+    background: transparent; border: 1px solid var(--border);
+    border-radius: 50px; padding: 5px 12px 5px 7px;
+    cursor: pointer; font-family: 'Source Serif 4', serif;
+    font-size: 0.88rem; font-weight: 600; color: var(--text);
+    transition: all 0.15s; flex-shrink: 0; white-space: nowrap;
+  }
+  #auth-btn:hover { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.2); }
+  #auth-btn .auth-avatar {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: linear-gradient(135deg,#1a6fd4,#7c3aed);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 0.75rem; font-weight: 700; flex-shrink: 0;
+    overflow: hidden;
+  }
+  #auth-btn .auth-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* ── LOGIN MODAL ──────────────────────────────────────────────────────── */
+  #login-modal {
+    display: none; position: fixed; inset: 0; z-index: 3000;
+    background: rgba(0,0,0,0.55); backdrop-filter: blur(4px);
+    align-items: center; justify-content: center;
+  }
+  #login-modal.open { display: flex; }
+  #login-card {
+    background: var(--surface); border-radius: 20px;
+    padding: 36px 32px 28px; width: min(420px, 92vw);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+    display: flex; flex-direction: column; gap: 14px;
+    animation: loginPop 0.28s cubic-bezier(.34,1.4,.64,1);
+  }
+  @keyframes loginPop {
+    from { opacity:0; transform: scale(0.88) translateY(16px); }
+    to   { opacity:1; transform: scale(1)    translateY(0); }
+  }
+  #login-card h2 {
+    font-family: 'Playfair Display', serif; font-size: 1.7rem;
+    font-weight: 900; text-align: center; margin-bottom: 2px;
+    background: linear-gradient(90deg,#1a6fd4,#7c3aed);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  #login-card .login-sub {
+    text-align: center; color: var(--muted); font-size: 0.9rem; margin-top: -8px;
+  }
+  .login-divider {
+    display: flex; align-items: center; gap: 10px;
+    color: var(--muted); font-size: 0.8rem;
+  }
+  .login-divider::before, .login-divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+  .login-input {
+    width: 100%; padding: 10px 14px; border-radius: 10px;
+    border: 1px solid var(--border); font-size: 0.95rem;
+    font-family: 'Source Serif 4', serif; background: var(--bg);
+    color: var(--text); outline: none; transition: border 0.15s;
+  }
+  .login-input:focus { border-color: #1a6fd4; }
+  .btn-google {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; padding: 10px; border-radius: 10px;
+    border: 1px solid var(--border); background: var(--surface);
+    cursor: pointer; font-size: 0.95rem; font-weight: 600;
+    font-family: 'Source Serif 4', serif; color: var(--text);
+    transition: all 0.15s;
+  }
+  .btn-google:hover { background: var(--bg); }
+  .btn-google svg { width: 20px; height: 20px; flex-shrink: 0; }
+  .btn-auth-submit {
+    width: 100%; padding: 11px; border-radius: 10px; border: none;
+    background: linear-gradient(135deg,#1a6fd4,#7c3aed); color: #fff;
+    font-size: 1rem; font-weight: 700; font-family: 'Source Serif 4', serif;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .btn-auth-submit:hover { opacity: 0.9; transform: translateY(-1px); }
+  #login-error {
+    color: var(--red); font-size: 0.85rem; text-align: center;
+    min-height: 1.2em; margin-top: -6px;
+  }
+  #login-toggle {
+    text-align: center; font-size: 0.85rem; color: var(--muted);
+  }
+  #login-toggle a {
+    color: #1a6fd4; cursor: pointer; text-decoration: underline;
+  }
+  #login-modal-close {
+    position: absolute; top: 14px; right: 18px;
+    background: none; border: none; font-size: 1.4rem;
+    cursor: pointer; color: var(--muted); line-height: 1;
+  }
+
+  /* ── SCORE HISTORY ─────────────────────────────────────────────────────── */
+  #history-section {
+    margin-top: 12px; border-top: 1px solid var(--border);
+    padding-top: 12px; display: none;
+  }
+  #history-section.show { display: block; }
+  #history-section h3 {
+    font-family: 'Playfair Display', serif; font-size: 1rem;
+    font-weight: 700; margin-bottom: 8px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 1.5px;
+  }
+  .history-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 10px; border-radius: 8px; font-size: 0.85rem;
+    background: var(--bg); margin-bottom: 4px;
+  }
+  .history-row .h-score { font-weight: 700; color: #1a6fd4; }
+  .history-row .h-meta  { color: var(--muted); font-size: 0.78rem; }
+  #history-save-msg {
+    text-align: center; font-size: 0.85rem; font-weight: 600;
+    color: var(--green); margin-top: 6px; min-height: 1.2em;
   }
 
   /* TOP BAR */
@@ -1098,6 +1254,10 @@
     </div>
   </div>
   <div id="mobile-topbar-town" style="display:none"><span class="mob-find-label">📍 Find</span><span class="mob-town-text">—</span></div>
+  <button id="auth-btn" onclick="openLoginModal()">
+    <span class="auth-avatar" id="auth-avatar">👤</span>
+    <span id="auth-label">התחברות</span>
+  </button>
   <button class="btn btn-hint" id="mobile-menu-btn" onclick="toggleMobileMenu()" style="display:none">☰</button>
 </div>
 
@@ -1223,6 +1383,11 @@
     <div class="btn-row">
       <button id="btn-play-again" class="btn btn-primary" onclick="startGame()">▶ שחק שוב</button>
       <button id="btn-menu" class="btn-secondary" onclick="showMenu()">תפריט</button>
+    </div>
+    <div id="history-save-msg"></div>
+    <div id="history-section">
+      <h3 id="history-title">Your Recent Games</h3>
+      <div id="history-list"></div>
     </div>
   </div>
 </div>
@@ -2787,6 +2952,205 @@ function showResults() {
 setDiff('medium');
 setRegion('all');
 applyLang();
+
+// ── FIREBASE AUTH & SCORING ────────────────────────────────────────────────
+
+let _authMode = 'signin'; // 'signin' | 'signup'
+
+// Called by the Firebase module once auth state changes
+window._onAuthChange = function(user) {
+  const btn   = document.getElementById('auth-btn');
+  const avatar = document.getElementById('auth-avatar');
+  const label  = document.getElementById('auth-label');
+  if (user) {
+    label.textContent = user.displayName ? user.displayName.split(' ')[0] : 'Profile';
+    if (user.photoURL) {
+      avatar.innerHTML = `<img src="${user.photoURL}" alt="avatar"/>`;
+    } else {
+      const initials = (user.displayName || user.email || '?').charAt(0).toUpperCase();
+      avatar.textContent = initials;
+    }
+    btn.onclick = signOutUser;
+    btn.title = 'Sign out';
+  } else {
+    avatar.textContent = '👤';
+    label.textContent = lang === 'he' ? 'התחברות' : 'Sign in';
+    btn.onclick = openLoginModal;
+    btn.title = 'Sign in';
+  }
+};
+
+function openLoginModal() {
+  document.getElementById('login-modal').classList.add('open');
+  document.getElementById('login-error').textContent = '';
+}
+function closeLoginModal() {
+  document.getElementById('login-modal').classList.remove('open');
+}
+// Close on backdrop click
+document.getElementById('login-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('login-modal')) closeLoginModal();
+});
+
+function toggleAuthMode() {
+  _authMode = _authMode === 'signin' ? 'signup' : 'signin';
+  const isSignup = _authMode === 'signup';
+  document.getElementById('login-name').style.display     = isSignup ? 'block' : 'none';
+  document.getElementById('login-submit-btn').textContent = isSignup ? 'Create account' : 'Sign in';
+  document.getElementById('login-toggle').innerHTML = isSignup
+    ? `Already have an account? <a onclick="toggleAuthMode()">Sign in</a>`
+    : `Don't have an account? <a onclick="toggleAuthMode()">Sign up</a>`;
+  document.getElementById('login-error').textContent = '';
+}
+
+async function signInGoogle() {
+  const { GoogleAuthProvider, signInWithPopup } = window._fbFns;
+  try {
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(window._fbAuth, provider);
+    closeLoginModal();
+  } catch (e) {
+    document.getElementById('login-error').textContent = e.message;
+  }
+}
+
+async function submitEmailAuth() {
+  const { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } = window._fbFns;
+  const email    = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const name     = document.getElementById('login-name').value.trim();
+  const errEl    = document.getElementById('login-error');
+  errEl.textContent = '';
+  if (!email || !password) { errEl.textContent = 'Please fill in all fields.'; return; }
+  try {
+    if (_authMode === 'signup') {
+      if (!name) { errEl.textContent = 'Please enter a display name.'; return; }
+      const cred = await createUserWithEmailAndPassword(window._fbAuth, email, password);
+      await updateProfile(cred.user, { displayName: name });
+      window._onAuthChange(cred.user);
+    } else {
+      await signInWithEmailAndPassword(window._fbAuth, email, password);
+    }
+    closeLoginModal();
+  } catch (e) {
+    const msgs = {
+      'auth/email-already-in-use': 'Email already in use.',
+      'auth/invalid-email':        'Invalid email address.',
+      'auth/weak-password':        'Password must be at least 6 characters.',
+      'auth/invalid-credential':   'Incorrect email or password.',
+    };
+    errEl.textContent = msgs[e.code] || e.message;
+  }
+}
+
+async function signOutUser() {
+  const { signOut } = window._fbFns;
+  await signOut(window._fbAuth);
+}
+
+// ── SAVE SCORE TO FIRESTORE ───────────────────────────────────────────────
+async function saveScore(scoreData) {
+  if (!window._fbUser) return;
+  const { collection, addDoc, serverTimestamp } = window._fbFns;
+  try {
+    await addDoc(collection(window._fbDb, 'scores'), {
+      uid:        window._fbUser.uid,
+      displayName: window._fbUser.displayName || '',
+      score:      scoreData.score,
+      difficulty: scoreData.difficulty,
+      region:     scoreData.region,
+      rounds:     scoreData.rounds,
+      hits:       scoreData.hits,
+      timestamp:  serverTimestamp(),
+    });
+    return true;
+  } catch (e) { console.error('Save score failed:', e); return false; }
+}
+
+// ── LOAD PERSONAL HISTORY ─────────────────────────────────────────────────
+async function loadHistory() {
+  const section = document.getElementById('history-section');
+  const list    = document.getElementById('history-list');
+  if (!window._fbUser) { section.classList.remove('show'); return; }
+
+  const { collection, query, where, orderBy, limit, getDocs } = window._fbFns;
+  try {
+    const q = query(
+      collection(window._fbDb, 'scores'),
+      where('uid', '==', window._fbUser.uid),
+      orderBy('timestamp', 'desc'),
+      limit(5)
+    );
+    const snap = await getDocs(q);
+    if (snap.empty) { section.classList.remove('show'); return; }
+
+    const diffLabel = { easy: '🟢 Easy', medium: '🟡 Medium', hard: '🔴 Hard' };
+    const regionLabel = { all: '🇮🇱 All', north: '🏔️ North', center: '🏙️ Center', south: '🏜️ South' };
+
+    list.innerHTML = snap.docs.map(doc => {
+      const d = doc.data();
+      const date = d.timestamp?.toDate
+        ? d.timestamp.toDate().toLocaleDateString('en-GB', { day:'numeric', month:'short' })
+        : '—';
+      return `<div class="history-row">
+        <div>
+          <div style="font-weight:600">${d.hits}/${d.rounds} correct</div>
+          <div class="h-meta">${diffLabel[d.difficulty] || d.difficulty} · ${regionLabel[d.region] || d.region} · ${date}</div>
+        </div>
+        <div class="h-score">${d.score} pts</div>
+      </div>`;
+    }).join('');
+    section.classList.add('show');
+  } catch (e) { console.error('Load history failed:', e); }
+}
+
+// ── HOOK INTO showResults ─────────────────────────────────────────────────
+const _origShowResults = showResults;
+showResults = async function() {
+  _origShowResults();
+  const hits = results.filter(r => r.pts >= 90).length;
+  const saveMsg = document.getElementById('history-save-msg');
+
+  if (window._fbUser) {
+    saveMsg.textContent = '💾 Saving…';
+    const ok = await saveScore({ score, difficulty, region, rounds: roundCount, hits });
+    saveMsg.textContent = ok ? '✅ Score saved!' : '⚠️ Could not save score.';
+    setTimeout(() => { saveMsg.textContent = ''; }, 3000);
+    loadHistory();
+  } else {
+    saveMsg.innerHTML = `<a style="cursor:pointer;color:#1a6fd4;text-decoration:underline" onclick="openLoginModal()">Sign in</a> to save your scores`;
+    document.getElementById('history-section').classList.remove('show');
+  }
+};
 </script>
+<!-- ── LOGIN MODAL ──────────────────────────────────────────────────────── -->
+<div id="login-modal">
+  <div id="login-card" style="position:relative">
+    <button id="login-modal-close" onclick="closeLoginModal()">✕</button>
+    <h2>🇮🇱 התחברות</h2>
+    <p class="login-sub">Save your scores and track your progress</p>
+
+    <button class="btn-google" onclick="signInGoogle()">
+      <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
+      Continue with Google
+    </button>
+
+    <div class="login-divider">or</div>
+
+    <div id="login-form-section">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <input class="login-input" id="login-name" type="text" placeholder="Display name" style="display:none"/>
+        <input class="login-input" id="login-email" type="email" placeholder="Email address"/>
+        <input class="login-input" id="login-password" type="password" placeholder="Password"/>
+      </div>
+      <div id="login-error"></div>
+      <button class="btn-auth-submit" id="login-submit-btn" onclick="submitEmailAuth()">Sign in</button>
+      <div id="login-toggle">
+        Don't have an account? <a onclick="toggleAuthMode()">Sign up</a>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
