@@ -320,6 +320,48 @@
     color: var(--green); margin-top: 6px; min-height: 1.2em;
   }
 
+  /* ── SCOREBOARD ──────────────────────────────────────────────────────── */
+  #scoreboard-section {
+    margin-top: 12px; border-top: 1px solid var(--border);
+    padding-top: 12px; display: none;
+  }
+  #scoreboard-section.show { display: block; }
+  #scoreboard-section h3 {
+    font-family: 'Playfair Display', serif; font-size: 1rem;
+    font-weight: 700; margin-bottom: 8px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 1.5px;
+  }
+  .sb-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 10px; border-radius: 10px; font-size: 0.88rem;
+    background: var(--bg); margin-bottom: 4px;
+    transition: background 0.15s;
+  }
+  .sb-row.sb-me {
+    background: linear-gradient(135deg, rgba(26,111,212,0.1), rgba(124,58,237,0.08));
+    border: 1.5px solid rgba(26,111,212,0.25);
+  }
+  .sb-rank {
+    font-weight: 800; font-size: 0.82rem; color: var(--muted);
+    min-width: 26px; text-align: center;
+  }
+  .sb-rank.gold   { color: #d4a017; font-size: 1rem; }
+  .sb-rank.silver { color: #8a9197; font-size: 1rem; }
+  .sb-rank.bronze { color: #b5561c; font-size: 1rem; }
+  .sb-name {
+    flex: 1; font-weight: 600; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .sb-score { font-weight: 800; color: #1a6fd4; font-size: 0.95rem; }
+  .sb-divider {
+    text-align: center; color: var(--muted); font-size: 0.75rem;
+    letter-spacing: 2px; padding: 2px 0; opacity: 0.5;
+  }
+  #scoreboard-guest {
+    text-align: center; font-size: 0.85rem; color: var(--muted);
+    padding: 10px 0;
+  }
+
   /* TOP BAR */
   #topbar {
     display: flex;
@@ -1556,6 +1598,14 @@
     <div id="history-section">
       <h3 id="history-title">Your Recent Games</h3>
       <div id="history-list"></div>
+    </div>
+    <div id="scoreboard-section">
+      <h3 id="scoreboard-title">🏆 Leaderboard</h3>
+      <div id="scoreboard-list"></div>
+      <div id="scoreboard-guest" style="display:none">
+        <a style="cursor:pointer;color:#1a6fd4;text-decoration:underline" onclick="openLoginModal()" id="sb-signin-link">Sign in</a>
+        <span id="sb-signin-text"> to see the leaderboard</span>
+      </div>
     </div>
   </div>
 </div>
@@ -3474,10 +3524,110 @@ function launchConfetti() {
   frame = requestAnimationFrame(draw);
 }
 
-// ── HOOK INTO showResults ─────────────────────────────────────────────────
+// ── SCOREBOARD ────────────────────────────────────────────────────────────
+async function loadScoreboard(myScore) {
+  const section = document.getElementById('scoreboard-section');
+  const list    = document.getElementById('scoreboard-list');
+  const guest   = document.getElementById('scoreboard-guest');
+  section.classList.add('show');
+  list.innerHTML = '';
+
+  // Update lang labels
+  document.getElementById('scoreboard-title').textContent    = lang === 'he' ? '🏆 לוח תוצאות' : '🏆 Leaderboard';
+  document.getElementById('sb-signin-link').textContent      = lang === 'he' ? 'התחברות' : 'Sign in';
+  document.getElementById('sb-signin-text').textContent      = lang === 'he' ? ' כדי לראות את לוח התוצאות' : ' to see the leaderboard';
+
+  if (!window._fbUser) {
+    list.style.display  = 'none';
+    guest.style.display = 'block';
+    return;
+  }
+  guest.style.display = 'none';
+  list.style.display  = 'block';
+  list.innerHTML = `<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:8px 0">${lang === 'he' ? 'טוען…' : 'Loading…'}</div>`;
+
+  try {
+    const { collection, getDocs, query, orderBy, limit } = window._fbFns;
+    // Fetch top scores from users collection (those with a highest_score)
+    const snap = await getDocs(query(
+      collection(window._fbDb, 'users'),
+      orderBy('highest_score', 'desc'),
+      limit(200)
+    ));
+
+    const players = [];
+    snap.forEach(doc => {
+      const d = doc.data();
+      if (d.highest_score > 0) {
+        players.push({
+          uid:      doc.id,
+          name:     d.nickname || d.displayName || (lang === 'he' ? 'שחקן אנונימי' : 'Anonymous'),
+          score:    d.highest_score,
+          isMe:     doc.id === window._fbUser.uid,
+        });
+      }
+    });
+
+    if (players.length === 0) {
+      list.innerHTML = `<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:8px 0">${lang === 'he' ? 'אין נתונים עדיין' : 'No scores yet'}</div>`;
+      return;
+    }
+
+    // Sort descending and find my position
+    players.sort((a, b) => b.score - a.score);
+    const myIdx = players.findIndex(p => p.isMe);
+
+    // Pick 5 neighbours: 2 above, me, 2 below (clamped to array bounds)
+    let start = Math.max(0, myIdx - 2);
+    let end   = Math.min(players.length - 1, start + 4);
+    start     = Math.max(0, end - 4);
+    const visible = players.slice(start, end + 1);
+
+    // Show "..." if not starting from rank 1
+    let html = '';
+    if (start > 0) html += `<div class="sb-divider">· · ·</div>`;
+
+    visible.forEach((p, i) => {
+      const globalRank = start + i + 1;
+      let rankHtml;
+      if      (globalRank === 1) rankHtml = `<span class="sb-rank gold">🥇</span>`;
+      else if (globalRank === 2) rankHtml = `<span class="sb-rank silver">🥈</span>`;
+      else if (globalRank === 3) rankHtml = `<span class="sb-rank bronze">🥉</span>`;
+      else                       rankHtml = `<span class="sb-rank">#${globalRank}</span>`;
+
+      html += `
+        <div class="sb-row ${p.isMe ? 'sb-me' : ''}">
+          ${rankHtml}
+          <span class="sb-name">${p.isMe ? `<strong>${p.name}</strong>` : p.name}</span>
+          <span class="sb-score">${p.score}</span>
+        </div>`;
+    });
+
+    if (end < players.length - 1) html += `<div class="sb-divider">· · ·</div>`;
+
+    // If user isn't in the list yet (no previous score), append them at the bottom
+    if (myIdx === -1) {
+      html += `<div class="sb-divider">· · ·</div>`;
+      html += `<div class="sb-row sb-me">
+        <span class="sb-rank">#${players.length + 1}</span>
+        <span class="sb-name"><strong>${lang === 'he' ? 'את/ה' : 'You'}</strong></span>
+        <span class="sb-score">${myScore}</span>
+      </div>`;
+    }
+
+    list.innerHTML = html;
+  } catch(e) {
+    console.error('Scoreboard failed:', e);
+    list.innerHTML = `<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:8px 0">${lang === 'he' ? 'שגיאה בטעינה' : 'Could not load'}</div>`;
+  }
+}
 const _origShowResults = showResults;
 showResults = async function() {
   _origShowResults();
+  // Reset scoreboard
+  document.getElementById('scoreboard-section').classList.remove('show');
+  document.getElementById('scoreboard-list').innerHTML = '';
+
   const hits = results.filter(r => r.pts >= 90).length;
   const saveMsg   = document.getElementById('history-save-msg');
   const recBanner = document.getElementById('new-record-banner');
@@ -3507,6 +3657,9 @@ showResults = async function() {
     saveMsg.innerHTML = `<a style="cursor:pointer;color:#1a6fd4;text-decoration:underline" onclick="openLoginModal()">${lang === 'he' ? 'התחברות' : 'Sign in'}</a> ${lang === 'he' ? 'כדי לשמור את הניקוד' : 'to save your scores'}`;
     document.getElementById('history-section').classList.remove('show');
   }
+
+  // Always show scoreboard (sign-in prompt for guests)
+  loadScoreboard(score);
 };
 
 // ── SETTINGS ──────────────────────────────────────────────────────────────
