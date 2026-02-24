@@ -246,10 +246,11 @@
     font-weight: 600; color: var(--text); cursor: pointer;
     transition: all 0.15s; text-align: center;
   }
-  .gender-btn:hover { border-color: #1a6fd4; background: #fff; }
+  .gender-btn:hover { border-color: #1a6fd4; background: #f0f6ff; }
   .gender-btn.selected {
-    border-color: #1a6fd4; background: rgba(26,111,212,0.08);
-    color: #1a6fd4;
+    border-color: #1a6fd4; background: linear-gradient(135deg, rgba(26,111,212,0.12), rgba(124,58,237,0.10));
+    color: #1a6fd4; box-shadow: 0 0 0 3px rgba(26,111,212,0.15);
+    transform: translateY(-1px);
   }
   #settings-save-msg {
     text-align: center; font-size: 0.85rem; font-weight: 600;
@@ -3293,7 +3294,7 @@ showResults = async function() {
 
 // ── SETTINGS ──────────────────────────────────────────────────────────────
 
-let _selectedGender = null;
+let _selectedGender = 'male';
 
 function selectGender(g) {
   _selectedGender = g;
@@ -3319,9 +3320,7 @@ async function openSettingsModal() {
         if (data.gender) selectGender(data.gender);
       } else {
         document.getElementById('settings-nickname').value = '';
-        _selectedGender = null;
-        ['male','female','other'].forEach(opt =>
-          document.getElementById(`gender-${opt}`).classList.remove('selected'));
+        selectGender('male');
       }
     } catch(e) { console.error('Load settings failed:', e); }
   }
