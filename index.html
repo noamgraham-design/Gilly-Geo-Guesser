@@ -16,7 +16,8 @@
            updateProfile }                          from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import { getFirestore, collection, addDoc,
            query, where, orderBy, limit,
-           getDocs, serverTimestamp }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+           getDocs, serverTimestamp,
+           setDoc, getDoc, doc }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey:            "AIzaSyC9bbLFNqAu5elsiWEmuFC_f4tZiPIRtLA",
@@ -39,7 +40,8 @@
     signOut, GoogleAuthProvider, signInWithPopup,
     createUserWithEmailAndPassword, signInWithEmailAndPassword,
     updateProfile, collection, addDoc, query, where,
-    orderBy, limit, getDocs, serverTimestamp
+    orderBy, limit, getDocs, serverTimestamp,
+    setDoc, getDoc, doc
   };
 
   onAuthStateChanged(auth, user => {
@@ -1510,6 +1512,68 @@
     <div id="history-section">
       <h3 id="history-title">Your Recent Games</h3>
       <div id="history-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODALS (placed before script so getElementById works) ────────── -->
+<!-- ── SETTINGS MODAL ─────────────────────────────────────────────────────── -->
+<div id="settings-modal">
+  <div id="settings-card">
+    <button id="settings-modal-close" onclick="closeSettingsModal()">✕</button>
+    <h2 id="settings-title">⚙️ Settings</h2>
+
+    <div class="settings-field">
+      <label class="settings-label" id="settings-lbl-nickname">Nickname</label>
+      <input class="login-input" id="settings-nickname" type="text" placeholder="Your nickname…" maxlength="30"/>
+    </div>
+
+    <div class="settings-field">
+      <label class="settings-label" id="settings-lbl-gender">Gender</label>
+      <div class="gender-options">
+        <button class="gender-btn" data-gender="male"   onclick="selectGender('male')"  id="gender-male">👨 Male</button>
+        <button class="gender-btn" data-gender="female" onclick="selectGender('female')" id="gender-female">👩 Female</button>
+        <button class="gender-btn" data-gender="other"  onclick="selectGender('other')"  id="gender-other">🧑 Other</button>
+      </div>
+    </div>
+
+    <div class="settings-field">
+      <label class="settings-label" id="settings-lbl-language">Language</label>
+      <div class="gender-options">
+        <button class="gender-btn" onclick="selectSettingsLang('he')" id="settings-lang-he">🇮🇱 עברית</button>
+        <button class="gender-btn" onclick="selectSettingsLang('en')" id="settings-lang-en">🇬🇧 English</button>
+      </div>
+    </div>
+
+    <div id="settings-save-msg"></div>
+    <button class="btn-auth-submit" onclick="saveSettings()" id="settings-save-btn">Save</button>
+  </div>
+</div>
+
+<div id="login-modal">
+  <div id="login-card" style="position:relative">
+    <button id="login-modal-close" onclick="closeLoginModal()">✕</button>
+    <h2>🇮🇱 התחברות</h2>
+    <p class="login-sub">Save your scores and track your progress</p>
+
+    <button class="btn-google" onclick="signInGoogle()">
+      <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
+      Continue with Google
+    </button>
+
+    <div class="login-divider">or</div>
+
+    <div id="login-form-section">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <input class="login-input" id="login-name" type="text" placeholder="Display name" style="display:none"/>
+        <input class="login-input" id="login-email" type="email" placeholder="Email address"/>
+        <input class="login-input" id="login-password" type="password" placeholder="Password"/>
+      </div>
+      <div id="login-error"></div>
+      <button class="btn-auth-submit" id="login-submit-btn" onclick="submitEmailAuth()">Sign in</button>
+      <div id="login-toggle">
+        Don't have an account? <a onclick="toggleAuthMode()">Sign up</a>
+      </div>
     </div>
   </div>
 </div>
@@ -3115,7 +3179,7 @@ window._onAuthChange = function(user) {
     document.getElementById('auth-dropdown-email').textContent = user.email || '';
 
     // Load ALL settings from Firestore and apply immediately
-    import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js').then(({ getDoc, doc }) => {
+    Promise.resolve(window._fbFns).then(({ getDoc, doc }) => {
       getDoc(doc(window._fbDb, 'users', user.uid)).then(snap => {
         if (snap.exists()) {
           const data = snap.data();
@@ -3237,7 +3301,7 @@ async function saveScore(scoreData) {
     });
 
     // Update highest_score in users doc if this score beats it
-    const { getDoc, setDoc, doc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const { getDoc, setDoc, doc } = window._fbFns;
     const userRef  = doc(window._fbDb, 'users', window._fbUser.uid);
     const userSnap = await getDoc(userRef);
     const current  = userSnap.exists() ? (userSnap.data().highest_score || 0) : 0;
@@ -3331,7 +3395,7 @@ async function openSettingsModal() {
 
   if (window._fbUser) {
     try {
-      const { getDoc, doc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      const { getDoc, doc } = window._fbFns;
       const snap = await getDoc(doc(window._fbDb, 'users', window._fbUser.uid));
       if (snap.exists()) {
         const data = snap.data();
@@ -3371,7 +3435,7 @@ async function saveSettings() {
   msgEl.textContent = lang === 'he' ? 'שומר…' : 'Saving…';
 
   try {
-    const { setDoc, doc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const { setDoc, doc } = window._fbFns;
     await setDoc(doc(window._fbDb, 'users', window._fbUser.uid), {
       nickname:    nickname,
       gender:      _selectedGender || null,
@@ -3392,67 +3456,6 @@ async function saveSettings() {
   }
 }
 </script>
-<!-- ── SETTINGS MODAL ─────────────────────────────────────────────────────── -->
-<div id="settings-modal">
-  <div id="settings-card">
-    <button id="settings-modal-close" onclick="closeSettingsModal()">✕</button>
-    <h2 id="settings-title">⚙️ Settings</h2>
-
-    <div class="settings-field">
-      <label class="settings-label" id="settings-lbl-nickname">Nickname</label>
-      <input class="login-input" id="settings-nickname" type="text" placeholder="Your nickname…" maxlength="30"/>
-    </div>
-
-    <div class="settings-field">
-      <label class="settings-label" id="settings-lbl-gender">Gender</label>
-      <div class="gender-options">
-        <button class="gender-btn" data-gender="male"   onclick="selectGender('male')"  id="gender-male">👨 Male</button>
-        <button class="gender-btn" data-gender="female" onclick="selectGender('female')" id="gender-female">👩 Female</button>
-        <button class="gender-btn" data-gender="other"  onclick="selectGender('other')"  id="gender-other">🧑 Other</button>
-      </div>
-    </div>
-
-    <div class="settings-field">
-      <label class="settings-label" id="settings-lbl-language">Language</label>
-      <div class="gender-options">
-        <button class="gender-btn" onclick="selectSettingsLang('he')" id="settings-lang-he">🇮🇱 עברית</button>
-        <button class="gender-btn" onclick="selectSettingsLang('en')" id="settings-lang-en">🇬🇧 English</button>
-      </div>
-    </div>
-
-    <div id="settings-save-msg"></div>
-    <button class="btn-auth-submit" onclick="saveSettings()" id="settings-save-btn">Save</button>
-  </div>
-</div>
-
-</body>
-<div id="login-modal">
-  <div id="login-card" style="position:relative">
-    <button id="login-modal-close" onclick="closeLoginModal()">✕</button>
-    <h2>🇮🇱 התחברות</h2>
-    <p class="login-sub">Save your scores and track your progress</p>
-
-    <button class="btn-google" onclick="signInGoogle()">
-      <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
-      Continue with Google
-    </button>
-
-    <div class="login-divider">or</div>
-
-    <div id="login-form-section">
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <input class="login-input" id="login-name" type="text" placeholder="Display name" style="display:none"/>
-        <input class="login-input" id="login-email" type="email" placeholder="Email address"/>
-        <input class="login-input" id="login-password" type="password" placeholder="Password"/>
-      </div>
-      <div id="login-error"></div>
-      <button class="btn-auth-submit" id="login-submit-btn" onclick="submitEmailAuth()">Sign in</button>
-      <div id="login-toggle">
-        Don't have an account? <a onclick="toggleAuthMode()">Sign up</a>
-      </div>
-    </div>
-  </div>
-</div>
 
 </body>
 </html>
