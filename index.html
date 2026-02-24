@@ -489,6 +489,12 @@
       -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff,
       -2px  0px 0 #fff, 2px  0px 0 #fff,  0px -2px 0 #fff, 0px  2px 0 #fff;
   }
+  .pts-time-bonus {
+    display: block; margin-top: 4px;
+    font-family: 'Source Serif 4', serif; font-size: 1.4rem; font-weight: 700;
+    letter-spacing: 1px;
+    text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
+  }
   /* Miss animation */
   @keyframes ptsMiss {
     0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
@@ -1761,7 +1767,7 @@ const TOWNS = [
 ];
 
 const DIFF = {
-  // maxPts: points for a perfect click; maxKm: distance beyond which you score 0; maxTier: highest town tier included
+  // maxPts: base points for a perfect click; maxKm: distance beyond which you score 0; maxTier: highest town tier included
   easy:   { maxPts:100, maxKm:100, maxTier:1, color:"#1a7f37" },
   medium: { maxPts:100, maxKm:50,  maxTier:2, color:"#9a6700" },
   hard:   { maxPts:100, maxKm:20,  maxTier:4, color:"#cf2316" },
@@ -1769,6 +1775,15 @@ const DIFF = {
 
 // Perfect radius by tier: bigger places are easier to hit for full points
 const PERFECT_RADIUS_KM = { 1: 5, 2: 3, 3: 2, 4: 1 };
+
+// Tier multiplier: smaller/harder towns award more points
+const TIER_MULTIPLIER = { 1: 1.0, 2: 1.3, 3: 1.6, 4: 2.0 };
+
+// Time bonus: up to +30 pts, decays to 0 over TIME_BONUS_SECS seconds
+const TIME_BONUS_MAX  = 30;
+const TIME_BONUS_SECS = 30;
+
+let roundStartTime = 0; // set in loadTown
 
 // ── POLYGON-BASED PERFECT SCORE ───────────────────────────────────────────────
 // Maps quiz city names → folder slugs in idoivri/israel-municipalities-polygons
@@ -1861,15 +1876,22 @@ function pointInRing(lat, lng, ring) {
   return inside;
 }
 
-// Distance-based scoring: full points within perfectKm, linear falloff to 0 at maxKm
+// Distance-based scoring with tier multiplier
 function calcPts(distKm, diff, hintUsed, tier) {
-  const perfectKm = PERFECT_RADIUS_KM[tier] ?? 1;
-  const raw = distKm <= perfectKm
+  const perfectKm  = PERFECT_RADIUS_KM[tier] ?? 1;
+  const multiplier = TIER_MULTIPLIER[tier]   ?? 1;
+  const base = distKm <= perfectKm
     ? diff.maxPts
     : Math.max(0, Math.round(diff.maxPts * (1 - (distKm - perfectKm) / (diff.maxKm - perfectKm))));
-  const afterHint = hintUsed ? Math.max(0, raw - 10) : raw;
-  // Cap at 20 points if street view was used at any point this round
+  const scaled    = Math.round(base * multiplier);
+  const afterHint = hintUsed ? Math.max(0, scaled - 10) : scaled;
   return streetUsedThisRound ? Math.min(20, afterHint) : afterHint;
+}
+
+function calcTimeBonus(elapsedMs) {
+  const secs = elapsedMs / 1000;
+  if (secs >= TIME_BONUS_SECS) return 0;
+  return Math.round(TIME_BONUS_MAX * (1 - secs / TIME_BONUS_SECS));
 }
 
 
@@ -2618,36 +2640,40 @@ function clearAllMarkers() {
   if (cityPolyLayer) { map.removeLayer(cityPolyLayer); cityPolyLayer = null; }
 }
 
-function showPtsPopup(pts, pct, perfect, distKm) {
+function showPtsPopup(pts, pct, perfect, distKm, timeBonus = 0) {
   const el = document.getElementById('pts-popup');
   el.className = '';
   void el.offsetWidth;
 
-  // Size scales with score quality
-  // Tiers based on absolute pts: 85+ = close, under 85 = far
-  const isClose   = pts >= 85;
-  const isGood    = pts >= 110;
+  // pct is based on basePts (without time bonus) for color/label thresholds
+  const basePts   = pts - timeBonus;
+  const isClose   = basePts >= 85;
+  const isGood    = basePts >= 110;
 
   const fontSize  = perfect ? '5.5rem' : isGood ? '4.2rem' : isClose ? '3.2rem' : '2.5rem';
   const labelSize = perfect ? '3.3rem' : isGood ? '2.5rem' : isClose ? '1.9rem' : '1.5rem';
 
-  // Color: red for < 85, yellow→green for 85+
   const color = perfect || isGood ? '#1a7f37'
               : isClose           ? '#2da44e'
               : pts > 0           ? '#cf2316'
               :                     '#cf2316';
 
   let label = '';
-  if (pts === 0)    label = lang === 'he' ? 'פספוס!'     : 'Miss!';
-  else if (perfect) label = lang === 'he' ? '🎯 מושלם!'  : '🎯 Perfect!';
-  else if (isGood)  label = lang === 'he' ? 'קרוב מאוד!' : 'Very close!';
-  else if (isClose) label = lang === 'he' ? 'לא רע!'     : 'Not bad!';
+  if (pts === 0)    label = lang === 'he' ? 'פספוס!'       : 'Miss!';
+  else if (perfect) label = lang === 'he' ? '🎯 מושלם!'    : '🎯 Perfect!';
+  else if (isGood)  label = lang === 'he' ? 'קרוב מאוד!'   : 'Very close!';
+  else if (isClose) label = lang === 'he' ? 'לא רע!'       : 'Not bad!';
   else              label = lang === 'he' ? 'רחוק מאוד...' : 'Very far...';
 
   const prefix = pts > 0 ? '+' : '';
+  const timeLine = timeBonus > 0
+    ? `<span class="pts-time-bonus" style="color:${color}">⚡ +${timeBonus} ${lang === 'he' ? 'מהיר' : 'speed'}</span>`
+    : '';
+
   el.innerHTML = `
     <span class="pts-number" style="font-size:${fontSize};color:${color}">${prefix}${pts}</span>
     <span class="pts-label" dir="${lang === 'he' ? 'rtl' : 'ltr'}" style="color:${color};font-size:${labelSize}">${label}</span>
+    ${timeLine}
   `;
 
   const cls = perfect ? 'show-perfect' : isClose ? 'show-good' : 'show-miss';
@@ -2892,6 +2918,7 @@ function loadTown() {
   document.getElementById('mobile-hint-badge').style.display = 'none';
   hintUsed = false;
   streetUsedThisRound = false;
+  roundStartTime = Date.now();
   updateHintBtn();
   updateHUD();
 }
@@ -3050,7 +3077,10 @@ function onMapClick(e) {
     ? pointInGeoJSONFeature(e.latlng.lat, e.latlng.lng, polyFeature)
     : distKm <= perfectKm;
   // When a polygon is available, award full points for any click inside it
-  const pts = (polyFeature && perfect) ? d.maxPts : calcPts(distKm, d, hintUsed, town.tier);
+  const basePts = (polyFeature && perfect) ? Math.round(DIFF[difficulty].maxPts * (TIER_MULTIPLIER[town.tier] ?? 1)) : calcPts(distKm, d, hintUsed, town.tier);
+  // Time bonus: only awarded when you score any points (no reward for a fast miss)
+  const timeBonus = basePts > 0 && !streetUsedThisRound ? calcTimeBonus(Date.now() - roundStartTime) : 0;
+  const pts = basePts + timeBonus;
   const closeEnough = distKm < 10;
   const newStreak = perfect ? streak + 1 : 0;
 
@@ -3060,7 +3090,7 @@ function onMapClick(e) {
   const pct = pts / d.maxPts;
   const color = pct >= 0.7 ? '#1a7f37' : pct >= 0.3 ? '#d29922' : '#cf2316';
 
-  showPtsPopup(pts, pct, perfect, distKm);
+  showPtsPopup(pts, pct, perfect, distKm, timeBonus);
   showCityPolygon(polyFeature, perfect);
 
   waiting = true;
