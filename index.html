@@ -131,11 +131,18 @@
   .auth-dropdown-signout { color: var(--red); }
   .auth-dropdown-signout svg { color: var(--red); }
 
-  /* Mobile: dropdown opens left-aligned to avoid clipping */
+  /* Mobile: auth dropdown matches hamburger menu style */
   @media (max-width: 768px) {
     #auth-btn { padding: 4px; border-radius: 50%; }
     #auth-label { display: none; }
-    #auth-dropdown { right: auto; left: 0; }
+    #auth-wrap { position: static; }
+    #auth-dropdown {
+      position: absolute;
+      top: 60px; left: 12px; right: 12px;
+      min-width: unset; border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      z-index: 5000;
+    }
   }
 
   /* ── LOGIN MODAL ──────────────────────────────────────────────────────── */
@@ -930,6 +937,7 @@
       align-items: center;
       gap: 8px;
       flex-wrap: nowrap;
+      position: relative;
     }
 
     /* Town name — centered between HUD and ☰ */
