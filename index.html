@@ -97,7 +97,7 @@
     min-width: 210px; background: #fff;
     border: 1px solid var(--border); border-radius: 14px;
     box-shadow: 0 8px 30px rgba(0,0,0,0.13);
-    z-index: 2000; overflow: hidden;
+    z-index: 2000;
     animation: ddPop 0.18s cubic-bezier(.34,1.4,.64,1);
   }
   #auth-dropdown.open { display: block; }
@@ -127,6 +127,9 @@
     text-align: left; transition: background 0.12s;
   }
   .auth-dropdown-item:hover { background: var(--bg); }
+  .auth-dropdown-item:first-of-type { border-radius: 14px 14px 0 0; }
+  .auth-dropdown-item:last-of-type  { border-radius: 0 0 14px 14px; }
+  #auth-dropdown-user { border-radius: 14px 14px 0 0; }
   .auth-dropdown-item svg { flex-shrink: 0; color: var(--muted); }
   .auth-dropdown-signout { color: var(--red); }
   .auth-dropdown-signout svg { color: var(--red); }
@@ -137,8 +140,8 @@
     #auth-label { display: none; }
     #auth-wrap { position: static; }
     #auth-dropdown {
-      position: absolute;
-      top: 60px; left: 12px; right: 12px;
+      position: fixed;
+      top: 56px; left: 12px; right: 12px;
       min-width: unset; border-radius: 12px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.15);
       z-index: 5000;
