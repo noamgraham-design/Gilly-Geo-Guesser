@@ -1893,8 +1893,8 @@ const CITY_POLYGON_SLUG = {
   "Lod": "lod", "Ma'ale Adumim": "maale_adumim",
   "Ma'alot-Tarshiha": "maalot_tarshiha", "Maghar": "maghar",
   "Migdal HaEmek": "migdal_haemek", "Mitzpe Ramon": "mitzpe_ramon",
-  "Modi'in": "modiin", "Nahariya": "nahariya",
-  "Nazareth": "nazareth", "Nes Ziona": "nes_ziona",
+  "Modi'in": "modiin",
+  "Nazareth": "nazareth_natsrat", "Nes Ziona": "nes_ziona",
   "Nesher": "nesher", "Netanya": "netanya", "Netivot": "netivot",
   "Nof HaGalil": "nof_hagalil", "Nazareth Illit": "nof_hagalil",
   "Ofakim": "ofakim", "Omer": "omer", "Or Akiva": "or_akiva",
@@ -1906,7 +1906,7 @@ const CITY_POLYGON_SLUG = {
   "Safed": "safed", "Sakhnin": "sakhnin", "Sderot": "sderot",
   "Shfar'am": "shfaram", "Shoham": "shoham", "Tamra": "tamra",
   "Tayibe": "tayibe", "Tel Aviv": "tel_aviv", "Tel Mond": "tel_mond",
-  "Tiberias": "tiberias", "Tira": "tira", "Tirat Carmel": "tirat_carmel",
+  "Tiberias": "tverya_tiberias", "Tira": "tira", "Tirat Carmel": "tirat_carmel",
   "Umm al-Fahm": "umm_al_fahm", "Yavne": "yavne", "Yehud": "yehud",
   "Yokneam": "yokneam", "Yoqne'am Illit": "yokneam",
   "Zichron Ya'akov": "zichron_yaakov",
@@ -3618,7 +3618,7 @@ async function loadScoreboard(myScore) {
     list.innerHTML = html;
   } catch(e) {
     console.error('Scoreboard failed:', e);
-    list.innerHTML = `<div style="color:var(--red);font-size:0.82rem;text-align:center;padding:8px 0">${e.code || e.message || JSON.stringify(e)}</div>`;
+    list.innerHTML = `<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:8px 0">${lang === 'he' ? 'שגיאה בטעינה' : 'Could not load'}</div>`;
   }
 }
 const _origShowResults = showResults;
