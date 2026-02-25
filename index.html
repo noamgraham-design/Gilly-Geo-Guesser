@@ -1574,10 +1574,6 @@
   </div>
   <div id="learning-hud">
     <div class="hud-block">
-      <span class="hud-label" id="lr-level-label">Level</span>
-      <span class="hud-value" id="lr-level-val" style="font-size:1rem;line-height:1.2">—</span>
-    </div>
-    <div class="hud-block">
       <span class="hud-label" id="lr-prog-label">Location</span>
       <span class="hud-value" id="lr-prog-val">—</span>
     </div>
@@ -3416,6 +3412,9 @@ function showMenu() {
   document.getElementById('mobile-btn-back').style.display = 'none';
   document.getElementById('mobile-dropdown').classList.remove('show');
   clearAllMarkers();
+  ['btn-hint', 'mobile-btn-hint', 'btn-layer', 'mobile-btn-layer'].forEach(id => {
+    document.getElementById(id).style.display = '';
+  });
 }
 
 // ── Learning Mode ─────────────────────────────────────────────────────────────
@@ -3458,8 +3457,6 @@ function updateLearningDots(used) {
 
 function loadLearningTown() {
   const t = learningSequence[learningIdx];
-  const tier = getLearningTier();
-  const tierName = LEARNING_TIER_NAMES[tier] || LEARNING_TIER_NAMES[1];
   const townName = lang === 'he' ? t.nameHe : t.name;
   const townDesc = lang === 'he' ? t.descHe : t.desc;
 
@@ -3470,8 +3467,6 @@ function loadLearningTown() {
   document.querySelector('#mobile-topbar-town .mob-town-text').textContent = townName;
 
   // Update learning HUD
-  document.getElementById('lr-level-label').textContent = lang === 'he' ? 'שלב' : 'Level';
-  document.getElementById('lr-level-val').textContent = tier + ' – ' + (lang === 'he' ? tierName.he : tierName.en);
   document.getElementById('lr-prog-label').textContent = lang === 'he' ? 'מיקום' : 'Location';
   document.getElementById('lr-prog-val').textContent = (learningIdx + 1) + ' / ' + learningSequence.length;
   document.getElementById('lr-att-label').textContent = lang === 'he' ? 'נסיונות' : 'Tries';
@@ -3675,6 +3670,9 @@ async function startLearning() {
   showKnownPins();
   document.getElementById('hud').style.display = 'none';
   document.getElementById('learning-hud').classList.add('active');
+  ['btn-hint', 'mobile-btn-hint', 'btn-layer', 'mobile-btn-layer'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
 
   loadLearningTown();
 }
