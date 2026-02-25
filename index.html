@@ -2999,6 +2999,8 @@ function loadTown() {
   hintUsed = false;
   streetUsedThisRound = false;
   roundStartTime = Date.now();
+  // Auto-switch back to satellite if player left street view on
+  if (currentLayer === 'street') toggleMapLayer(true);
   updateHintBtn();
   updateHUD();
 }
