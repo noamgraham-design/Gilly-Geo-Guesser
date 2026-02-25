@@ -3101,8 +3101,9 @@ function showLearningPopup(icon, label, color, animCls) {
     <span class="pts-number" style="font-size:${iconSize};color:${color}">${icon}</span>
     <span class="pts-label" dir="${dir}" style="color:${color};font-size:${labelSize}">${label}</span>
   `;
+  el.dir = dir;
   el.classList.add(animCls);
-  el.addEventListener('animationend', () => { el.className = ''; }, { once: true });
+  el.addEventListener('animationend', () => { el.className = ''; el.dir = ''; }, { once: true });
 }
 
 let cityPolyLayer = null;
