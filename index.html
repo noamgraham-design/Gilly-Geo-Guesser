@@ -1535,6 +1535,55 @@
   .lr-badge-next { color: #9a6700; font-weight: 700; font-size: 0.82rem; flex-shrink: 0; margin-left: 6px; }
   #lr-level-up-banner { background: linear-gradient(135deg, #f0a500, #e05c00); color: #fff; border-radius: 10px; padding: 10px 14px; text-align: center; font-size: 0.95rem; font-weight: 700; margin: 4px 0; width: 100%; box-sizing: border-box; }
   #lr-list { width: 100%; overflow-y: auto; max-height: 260px; }
+  #learning-preview-bar {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 850;
+    background: rgba(0,0,0,0.78);
+    color: #fff;
+    border-radius: 30px;
+    padding: 11px 22px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    display: none;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  #learning-preview-bar.active { display: flex; }
+  #learning-preview-count {
+    font-size: 1.4rem;
+    font-weight: 900;
+    min-width: 28px;
+    text-align: center;
+    color: #ffd700;
+    font-family: 'Playfair Display', serif;
+  }
+  @keyframes lrPulse {
+    0%   { transform: scale(1);    opacity: 1; }
+    50%  { transform: scale(1.18); opacity: 0.85; }
+    100% { transform: scale(1);    opacity: 1; }
+  }
+  #learning-big-countdown {
+    display: none;
+    position: fixed;
+    top: 72px;
+    right: 16px;
+    z-index: 860;
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 0 0 24px rgba(220,50,50,0.9), 0 2px 6px rgba(0,0,0,0.6);
+    line-height: 1;
+    pointer-events: none;
+    animation: lrPulse 1s ease-in-out infinite;
+  }
+  #learning-big-countdown.active { display: block; }
   @media (max-width: 768px) {
     #learning-results-panel { width: 100% !important; }
     #learning-hud { position: static !important; transform: none !important; display: none; gap: 10px; }
@@ -1573,10 +1622,6 @@
     </div>
   </div>
   <div id="learning-hud">
-    <div class="hud-block">
-      <span class="hud-label" id="lr-level-label">Level</span>
-      <span class="hud-value" id="lr-level-val" style="font-size:1rem;line-height:1.2">—</span>
-    </div>
     <div class="hud-block">
       <span class="hud-label" id="lr-prog-label">Location</span>
       <span class="hud-value" id="lr-prog-val">—</span>
@@ -1763,6 +1808,13 @@
     </div>
   </div>
 </div>
+
+<!-- ── LEARNING PREVIEW BAR ──────────────────────────────────────────────── -->
+<div id="learning-preview-bar">
+  <span id="learning-preview-msg"></span>
+  <span id="learning-preview-count">15</span>
+</div>
+<div id="learning-big-countdown"></div>
 
 <!-- ── LEARNING RESULTS PANEL ─────────────────────────────────────────────── -->
 <div id="learning-results-panel">
@@ -2391,6 +2443,7 @@ let hintsLeft = 3, hintAnimFrame = null;
 let isLearningMode = false;
 let learningSequence = [], learningIdx = 0, learningAttempt = 0;
 let knownLocations = [], learningSessionResults = [], learningPins = [];
+let learningPreviewActive = false, learningPreviewTimer = null, learningPreviewInterval = null;
 
 // ── MAP — ESRI World Physical: free, no API key, no city labels ──────────────
 const ISRAEL_BOUNDS = L.latLngBounds(
@@ -3404,6 +3457,7 @@ function useHint() {
 
 function showMenu() {
   isLearningMode = false;
+  clearLearningPreview();
   document.getElementById('learning-hud').classList.remove('active');
   document.getElementById('hud').style.display = '';
   document.getElementById('learning-results-panel').className = '';
@@ -3416,6 +3470,9 @@ function showMenu() {
   document.getElementById('mobile-btn-back').style.display = 'none';
   document.getElementById('mobile-dropdown').classList.remove('show');
   clearAllMarkers();
+  ['btn-hint', 'mobile-btn-hint', 'btn-layer', 'mobile-btn-layer'].forEach(id => {
+    document.getElementById(id).style.display = '';
+  });
 }
 
 // ── Learning Mode ─────────────────────────────────────────────────────────────
@@ -3456,10 +3513,58 @@ function updateLearningDots(used) {
   }
 }
 
+function startLearningPreview(town) {
+  learningPreviewActive = true;
+  if (currentLayer !== 'street') toggleMapLayer(true);
+  map.setView([town.lat, town.lng], 14, { animate: true });
+
+  let secondsLeft = 15;
+  const bar = document.getElementById('learning-preview-bar');
+  const msgEl = document.getElementById('learning-preview-msg');
+  const countEl = document.getElementById('learning-preview-count');
+  msgEl.textContent = lang === 'he' ? '📍 זכרו את המיקום — הקישו להמשך' : '📍 Memorize the location — tap to continue';
+  countEl.textContent = secondsLeft;
+  bar.classList.add('active');
+
+  const bigEl = document.getElementById('learning-big-countdown');
+  learningPreviewInterval = setInterval(() => {
+    secondsLeft--;
+    countEl.textContent = secondsLeft;
+    if (secondsLeft <= 5 && secondsLeft > 0) {
+      bigEl.textContent = secondsLeft;
+      bigEl.classList.add('active');
+    } else {
+      bigEl.classList.remove('active');
+    }
+    if (secondsLeft <= 0) endLearningPreview();
+  }, 1000);
+  learningPreviewTimer = setTimeout(endLearningPreview, 15000);
+}
+
+function endLearningPreview() {
+  if (!learningPreviewActive) return;
+  learningPreviewActive = false;
+  clearTimeout(learningPreviewTimer);
+  clearInterval(learningPreviewInterval);
+  learningPreviewTimer = learningPreviewInterval = null;
+  document.getElementById('learning-preview-bar').classList.remove('active');
+  document.getElementById('learning-big-countdown').classList.remove('active');
+  if (currentLayer === 'street') toggleMapLayer(true);
+  const v = REGION_VIEWS['all'];
+  map.setView(v.center, v.zoom);
+}
+
+function clearLearningPreview() {
+  learningPreviewActive = false;
+  clearTimeout(learningPreviewTimer);
+  clearInterval(learningPreviewInterval);
+  learningPreviewTimer = learningPreviewInterval = null;
+  document.getElementById('learning-preview-bar').classList.remove('active');
+  document.getElementById('learning-big-countdown').classList.remove('active');
+}
+
 function loadLearningTown() {
   const t = learningSequence[learningIdx];
-  const tier = getLearningTier();
-  const tierName = LEARNING_TIER_NAMES[tier] || LEARNING_TIER_NAMES[1];
   const townName = lang === 'he' ? t.nameHe : t.name;
   const townDesc = lang === 'he' ? t.descHe : t.desc;
 
@@ -3470,8 +3575,6 @@ function loadLearningTown() {
   document.querySelector('#mobile-topbar-town .mob-town-text').textContent = townName;
 
   // Update learning HUD
-  document.getElementById('lr-level-label').textContent = lang === 'he' ? 'שלב' : 'Level';
-  document.getElementById('lr-level-val').textContent = tier + ' – ' + (lang === 'he' ? tierName.he : tierName.en);
   document.getElementById('lr-prog-label').textContent = lang === 'he' ? 'מיקום' : 'Location';
   document.getElementById('lr-prog-val').textContent = (learningIdx + 1) + ' / ' + learningSequence.length;
   document.getElementById('lr-att-label').textContent = lang === 'he' ? 'נסיונות' : 'Tries';
@@ -3486,6 +3589,8 @@ function loadLearningTown() {
 
   fetchCityPolygon(t.name);
   if (learningIdx + 1 < learningSequence.length) fetchCityPolygon(learningSequence[learningIdx + 1].name);
+
+  startLearningPreview(t);
 }
 
 function handleLearningClick(e) {
@@ -3675,6 +3780,9 @@ async function startLearning() {
   showKnownPins();
   document.getElementById('hud').style.display = 'none';
   document.getElementById('learning-hud').classList.add('active');
+  ['btn-hint', 'mobile-btn-hint', 'btn-layer', 'mobile-btn-layer'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
 
   loadLearningTown();
 }
@@ -3709,7 +3817,9 @@ function startGame() {
 }
 
 function onMapClick(e) {
-  if (waiting || factModalOpen || document.getElementById('overlay').style.display !== 'none') return;
+  if (factModalOpen || document.getElementById('overlay').style.display !== 'none') return;
+  if (isLearningMode && learningPreviewActive) { endLearningPreview(); return; }
+  if (waiting) return;
   if (isLearningMode) { handleLearningClick(e); return; }
 
   haptic(30); // subtle tap on pin placement
