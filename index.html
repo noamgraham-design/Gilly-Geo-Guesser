@@ -3090,6 +3090,21 @@ function showPtsPopup(pts, pct, perfect, distKm, timeBonus = 0) {
   el.addEventListener('animationend', () => { el.className = ''; }, { once: true });
 }
 
+function showLearningPopup(icon, label, color, animCls) {
+  const el = document.getElementById('pts-popup');
+  el.className = '';
+  void el.offsetWidth;
+  const iconSize  = animCls === 'show-perfect' ? '5.5rem' : '4rem';
+  const labelSize = animCls === 'show-perfect' ? '3rem'   : '1.8rem';
+  const dir = lang === 'he' ? 'rtl' : 'ltr';
+  el.innerHTML = `
+    <span class="pts-number" style="font-size:${iconSize};color:${color}">${icon}</span>
+    <span class="pts-label" dir="${dir}" style="color:${color};font-size:${labelSize}">${label}</span>
+  `;
+  el.classList.add(animCls);
+  el.addEventListener('animationend', () => { el.className = ''; }, { once: true });
+}
+
 let cityPolyLayer = null;
 
 function showCityPolygon(feature, perfect) {
@@ -3609,24 +3624,24 @@ function handleLearningClick(e) {
   if (perfect) {
     haptic([60, 40, 100]);
     learningSessionResults.push({ town, mastered: true });
-    showFeedback(lang === 'he' ? '✅ שלטת!' : '✅ Mastered!', '#1a7f37');
+    showLearningPopup('✅', lang === 'he' ? 'בול פגיעה!' : 'Mastered!', '#1a7f37', 'show-perfect');
     showCityPolygon(polyFeature, true);
     placeLearningCorrectMarker(town, '#1a7f37');
     waiting = true;
-    setTimeout(() => { clearMapFeedback(); advanceLearning(); }, 2000);
+    setTimeout(() => { clearMapFeedback(); advanceLearning(); }, 2600);
   } else if (learningAttempt < LEARNING_MAX_ATTEMPTS) {
     const left = LEARNING_MAX_ATTEMPTS - learningAttempt;
-    const msg = lang === 'he'
-      ? `❌ נסה שוב! נותרו ${left} נסיון${left === 1 ? '' : 'ות'}`
-      : `❌ Try again! ${left} attempt${left === 1 ? '' : 's'} left`;
-    showFeedback(msg, '#d29922');
+    const retryMsg = lang === 'he'
+      ? (left === 2 ? 'נסה שוב!<br>נותרו שני נסיונות' : 'נסה שוב!<br>נותר נסיון אחד')
+      : `Try again!<br>${left} attempt${left === 1 ? '' : 's'} left`;
+    showLearningPopup('❌', retryMsg, '#d29922', 'show-good');
     if (clickMarker) map.removeLayer(clickMarker);
     clickMarker = L.circleMarker([e.latlng.lat, e.latlng.lng], {
       radius: 7, color: '#fff', weight: 2, fillColor: '#d29922', fillOpacity: 0.8,
     }).addTo(map);
   } else {
     learningSessionResults.push({ town, mastered: false });
-    showFeedback(lang === 'he' ? '📅 בפעם הבאה!' : '📅 Next Time!', '#cf2316');
+    showLearningPopup('📅', lang === 'he' ? 'בפעם הבאה!' : 'Next Time!', '#cf2316', 'show-miss');
     showCityPolygon(polyFeature, false);
     placeLearningCorrectMarker(town, '#cf2316');
     waiting = true;
