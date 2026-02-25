@@ -320,13 +320,39 @@
     color: var(--green); margin-top: 6px; min-height: 1.2em;
   }
 
-  /* ── SCOREBOARD ──────────────────────────────────────────────────────── */
-  #scoreboard-section {
-    margin-top: 12px; border-top: 1px solid var(--border);
-    padding-top: 12px; display: none;
+  /* ── SCOREBOARD PANEL ────────────────────────────────────────────────── */
+  @keyframes slideInScoreboard {
+    from { transform: translateX(-100%); opacity: 0; }
+    to   { transform: translateX(0);     opacity: 1; }
   }
-  #scoreboard-section.show { display: block; }
-  #scoreboard-section h3 {
+  #scoreboard-panel {
+    display: none;
+    position: fixed;
+    top: 0; left: 280px; bottom: 0;
+    width: 260px;
+    z-index: 8999;
+    pointer-events: none;
+  }
+  #scoreboard-panel.show {
+    display: flex;
+    flex-direction: column;
+    pointer-events: auto;
+    animation: slideInScoreboard 0.4s cubic-bezier(.34,1.2,.64,1);
+  }
+  #scoreboard-card {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.10);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px 16px;
+    height: 100%;
+    overflow-y: auto;
+  }
+  #scoreboard-card::-webkit-scrollbar { width: 4px; }
+  #scoreboard-card::-webkit-scrollbar-thumb { background: #c8ccd2; border-radius: 99px; }
+  #scoreboard-card h3 {
     font-family: 'Playfair Display', serif; font-size: 1rem;
     font-weight: 700; margin-bottom: 8px; color: var(--muted);
     text-transform: uppercase; letter-spacing: 1.5px;
@@ -999,6 +1025,9 @@
 
   /* MOBILE RESPONSIVE STYLES */
   @media (max-width: 768px) {
+    /* Hide scoreboard panel on mobile — shown inline in results instead */
+    #scoreboard-panel { display: none !important; }
+
     /* Hide logo and title on mobile */
     #topbar h1 {
       display: none !important;
@@ -1599,13 +1628,15 @@
       <h3 id="history-title">Your Recent Games</h3>
       <div id="history-list"></div>
     </div>
-    <div id="scoreboard-section">
-      <h3 id="scoreboard-title">🏆 Leaderboard</h3>
-      <div id="scoreboard-list"></div>
-      <div id="scoreboard-guest" style="display:none">
-        <a style="cursor:pointer;color:#1a6fd4;text-decoration:underline" onclick="openLoginModal()" id="sb-signin-link">Sign in</a>
-        <span id="sb-signin-text"> to see the leaderboard</span>
-      </div>
+  </div>
+</div>
+<div id="scoreboard-panel">
+  <div id="scoreboard-card">
+    <h3 id="scoreboard-title">🏆 Leaderboard</h3>
+    <div id="scoreboard-list"></div>
+    <div id="scoreboard-guest" style="display:none">
+      <a style="cursor:pointer;color:#1a6fd4;text-decoration:underline" onclick="openLoginModal()" id="sb-signin-link">Sign in</a>
+      <span id="sb-signin-text"> to see the leaderboard</span>
     </div>
   </div>
 </div>
@@ -3219,6 +3250,7 @@ function showMenu() {
   document.getElementById('overlay').style.display = 'flex';
   document.getElementById('menu-card').style.display = 'flex';
   document.getElementById('results-panel').className = '';
+  document.getElementById('scoreboard-panel').className = '';
   document.getElementById('btn-back').style.display = 'none';
   document.getElementById('mobile-btn-back').style.display = 'none';
   document.getElementById('mobile-dropdown').classList.remove('show');
@@ -3245,6 +3277,7 @@ function startGame() {
   }
   document.getElementById('overlay').style.display = 'none';
   document.getElementById('results-panel').className = '';
+  document.getElementById('scoreboard-panel').className = '';
   document.getElementById('mobile-dropdown').classList.remove('show');
   document.getElementById('btn-back').style.display = 'inline-block';
   document.getElementById('mobile-btn-back').style.display = 'block';
@@ -3636,7 +3669,7 @@ function launchConfetti() {
 
 // ── SCOREBOARD ────────────────────────────────────────────────────────────
 async function loadScoreboard(myScore) {
-  const section = document.getElementById('scoreboard-section');
+  const section = document.getElementById('scoreboard-panel');
   const list    = document.getElementById('scoreboard-list');
   const guest   = document.getElementById('scoreboard-guest');
   section.classList.add('show');
@@ -3735,7 +3768,7 @@ const _origShowResults = showResults;
 showResults = async function() {
   _origShowResults();
   // Reset scoreboard
-  document.getElementById('scoreboard-section').classList.remove('show');
+  document.getElementById('scoreboard-panel').classList.remove('show');
   document.getElementById('scoreboard-list').innerHTML = '';
 
   const hits = results.filter(r => r.pts >= 90).length;
