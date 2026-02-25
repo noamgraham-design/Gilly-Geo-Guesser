@@ -480,6 +480,19 @@
   .btn-hint:disabled { opacity: 0.4; cursor: default; }
   .btn-primary { background: linear-gradient(135deg, #1a6fd4, #7c3aed); color: #fff; box-shadow: 0 4px 14px rgba(26,111,212,0.35); }
   .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(26,111,212,0.45); }
+  .btn-learn {
+    background: transparent;
+    border: 2px solid #7c3aed;
+    color: #7c3aed;
+    font-size: 1rem;
+    padding: 10px 36px;
+    transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+  }
+  .btn-learn:hover {
+    background: rgba(124,58,237,0.08);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(124,58,237,0.2);
+  }
   @keyframes gentlePulse {
     0%, 100% { box-shadow: 0 4px 14px rgba(26,111,212,0.35); }
     50%       { box-shadow: 0 4px 22px rgba(124,58,237,0.55); }
@@ -1475,6 +1488,61 @@
       padding: 16px 28px 18px;
     }
   }
+
+  /* ── Learning Mode ───────────────────────────────────────────────────────── */
+  #learning-hud {
+    display: none;
+    align-items: center;
+    gap: 20px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  #learning-hud.active { display: flex; }
+  .lr-dot { width: 11px; height: 11px; border-radius: 50%; background: #e0e0e0; border: 1.5px solid #ccc; display: inline-block; transition: background 0.2s, border-color 0.2s; }
+  .lr-dot.used { background: #cf2316; border-color: #cf2316; }
+  .lr-dot.mastered { background: #1a7f37; border-color: #1a7f37; }
+  .lr-att-wrap { display: flex; gap: 5px; align-items: center; margin-top: 4px; justify-content: center; }
+  #learning-results-panel {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    width: 280px;
+    z-index: 9000;
+    pointer-events: none;
+  }
+  #learning-results-panel.show {
+    display: flex;
+    flex-direction: column;
+    pointer-events: auto;
+    animation: slideInLeft 0.35s cubic-bezier(.34,1.2,.64,1);
+  }
+  #learning-results-card {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.12);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 16px 20px;
+    height: 100%;
+    overflow-y: auto;
+  }
+  .lr-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 0.88rem; width: 100%; }
+  .lr-row:last-child { border-bottom: none; }
+  .lr-badge-mastered { color: #1a7f37; font-weight: 700; font-size: 0.82rem; flex-shrink: 0; margin-left: 6px; }
+  .lr-badge-next { color: #9a6700; font-weight: 700; font-size: 0.82rem; flex-shrink: 0; margin-left: 6px; }
+  #lr-level-up-banner { background: linear-gradient(135deg, #f0a500, #e05c00); color: #fff; border-radius: 10px; padding: 10px 14px; text-align: center; font-size: 0.95rem; font-weight: 700; margin: 4px 0; width: 100%; box-sizing: border-box; }
+  #lr-list { width: 100%; overflow-y: auto; max-height: 260px; }
+  @media (max-width: 768px) {
+    #learning-results-panel { width: 100% !important; }
+    #learning-hud { position: static !important; transform: none !important; display: none; gap: 10px; }
+    #learning-hud.active { display: flex; }
+  }
+  @media (max-width: 480px) {
+    #learning-results-panel { width: 100% !important; }
+  }
 </style>
 </head>
 <body>
@@ -1502,6 +1570,20 @@
     <div class="hud-block">
       <span class="hud-label" id="lbl-score">Score</span>
       <span class="hud-value" id="score-val" style="color:#1a6fd4">0</span>
+    </div>
+  </div>
+  <div id="learning-hud">
+    <div class="hud-block">
+      <span class="hud-label" id="lr-level-label">Level</span>
+      <span class="hud-value" id="lr-level-val" style="font-size:1rem;line-height:1.2">—</span>
+    </div>
+    <div class="hud-block">
+      <span class="hud-label" id="lr-prog-label">Location</span>
+      <span class="hud-value" id="lr-prog-val">—</span>
+    </div>
+    <div class="hud-block">
+      <span class="hud-label" id="lr-att-label">Tries</span>
+      <div class="lr-att-wrap" id="lr-att-dots"></div>
     </div>
   </div>
   <div id="mobile-topbar-town" style="display:none"><span class="mob-find-label">📍 Find</span><span class="mob-town-text">—</span></div>
@@ -1639,6 +1721,7 @@
       <button class="diff-btn" id="r-south"  onclick="setRegion('south')">🏜️ South</button>
     </div>
     <button id="start-btn" class="btn btn-primary" style="font-size:1.1rem;padding:12px 44px" onclick="startGame()">← התחל משחק</button>
+    <button id="learn-btn" class="btn btn-learn" onclick="startLearning()">📚 מצב למידה</button>
   </div>
 
 </div>
@@ -1677,6 +1760,21 @@
     <div id="scoreboard-guest" style="display:none">
       <a style="cursor:pointer;color:#1a6fd4;text-decoration:underline" onclick="openLoginModal()" id="sb-signin-link">Sign in</a>
       <span id="sb-signin-text"> to see the leaderboard</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── LEARNING RESULTS PANEL ─────────────────────────────────────────────── -->
+<div id="learning-results-panel">
+  <div id="learning-results-card">
+    <div id="lr-emoji" style="font-size:2.2rem">📚</div>
+    <h2 id="lr-title" style="margin:4px 0;text-align:center;font-size:1.15rem;line-height:1.3"></h2>
+    <div id="lr-subtitle" style="color:var(--muted);font-size:0.88rem;text-align:center;margin-bottom:4px"></div>
+    <div id="lr-level-up-banner" style="display:none"></div>
+    <div id="lr-list"></div>
+    <div class="btn-row" style="flex-direction:column;gap:8px;width:100%;margin-top:10px">
+      <button class="btn btn-primary" id="lr-continue-btn" onclick="continueLearning()" style="width:100%">📚 Continue</button>
+      <button class="btn-secondary" id="lr-menu-btn" onclick="showMenu()" style="width:100%;text-align:center;padding:9px 16px">← Menu</button>
     </div>
   </div>
 </div>
@@ -1988,6 +2086,16 @@ const PERFECT_RADIUS_KM = { 1: 5, 2: 3, 3: 2, 4: 1 };
 // Tier multiplier: smaller/harder towns award more points
 const TIER_MULTIPLIER = { 1: 1.0, 2: 1.3, 3: 1.6, 4: 2.0 };
 
+// Learning Mode constants
+const LEARNING_MAX_ATTEMPTS = 3;
+const LEARNING_SESSION_SIZE = 10;
+const LEARNING_TIER_NAMES = {
+  1: { en: 'Major Cities',         he: 'ערים גדולות'     },
+  2: { en: 'Medium Cities',        he: 'ערים בינוניות'   },
+  3: { en: 'Small Towns',          he: 'ישובים קטנים'    },
+  4: { en: 'Villages & Junctions', he: 'כפרים וצמתים'    },
+};
+
 // Time bonus: up to +30 pts, decays to 0 over TIME_BONUS_SECS seconds
 const TIME_BONUS_MAX  = 30;
 const TIME_BONUS_SECS = 30;
@@ -2159,6 +2267,7 @@ const STRINGS = {
     note_medium:      "Cities & towns",
     note_hard:        "All settlements + road interchanges",
     start_btn:        "Start Game →",
+    learn_btn:        "📚 Learning Mode",
     result_excellent: "Excellent!",
     result_good:      "Good Job!",
     result_practice:  "Keep Practicing!",
@@ -2190,6 +2299,7 @@ const STRINGS = {
     note_medium:      'ערים ועיירות',
     note_hard:        'כל הישובים + מחלפים',
     start_btn:        "← התחל משחק",
+    learn_btn:        "📚 מצב למידה",
     result_excellent: "מצוין!",
     result_good:      "כל הכבוד!",
     result_practice:  "כדאי להמשיך להתאמן!",
@@ -2225,6 +2335,7 @@ function applyLang() {
   document.getElementById('r-center').textContent = t('region_center');
   document.getElementById('r-south').textContent  = t('region_south');
   document.getElementById('start-btn').textContent    = t('start_btn');
+  document.getElementById('learn-btn').textContent    = t('learn_btn');
   document.getElementById('btn-play-again').textContent = t('play_again');
   document.getElementById('btn-menu').textContent      = t('menu_btn');
   document.getElementById('btn-back').textContent      = t('back_btn');
@@ -2275,6 +2386,11 @@ let difficulty = "medium", region = "all", sequence = [], currentIdx = 0, score 
 let streak = 0, hintUsed = false, streetUsedThisRound = false, results = [], waiting = false;
 let correctMarkers = [], clickMarker = null, circle = null, hintCircle = null;
 let hintsLeft = 3, hintAnimFrame = null;
+
+// ── Learning Mode State ───────────────────────────────────────────────────────
+let isLearningMode = false;
+let learningSequence = [], learningIdx = 0, learningAttempt = 0;
+let knownLocations = [], learningSessionResults = [], learningPins = [];
 
 // ── MAP — ESRI World Physical: free, no API key, no city labels ──────────────
 const ISRAEL_BOUNDS = L.latLngBounds(
@@ -3287,6 +3403,11 @@ function useHint() {
 }
 
 function showMenu() {
+  isLearningMode = false;
+  document.getElementById('learning-hud').classList.remove('active');
+  document.getElementById('hud').style.display = '';
+  document.getElementById('learning-results-panel').className = '';
+  clearLearningPins();
   document.getElementById('overlay').style.display = 'flex';
   document.getElementById('menu-card').style.display = 'flex';
   document.getElementById('results-panel').className = '';
@@ -3295,6 +3416,267 @@ function showMenu() {
   document.getElementById('mobile-btn-back').style.display = 'none';
   document.getElementById('mobile-dropdown').classList.remove('show');
   clearAllMarkers();
+}
+
+// ── Learning Mode ─────────────────────────────────────────────────────────────
+
+function getLearningTier() {
+  for (let tier = 1; tier <= 4; tier++) {
+    const allInTier = TOWNS.filter(t => t.tier === tier);
+    if (!allInTier.every(t => knownLocations.includes(t.name))) return tier;
+  }
+  return null; // all tiers complete
+}
+
+function showKnownPins() {
+  clearLearningPins();
+  const known = new Set(knownLocations);
+  TOWNS.forEach(t => {
+    if (!known.has(t.name)) return;
+    const pin = L.circleMarker([t.lat, t.lng], {
+      radius: 5, color: '#1a7f37', weight: 1.5,
+      fillColor: '#1a7f37', fillOpacity: 0.7,
+    }).addTo(map);
+    learningPins.push(pin);
+  });
+}
+
+function clearLearningPins() {
+  learningPins.forEach(p => map.removeLayer(p));
+  learningPins = [];
+}
+
+function updateLearningDots(used) {
+  const dotsEl = document.getElementById('lr-att-dots');
+  dotsEl.innerHTML = '';
+  for (let i = 0; i < LEARNING_MAX_ATTEMPTS; i++) {
+    const d = document.createElement('div');
+    d.className = 'lr-dot' + (i < used ? ' used' : '');
+    dotsEl.appendChild(d);
+  }
+}
+
+function loadLearningTown() {
+  const t = learningSequence[learningIdx];
+  const tier = getLearningTier();
+  const tierName = LEARNING_TIER_NAMES[tier] || LEARNING_TIER_NAMES[1];
+  const townName = lang === 'he' ? t.nameHe : t.name;
+  const townDesc = lang === 'he' ? t.descHe : t.desc;
+
+  document.getElementById('town-name').textContent = townName;
+  document.getElementById('town-desc').textContent = townDesc;
+  document.getElementById('mobile-town-name').textContent = townName;
+  document.getElementById('mobile-town-desc').textContent = townDesc;
+  document.querySelector('#mobile-topbar-town .mob-town-text').textContent = townName;
+
+  // Update learning HUD
+  document.getElementById('lr-level-label').textContent = lang === 'he' ? 'שלב' : 'Level';
+  document.getElementById('lr-level-val').textContent = tier + ' – ' + (lang === 'he' ? tierName.he : tierName.en);
+  document.getElementById('lr-prog-label').textContent = lang === 'he' ? 'מיקום' : 'Location';
+  document.getElementById('lr-prog-val').textContent = (learningIdx + 1) + ' / ' + learningSequence.length;
+  document.getElementById('lr-att-label').textContent = lang === 'he' ? 'נסיונות' : 'Tries';
+  updateLearningDots(0);
+
+  document.getElementById('hint-badge').style.display = 'none';
+  document.getElementById('mobile-hint-badge').style.display = 'none';
+  hintUsed = false;
+  streetUsedThisRound = false;
+  learningAttempt = 0;
+  waiting = false;
+
+  fetchCityPolygon(t.name);
+  if (learningIdx + 1 < learningSequence.length) fetchCityPolygon(learningSequence[learningIdx + 1].name);
+}
+
+function handleLearningClick(e) {
+  haptic(30);
+  const town = learningSequence[learningIdx];
+  const distKm = haversineKm(e.latlng.lat, e.latlng.lng, town.lat, town.lng);
+  const perfectKm = PERFECT_RADIUS_KM[town.tier] ?? 1;
+  const polyFeature = polyCache[town.name] ?? null;
+  const perfect = polyFeature
+    ? pointInGeoJSONFeature(e.latlng.lat, e.latlng.lng, polyFeature)
+    : distKm <= perfectKm;
+
+  learningAttempt++;
+  updateLearningDots(learningAttempt);
+
+  if (perfect) {
+    haptic([60, 40, 100]);
+    learningSessionResults.push({ town, mastered: true });
+    showFeedback(lang === 'he' ? '✅ שלטת!' : '✅ Mastered!', '#1a7f37');
+    showCityPolygon(polyFeature, true);
+    placeLearningCorrectMarker(town, '#1a7f37');
+    waiting = true;
+    setTimeout(() => { clearMapFeedback(); advanceLearning(); }, 2000);
+  } else if (learningAttempt < LEARNING_MAX_ATTEMPTS) {
+    const left = LEARNING_MAX_ATTEMPTS - learningAttempt;
+    const msg = lang === 'he'
+      ? `❌ נסה שוב! נותרו ${left} נסיון${left === 1 ? '' : 'ות'}`
+      : `❌ Try again! ${left} attempt${left === 1 ? '' : 's'} left`;
+    showFeedback(msg, '#d29922');
+    if (clickMarker) map.removeLayer(clickMarker);
+    clickMarker = L.circleMarker([e.latlng.lat, e.latlng.lng], {
+      radius: 7, color: '#fff', weight: 2, fillColor: '#d29922', fillOpacity: 0.8,
+    }).addTo(map);
+  } else {
+    learningSessionResults.push({ town, mastered: false });
+    showFeedback(lang === 'he' ? '📅 בפעם הבאה!' : '📅 Next Time!', '#cf2316');
+    showCityPolygon(polyFeature, false);
+    placeLearningCorrectMarker(town, '#cf2316');
+    waiting = true;
+    setTimeout(() => { clearMapFeedback(); advanceLearning(); }, 2500);
+  }
+}
+
+function placeLearningCorrectMarker(town, color) {
+  const displayName = lang === 'he' ? town.nameHe : town.name;
+  const m = L.circleMarker([town.lat, town.lng], {
+    radius: 9, color, weight: 2, fillColor: color, fillOpacity: 0.9,
+  }).addTo(map);
+  m.bindTooltip(
+    `<div class="tooltip-inner"><span class="tooltip-name">${displayName}</span></div>`,
+    { permanent: true, direction: 'top', offset: [0, -10], className: 'city-label' }
+  ).openTooltip();
+  correctMarkers.push(m);
+}
+
+function advanceLearning() {
+  learningIdx++;
+  if (learningIdx >= learningSequence.length) {
+    showLearningResults();
+  } else {
+    waiting = false;
+    loadLearningTown();
+  }
+}
+
+async function showLearningResults() {
+  const masteredNames = learningSessionResults.filter(r => r.mastered).map(r => r.town.name);
+  const prevKnownSet = new Set(knownLocations);
+  const newKnown = [...knownLocations, ...masteredNames.filter(n => !prevKnownSet.has(n))];
+  const prevTier = getLearningTier();
+
+  knownLocations = newKnown;
+  if (window._fbUser && masteredNames.length > 0) {
+    try {
+      const { setDoc, doc } = window._fbFns;
+      await setDoc(doc(window._fbDb, 'users', window._fbUser.uid), { knownLocations: newKnown }, { merge: true });
+    } catch (e) { console.error('Failed to save known locations:', e); }
+  }
+
+  showKnownPins();
+  const newTier = getLearningTier();
+  const leveledUp = prevTier !== null && newTier !== prevTier;
+  const mastered = learningSessionResults.filter(r => r.mastered).length;
+  const total = learningSessionResults.length;
+
+  document.getElementById('lr-emoji').textContent = mastered === total ? '🏆' : mastered > 0 ? '🌟' : '📚';
+  document.getElementById('lr-title').textContent = lang === 'he'
+    ? `${mastered} / ${total} מיקומים נלמדו`
+    : `${mastered} / ${total} Mastered`;
+
+  const tierForDisplay = prevTier ?? 4;
+  const tierKnown = TOWNS.filter(t => t.tier === tierForDisplay && knownLocations.includes(t.name)).length;
+  const tierTotal = TOWNS.filter(t => t.tier === tierForDisplay).length;
+  document.getElementById('lr-subtitle').textContent = lang === 'he'
+    ? `שלב ${tierForDisplay}: ${tierKnown} / ${tierTotal} ידועים`
+    : `Level ${tierForDisplay}: ${tierKnown} / ${tierTotal} known`;
+
+  const levelUpEl = document.getElementById('lr-level-up-banner');
+  if (leveledUp && newTier !== null) {
+    const n = LEARNING_TIER_NAMES[newTier];
+    levelUpEl.style.display = 'block';
+    levelUpEl.textContent = lang === 'he'
+      ? `🎉 עלית שלב! שלב ${newTier}: ${n.he}`
+      : `🎉 Level Up! Level ${newTier}: ${n.en}`;
+  } else if (leveledUp && newTier === null) {
+    levelUpEl.style.display = 'block';
+    levelUpEl.textContent = lang === 'he' ? '🏆 שלטת בכל המיקומים!' : '🏆 All locations mastered!';
+  } else {
+    levelUpEl.style.display = 'none';
+  }
+
+  document.getElementById('lr-list').innerHTML = learningSessionResults.map(r => {
+    const name = lang === 'he' ? r.town.nameHe : r.town.name;
+    return `<div class="lr-row">
+      <span>${r.mastered ? '✅' : '❌'} ${name}</span>
+      <span class="${r.mastered ? 'lr-badge-mastered' : 'lr-badge-next'}">${r.mastered ? (lang === 'he' ? 'שולט!' : 'Mastered!') : (lang === 'he' ? 'בפעם הבאה' : 'Next Time')}</span>
+    </div>`;
+  }).join('');
+
+  const continueBtn = document.getElementById('lr-continue-btn');
+  const menuBtn = document.getElementById('lr-menu-btn');
+  if (newTier === null) {
+    continueBtn.style.display = 'none';
+  } else {
+    continueBtn.style.display = '';
+    continueBtn.textContent = lang === 'he' ? '📚 המשך ללמוד' : '📚 Continue Learning';
+  }
+  menuBtn.textContent = lang === 'he' ? '← תפריט' : '← Menu';
+
+  document.getElementById('learning-results-panel').classList.add('show');
+  document.getElementById('learning-hud').classList.remove('active');
+  document.getElementById('hud').style.display = '';
+}
+
+async function continueLearning() {
+  document.getElementById('learning-results-panel').className = '';
+  await startLearning();
+}
+
+async function startLearning() {
+  if (!window._fbUser) {
+    showFeedback(lang === 'he' ? '🔒 יש להתחבר כדי להשתמש במצב למידה' : '🔒 Sign in to use Learning Mode', '#cf2316');
+    return;
+  }
+
+  try {
+    const { getDoc, doc } = window._fbFns;
+    const userSnap = await getDoc(doc(window._fbDb, 'users', window._fbUser.uid));
+    knownLocations = userSnap.exists() ? (userSnap.data().knownLocations || []) : [];
+  } catch (e) {
+    knownLocations = [];
+    console.error('Failed to load known locations:', e);
+  }
+
+  const tier = getLearningTier();
+  if (tier === null) {
+    showFeedback(lang === 'he' ? '🏆 שלטת בכל המיקומים!' : '🏆 All locations mastered!', '#1a7f37');
+    return;
+  }
+
+  const allInTier = TOWNS.filter(t => t.tier === tier);
+  learningSequence = allInTier.filter(t => !knownLocations.includes(t.name)).slice(0, LEARNING_SESSION_SIZE);
+  if (learningSequence.length === 0) {
+    showFeedback(lang === 'he' ? '🎉 כל המיקומים בשלב זה ידועים!' : '🎉 All locations in this level known!', '#1a7f37');
+    return;
+  }
+
+  isLearningMode = true;
+  learningIdx = 0;
+  learningAttempt = 0;
+  learningSessionResults = [];
+  waiting = false;
+  clearAllMarkers();
+  if (currentLayer === 'street') toggleMapLayer(true);
+
+  document.getElementById('overlay').style.display = 'none';
+  document.getElementById('results-panel').className = '';
+  document.getElementById('learning-results-panel').className = '';
+  document.getElementById('scoreboard-panel').className = '';
+  document.getElementById('mobile-dropdown').classList.remove('show');
+  document.getElementById('btn-back').style.display = 'inline-block';
+  document.getElementById('mobile-btn-back').style.display = 'block';
+
+  const v = REGION_VIEWS['all'];
+  map.setView(v.center, v.zoom);
+
+  showKnownPins();
+  document.getElementById('hud').style.display = 'none';
+  document.getElementById('learning-hud').classList.add('active');
+
+  loadLearningTown();
 }
 
 function startGame() {
@@ -3328,6 +3710,7 @@ function startGame() {
 
 function onMapClick(e) {
   if (waiting || factModalOpen || document.getElementById('overlay').style.display !== 'none') return;
+  if (isLearningMode) { handleLearningClick(e); return; }
 
   haptic(30); // subtle tap on pin placement
 
