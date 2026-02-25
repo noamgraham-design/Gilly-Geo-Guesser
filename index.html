@@ -320,17 +320,53 @@
     color: var(--green); margin-top: 6px; min-height: 1.2em;
   }
 
-  /* ── SCOREBOARD ──────────────────────────────────────────────────────── */
-  #scoreboard-section {
-    margin-top: 12px; border-top: 1px solid var(--border);
-    padding-top: 12px; display: none;
+  /* ── SCOREBOARD PANEL ────────────────────────────────────────────────── */
+  @keyframes slideInScoreboard {
+    from { transform: translateX(-100%); opacity: 0; }
+    to   { transform: translateX(0);     opacity: 1; }
   }
-  #scoreboard-section.show { display: block; }
-  #scoreboard-section h3 {
+  #scoreboard-panel {
+    display: none;
+    position: fixed;
+    top: 0; left: 280px; bottom: 0;
+    width: 260px;
+    z-index: 8999;
+    pointer-events: none;
+  }
+  #scoreboard-panel.show {
+    display: flex;
+    flex-direction: column;
+    pointer-events: auto;
+    animation: slideInScoreboard 0.4s cubic-bezier(.34,1.2,.64,1);
+  }
+  #scoreboard-card {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.10);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px 16px;
+    height: 100%;
+    overflow-y: auto;
+  }
+  #scoreboard-card::-webkit-scrollbar { width: 4px; }
+  #scoreboard-card::-webkit-scrollbar-thumb { background: #c8ccd2; border-radius: 99px; }
+  #sb-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  #scoreboard-card h3 {
     font-family: 'Playfair Display', serif; font-size: 1rem;
-    font-weight: 700; margin-bottom: 8px; color: var(--muted);
+    font-weight: 700; margin-bottom: 0; color: var(--muted);
     text-transform: uppercase; letter-spacing: 1.5px;
   }
+  #sb-close-btn {
+    display: none; background: transparent; border: none;
+    color: var(--muted); font-size: 1rem; cursor: pointer;
+    padding: 2px 6px; border-radius: 6px; line-height: 1;
+  }
+  #sb-close-btn:hover { background: var(--bg); }
   .sb-row {
     display: flex; align-items: center; gap: 10px;
     padding: 7px 10px; border-radius: 10px; font-size: 0.88rem;
@@ -999,6 +1035,29 @@
 
   /* MOBILE RESPONSIVE STYLES */
   @media (max-width: 768px) {
+    /* Scoreboard panel — popup below the results bar on mobile */
+    #scoreboard-panel {
+      top: 68px !important; left: 0 !important; right: 0 !important;
+      bottom: auto !important; width: 100% !important;
+    }
+    #scoreboard-panel.show {
+      animation: mobileScoreboardIn 0.3s cubic-bezier(.34,1.2,.64,1) !important;
+    }
+    @keyframes mobileScoreboardIn {
+      from { transform: translateY(-12px); opacity: 0; }
+      to   { transform: translateY(0);     opacity: 1; }
+    }
+    #scoreboard-card {
+      border-right: none !important;
+      border-bottom: 1px solid var(--border) !important;
+      border-radius: 0 0 16px 16px !important;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.18) !important;
+      height: auto !important;
+      max-height: 55vh !important;
+      padding: 14px 16px !important;
+    }
+    #sb-close-btn { display: block !important; }
+
     /* Hide logo and title on mobile */
     #topbar h1 {
       display: none !important;
@@ -1284,9 +1343,7 @@
       margin: 0 !important;
     }
     #result-title {
-      font-size: 0.9rem !important;
-      display: block !important;
-      line-height: 1.2 !important;
+      display: none !important;
     }
     #result-sub {
       font-size: 0.75rem !important;
@@ -1302,6 +1359,7 @@
       flex-wrap: nowrap !important;
       margin-top: 0 !important;
       gap: 6px !important;
+      flex-shrink: 0 !important;
     }
     #btn-play-again {
       font-size: 0.85rem !important;
@@ -1599,13 +1657,18 @@
       <h3 id="history-title">Your Recent Games</h3>
       <div id="history-list"></div>
     </div>
-    <div id="scoreboard-section">
+  </div>
+</div>
+<div id="scoreboard-panel">
+  <div id="scoreboard-card">
+    <div id="sb-header">
       <h3 id="scoreboard-title">🏆 Leaderboard</h3>
-      <div id="scoreboard-list"></div>
-      <div id="scoreboard-guest" style="display:none">
-        <a style="cursor:pointer;color:#1a6fd4;text-decoration:underline" onclick="openLoginModal()" id="sb-signin-link">Sign in</a>
-        <span id="sb-signin-text"> to see the leaderboard</span>
-      </div>
+      <button id="sb-close-btn" onclick="document.getElementById('scoreboard-panel').classList.remove('show')">✕</button>
+    </div>
+    <div id="scoreboard-list"></div>
+    <div id="scoreboard-guest" style="display:none">
+      <a style="cursor:pointer;color:#1a6fd4;text-decoration:underline" onclick="openLoginModal()" id="sb-signin-link">Sign in</a>
+      <span id="sb-signin-text"> to see the leaderboard</span>
     </div>
   </div>
 </div>
@@ -3219,6 +3282,7 @@ function showMenu() {
   document.getElementById('overlay').style.display = 'flex';
   document.getElementById('menu-card').style.display = 'flex';
   document.getElementById('results-panel').className = '';
+  document.getElementById('scoreboard-panel').className = '';
   document.getElementById('btn-back').style.display = 'none';
   document.getElementById('mobile-btn-back').style.display = 'none';
   document.getElementById('mobile-dropdown').classList.remove('show');
@@ -3245,6 +3309,7 @@ function startGame() {
   }
   document.getElementById('overlay').style.display = 'none';
   document.getElementById('results-panel').className = '';
+  document.getElementById('scoreboard-panel').className = '';
   document.getElementById('mobile-dropdown').classList.remove('show');
   document.getElementById('btn-back').style.display = 'inline-block';
   document.getElementById('mobile-btn-back').style.display = 'block';
@@ -3636,7 +3701,7 @@ function launchConfetti() {
 
 // ── SCOREBOARD ────────────────────────────────────────────────────────────
 async function loadScoreboard(myScore) {
-  const section = document.getElementById('scoreboard-section');
+  const section = document.getElementById('scoreboard-panel');
   const list    = document.getElementById('scoreboard-list');
   const guest   = document.getElementById('scoreboard-guest');
   section.classList.add('show');
@@ -3735,7 +3800,7 @@ const _origShowResults = showResults;
 showResults = async function() {
   _origShowResults();
   // Reset scoreboard
-  document.getElementById('scoreboard-section').classList.remove('show');
+  document.getElementById('scoreboard-panel').classList.remove('show');
   document.getElementById('scoreboard-list').innerHTML = '';
 
   const hits = results.filter(r => r.pts >= 90).length;
