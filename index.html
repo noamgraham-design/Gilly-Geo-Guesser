@@ -1563,6 +1563,27 @@
     color: #ffd700;
     font-family: 'Playfair Display', serif;
   }
+  @keyframes lrPulse {
+    0%   { transform: scale(1);    opacity: 1; }
+    50%  { transform: scale(1.18); opacity: 0.85; }
+    100% { transform: scale(1);    opacity: 1; }
+  }
+  #learning-big-countdown {
+    display: none;
+    position: fixed;
+    top: 72px;
+    right: 16px;
+    z-index: 860;
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 0 0 24px rgba(220,50,50,0.9), 0 2px 6px rgba(0,0,0,0.6);
+    line-height: 1;
+    pointer-events: none;
+    animation: lrPulse 1s ease-in-out infinite;
+  }
+  #learning-big-countdown.active { display: block; }
   @media (max-width: 768px) {
     #learning-results-panel { width: 100% !important; }
     #learning-hud { position: static !important; transform: none !important; display: none; gap: 10px; }
@@ -1793,6 +1814,7 @@
   <span id="learning-preview-msg"></span>
   <span id="learning-preview-count">15</span>
 </div>
+<div id="learning-big-countdown"></div>
 
 <!-- ── LEARNING RESULTS PANEL ─────────────────────────────────────────────── -->
 <div id="learning-results-panel">
@@ -3504,9 +3526,16 @@ function startLearningPreview(town) {
   countEl.textContent = secondsLeft;
   bar.classList.add('active');
 
+  const bigEl = document.getElementById('learning-big-countdown');
   learningPreviewInterval = setInterval(() => {
     secondsLeft--;
     countEl.textContent = secondsLeft;
+    if (secondsLeft <= 5 && secondsLeft > 0) {
+      bigEl.textContent = secondsLeft;
+      bigEl.classList.add('active');
+    } else {
+      bigEl.classList.remove('active');
+    }
     if (secondsLeft <= 0) endLearningPreview();
   }, 1000);
   learningPreviewTimer = setTimeout(endLearningPreview, 15000);
@@ -3519,6 +3548,7 @@ function endLearningPreview() {
   clearInterval(learningPreviewInterval);
   learningPreviewTimer = learningPreviewInterval = null;
   document.getElementById('learning-preview-bar').classList.remove('active');
+  document.getElementById('learning-big-countdown').classList.remove('active');
   if (currentLayer === 'street') toggleMapLayer(true);
   const v = REGION_VIEWS['all'];
   map.setView(v.center, v.zoom);
@@ -3530,6 +3560,7 @@ function clearLearningPreview() {
   clearInterval(learningPreviewInterval);
   learningPreviewTimer = learningPreviewInterval = null;
   document.getElementById('learning-preview-bar').classList.remove('active');
+  document.getElementById('learning-big-countdown').classList.remove('active');
 }
 
 function loadLearningTown() {
