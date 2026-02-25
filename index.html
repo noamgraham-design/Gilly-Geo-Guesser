@@ -480,6 +480,19 @@
   .btn-hint:disabled { opacity: 0.4; cursor: default; }
   .btn-primary { background: linear-gradient(135deg, #1a6fd4, #7c3aed); color: #fff; box-shadow: 0 4px 14px rgba(26,111,212,0.35); }
   .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(26,111,212,0.45); }
+  .btn-learn {
+    background: transparent;
+    border: 2px solid #7c3aed;
+    color: #7c3aed;
+    font-size: 1rem;
+    padding: 10px 36px;
+    transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+  }
+  .btn-learn:hover {
+    background: rgba(124,58,237,0.08);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(124,58,237,0.2);
+  }
   @keyframes gentlePulse {
     0%, 100% { box-shadow: 0 4px 14px rgba(26,111,212,0.35); }
     50%       { box-shadow: 0 4px 22px rgba(124,58,237,0.55); }
@@ -1639,6 +1652,7 @@
       <button class="diff-btn" id="r-south"  onclick="setRegion('south')">🏜️ South</button>
     </div>
     <button id="start-btn" class="btn btn-primary" style="font-size:1.1rem;padding:12px 44px" onclick="startGame()">← התחל משחק</button>
+    <button id="learn-btn" class="btn btn-learn" onclick="startLearning()">📚 מצב למידה</button>
   </div>
 
 </div>
@@ -2159,6 +2173,7 @@ const STRINGS = {
     note_medium:      "Cities & towns",
     note_hard:        "All settlements + road interchanges",
     start_btn:        "Start Game →",
+    learn_btn:        "📚 Learning Mode",
     result_excellent: "Excellent!",
     result_good:      "Good Job!",
     result_practice:  "Keep Practicing!",
@@ -2190,6 +2205,7 @@ const STRINGS = {
     note_medium:      'ערים ועיירות',
     note_hard:        'כל הישובים + מחלפים',
     start_btn:        "← התחל משחק",
+    learn_btn:        "📚 מצב למידה",
     result_excellent: "מצוין!",
     result_good:      "כל הכבוד!",
     result_practice:  "כדאי להמשיך להתאמן!",
@@ -2225,6 +2241,7 @@ function applyLang() {
   document.getElementById('r-center').textContent = t('region_center');
   document.getElementById('r-south').textContent  = t('region_south');
   document.getElementById('start-btn').textContent    = t('start_btn');
+  document.getElementById('learn-btn').textContent    = t('learn_btn');
   document.getElementById('btn-play-again').textContent = t('play_again');
   document.getElementById('btn-menu').textContent      = t('menu_btn');
   document.getElementById('btn-back').textContent      = t('back_btn');
@@ -3295,6 +3312,12 @@ function showMenu() {
   document.getElementById('mobile-btn-back').style.display = 'none';
   document.getElementById('mobile-dropdown').classList.remove('show');
   clearAllMarkers();
+}
+
+function startLearning() {
+  // Learning mode — to be implemented
+  // For now: hide menu and show a coming-soon placeholder
+  showFeedback(lang === 'he' ? '📚 מצב למידה — בקרוב!' : '📚 Learning Mode — coming soon!', 3000);
 }
 
 function startGame() {
