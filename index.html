@@ -330,7 +330,7 @@
     position: fixed;
     top: 80px;
     left: 308px; /* 280px results panel + 28px gap */
-    width: 280px;
+    width: 310px;
     z-index: 8999;
     pointer-events: none;
   }
@@ -393,7 +393,14 @@
   .sb-rank.silver { color: #8a9197; font-size: 1rem; }
   .sb-rank.bronze { color: #b5561c; font-size: 1rem; }
   .sb-name {
-    flex: 1; font-weight: 600; color: var(--text);
+    flex: 1; display: flex; flex-direction: column; gap: 1px; overflow: hidden;
+  }
+  .sb-name-text {
+    font-weight: 600; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .sb-level-badge {
+    font-size: 0.68rem; color: var(--muted); font-weight: 500;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .sb-score { font-weight: 800; color: #1a6fd4; font-size: 0.95rem; }
@@ -2146,6 +2153,13 @@ const LEARNING_TIER_NAMES = {
   2: { en: 'Medium Cities',        he: 'ערים בינוניות'   },
   3: { en: 'Small Towns',          he: 'ישובים קטנים'    },
   4: { en: 'Villages & Junctions', he: 'כפרים וצמתים'    },
+};
+
+const PLAYER_LEVEL_NAMES = {
+  1: { en: 'City Rat',       he: 'עכבר העיר'    },
+  2: { en: 'Periphery Fox',  he: 'שועל פריפריה' },
+  3: { en: 'Country Mouse',  he: 'עכבר הכפר'    },
+  4: { en: 'Trail King',     he: 'מלך השבילים'  },
 };
 
 // Time bonus: up to +30 pts, decays to 0 over TIME_BONUS_SECS seconds
@@ -4116,8 +4130,11 @@ async function saveScore(scoreData) {
     const userSnap = await getDoc(userRef);
     const current  = userSnap.exists() ? (userSnap.data().highest_score || 0) : 0;
     const isNewRecord = scoreData.score > current;
+    const tier = getLearningTier() || 4;
     if (isNewRecord) {
-      await setDoc(userRef, { highest_score: scoreData.score }, { merge: true });
+      await setDoc(userRef, { highest_score: scoreData.score, level: tier }, { merge: true });
+    } else {
+      await setDoc(userRef, { level: tier }, { merge: true });
     }
 
     return { ok: true, isNewRecord };
@@ -4255,6 +4272,7 @@ async function loadScoreboard(myScore) {
           uid:      doc.id,
           name:     d.nickname || d.displayName || (lang === 'he' ? 'שחקן אנונימי' : 'Anonymous'),
           score:    d.highest_score,
+          level:    d.level || 1,
           isMe:     doc.id === window._fbUser.uid,
         });
       }
@@ -4287,10 +4305,15 @@ async function loadScoreboard(myScore) {
       else if (globalRank === 3) rankHtml = `<span class="sb-rank bronze">🥉</span>`;
       else                       rankHtml = `<span class="sb-rank">#${globalRank}</span>`;
 
+      const lvl = PLAYER_LEVEL_NAMES[p.level] || PLAYER_LEVEL_NAMES[1];
+      const lvlText = lang === 'he' ? lvl.he : lvl.en;
       html += `
         <div class="sb-row ${p.isMe ? 'sb-me' : ''}">
           ${rankHtml}
-          <span class="sb-name">${p.isMe ? `<strong>${p.name}</strong>` : p.name}</span>
+          <span class="sb-name">
+            <span class="sb-name-text">${p.isMe ? `<strong>${p.name}</strong>` : p.name}</span>
+            <span class="sb-level-badge" dir="${lang === 'he' ? 'rtl' : 'ltr'}">${lvlText}</span>
+          </span>
           <span class="sb-score">${p.score}</span>
         </div>`;
     });
@@ -4299,10 +4322,16 @@ async function loadScoreboard(myScore) {
 
     // If user isn't in the list yet (no previous score), append them at the bottom
     if (myIdx === -1) {
+      const myTier = getLearningTier() || 4;
+      const myLvl = PLAYER_LEVEL_NAMES[myTier] || PLAYER_LEVEL_NAMES[1];
+      const myLvlText = lang === 'he' ? myLvl.he : myLvl.en;
       html += `<div class="sb-divider">· · ·</div>`;
       html += `<div class="sb-row sb-me">
         <span class="sb-rank">#${players.length + 1}</span>
-        <span class="sb-name"><strong>${lang === 'he' ? 'את/ה' : 'You'}</strong></span>
+        <span class="sb-name">
+          <span class="sb-name-text"><strong>${lang === 'he' ? 'את/ה' : 'You'}</strong></span>
+          <span class="sb-level-badge" dir="${lang === 'he' ? 'rtl' : 'ltr'}">${myLvlText}</span>
+        </span>
         <span class="sb-score">${myScore}</span>
       </div>`;
     }
