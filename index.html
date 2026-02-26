@@ -315,10 +315,6 @@
   }
   .history-row .h-score { font-weight: 700; color: #1a6fd4; }
   .history-row .h-meta  { color: var(--muted); font-size: 0.78rem; }
-  #history-save-msg {
-    text-align: center; font-size: 0.85rem; font-weight: 600;
-    color: var(--green); margin-top: 6px; min-height: 1.2em;
-  }
 
   /* ── SCOREBOARD PANEL ────────────────────────────────────────────────── */
   @keyframes slideInScoreboard {
@@ -330,7 +326,7 @@
     position: fixed;
     top: 80px;
     left: 308px; /* 280px results panel + 28px gap */
-    width: 280px;
+    width: 310px;
     z-index: 8999;
     pointer-events: none;
   }
@@ -393,10 +389,33 @@
   .sb-rank.silver { color: #8a9197; font-size: 1rem; }
   .sb-rank.bronze { color: #b5561c; font-size: 1rem; }
   .sb-name {
-    flex: 1; font-weight: 600; color: var(--text);
+    flex: 1; display: flex; flex-direction: column; gap: 1px; overflow: hidden;
+  }
+  .sb-name-text {
+    font-weight: 600; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .sb-level-badge {
+    font-size: 0.68rem; color: var(--muted); font-weight: 500;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .sb-score { font-weight: 800; color: #1a6fd4; font-size: 0.95rem; }
+  .sb-summary {
+    display: flex; justify-content: space-between; align-items: center;
+    background: linear-gradient(135deg, rgba(26,111,212,0.08), rgba(124,58,237,0.06));
+    border: 1px solid rgba(26,111,212,0.18);
+    border-radius: 10px; padding: 10px 14px; margin-bottom: 10px;
+  }
+  .sb-summary-left, .sb-summary-right { display: flex; flex-direction: column; gap: 1px; }
+  .sb-summary-right { align-items: flex-end; }
+  .sb-summary-label { font-size: 0.68rem; color: var(--muted); font-weight: 500; }
+  .sb-summary-pts { font-size: 1.15rem; font-weight: 800; color: var(--text); }
+  .sb-summary-pts-unit { font-size: 0.75rem; font-weight: 600; color: var(--muted); }
+  .sb-top-pct {
+    font-size: 1.05rem; font-weight: 800;
+    background: linear-gradient(90deg, #1a6fd4, #7c3aed);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
   .sb-divider {
     text-align: center; color: var(--muted); font-size: 0.75rem;
     letter-spacing: 2px; padding: 2px 0; opacity: 0.5;
@@ -1788,7 +1807,6 @@
       <div class="record-title">🏅 New Personal Best!</div>
       <div class="record-sub" id="new-record-sub"></div>
     </div>
-    <div id="history-save-msg"></div>
     <div id="history-section">
       <h3 id="history-title">Your Recent Games</h3>
       <div id="history-list"></div>
@@ -2146,6 +2164,13 @@ const LEARNING_TIER_NAMES = {
   2: { en: 'Medium Cities',        he: 'ערים בינוניות'   },
   3: { en: 'Small Towns',          he: 'ישובים קטנים'    },
   4: { en: 'Villages & Junctions', he: 'כפרים וצמתים'    },
+};
+
+const PLAYER_LEVEL_NAMES = {
+  1: { en: 'City Rat',       he: 'עכבר העיר'    },
+  2: { en: 'Periphery Fox',  he: 'שועל פריפריה' },
+  3: { en: 'Country Mouse',  he: 'עכבר הכפר'    },
+  4: { en: 'Trail King',     he: 'מלך השבילים'  },
 };
 
 // Time bonus: up to +30 pts, decays to 0 over TIME_BONUS_SECS seconds
@@ -4116,8 +4141,11 @@ async function saveScore(scoreData) {
     const userSnap = await getDoc(userRef);
     const current  = userSnap.exists() ? (userSnap.data().highest_score || 0) : 0;
     const isNewRecord = scoreData.score > current;
+    const tier = getLearningTier() || 4;
     if (isNewRecord) {
-      await setDoc(userRef, { highest_score: scoreData.score }, { merge: true });
+      await setDoc(userRef, { highest_score: scoreData.score, level: tier }, { merge: true });
+    } else {
+      await setDoc(userRef, { level: tier }, { merge: true });
     }
 
     return { ok: true, isNewRecord };
@@ -4255,6 +4283,7 @@ async function loadScoreboard(myScore) {
           uid:      doc.id,
           name:     d.nickname || d.displayName || (lang === 'he' ? 'שחקן אנונימי' : 'Anonymous'),
           score:    d.highest_score,
+          level:    d.level || 1,
           isMe:     doc.id === window._fbUser.uid,
         });
       }
@@ -4275,8 +4304,23 @@ async function loadScoreboard(myScore) {
     start     = Math.max(0, end - 4);
     const visible = players.slice(start, end + 1);
 
+    // Current-game summary banner
+    const currentScoreRank = players.filter(p => p.score > myScore).length + 1;
+    const totalForRank     = myIdx === -1 ? players.length + 1 : players.length;
+    const topPct           = Math.max(1, Math.ceil((currentScoreRank / totalForRank) * 100));
+    let html = `
+      <div class="sb-summary">
+        <div class="sb-summary-left">
+          <div class="sb-summary-label">${lang === 'he' ? 'המשחק הנוכחי' : 'This game'}</div>
+          <div class="sb-summary-pts">${myScore} <span class="sb-summary-pts-unit">pts</span></div>
+        </div>
+        <div class="sb-summary-right">
+          <div class="sb-top-pct">Top ${topPct}%</div>
+          <div class="sb-summary-label">#${currentScoreRank} ${lang === 'he' ? 'מתוך' : 'of'} ${totalForRank}</div>
+        </div>
+      </div>`;
+
     // Show "..." if not starting from rank 1
-    let html = '';
     if (start > 0) html += `<div class="sb-divider">· · ·</div>`;
 
     visible.forEach((p, i) => {
@@ -4287,10 +4331,15 @@ async function loadScoreboard(myScore) {
       else if (globalRank === 3) rankHtml = `<span class="sb-rank bronze">🥉</span>`;
       else                       rankHtml = `<span class="sb-rank">#${globalRank}</span>`;
 
+      const lvl = PLAYER_LEVEL_NAMES[p.level] || PLAYER_LEVEL_NAMES[1];
+      const lvlText = lang === 'he' ? lvl.he : lvl.en;
       html += `
         <div class="sb-row ${p.isMe ? 'sb-me' : ''}">
           ${rankHtml}
-          <span class="sb-name">${p.isMe ? `<strong>${p.name}</strong>` : p.name}</span>
+          <span class="sb-name">
+            <span class="sb-name-text">${p.isMe ? `<strong>${p.name}</strong>` : p.name}</span>
+            <span class="sb-level-badge" dir="${lang === 'he' ? 'rtl' : 'ltr'}">${lvlText}</span>
+          </span>
           <span class="sb-score">${p.score}</span>
         </div>`;
     });
@@ -4299,10 +4348,16 @@ async function loadScoreboard(myScore) {
 
     // If user isn't in the list yet (no previous score), append them at the bottom
     if (myIdx === -1) {
+      const myTier = getLearningTier() || 4;
+      const myLvl = PLAYER_LEVEL_NAMES[myTier] || PLAYER_LEVEL_NAMES[1];
+      const myLvlText = lang === 'he' ? myLvl.he : myLvl.en;
       html += `<div class="sb-divider">· · ·</div>`;
       html += `<div class="sb-row sb-me">
         <span class="sb-rank">#${players.length + 1}</span>
-        <span class="sb-name"><strong>${lang === 'he' ? 'את/ה' : 'You'}</strong></span>
+        <span class="sb-name">
+          <span class="sb-name-text"><strong>${lang === 'he' ? 'את/ה' : 'You'}</strong></span>
+          <span class="sb-level-badge" dir="${lang === 'he' ? 'rtl' : 'ltr'}">${myLvlText}</span>
+        </span>
         <span class="sb-score">${myScore}</span>
       </div>`;
     }
@@ -4321,16 +4376,13 @@ showResults = async function() {
   document.getElementById('scoreboard-list').innerHTML = '';
 
   const hits = results.filter(r => r.pts >= 90).length;
-  const saveMsg   = document.getElementById('history-save-msg');
   const recBanner = document.getElementById('new-record-banner');
   const recSub    = document.getElementById('new-record-sub');
   recBanner.classList.remove('show');
 
   if (window._fbUser) {
-    saveMsg.textContent = lang === 'he' ? '💾 שומר…' : '💾 Saving…';
     const result = await saveScore({ score, difficulty, region, rounds: roundCount, hits });
     if (result?.ok) {
-      saveMsg.textContent = lang === 'he' ? '✅ נשמר!' : '✅ Score saved!';
       if (result.isNewRecord) {
         recSub.textContent = lang === 'he'
           ? `השגת שיא חדש עם ${score} נקודות!`
@@ -4338,15 +4390,9 @@ showResults = async function() {
         recBanner.classList.add('show');
         launchConfetti();
       }
-    } else {
-      saveMsg.textContent = result?.ok === false
-        ? (lang === 'he' ? '⚠️ שגיאה בשמירה' : '⚠️ Could not save score.')
-        : '';
     }
-    setTimeout(() => { saveMsg.textContent = ''; }, 3000);
     loadHistory();
   } else {
-    saveMsg.innerHTML = `<a style="cursor:pointer;color:#1a6fd4;text-decoration:underline" onclick="openLoginModal()">${lang === 'he' ? 'התחברות' : 'Sign in'}</a> ${lang === 'he' ? 'כדי לשמור את הניקוד' : 'to save your scores'}`;
     document.getElementById('history-section').classList.remove('show');
   }
 
