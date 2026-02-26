@@ -404,6 +404,22 @@
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .sb-score { font-weight: 800; color: #1a6fd4; font-size: 0.95rem; }
+  .sb-summary {
+    display: flex; justify-content: space-between; align-items: center;
+    background: linear-gradient(135deg, rgba(26,111,212,0.08), rgba(124,58,237,0.06));
+    border: 1px solid rgba(26,111,212,0.18);
+    border-radius: 10px; padding: 10px 14px; margin-bottom: 10px;
+  }
+  .sb-summary-left, .sb-summary-right { display: flex; flex-direction: column; gap: 1px; }
+  .sb-summary-right { align-items: flex-end; }
+  .sb-summary-label { font-size: 0.68rem; color: var(--muted); font-weight: 500; }
+  .sb-summary-pts { font-size: 1.15rem; font-weight: 800; color: var(--text); }
+  .sb-summary-pts-unit { font-size: 0.75rem; font-weight: 600; color: var(--muted); }
+  .sb-top-pct {
+    font-size: 1.05rem; font-weight: 800;
+    background: linear-gradient(90deg, #1a6fd4, #7c3aed);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
   .sb-divider {
     text-align: center; color: var(--muted); font-size: 0.75rem;
     letter-spacing: 2px; padding: 2px 0; opacity: 0.5;
@@ -4293,8 +4309,23 @@ async function loadScoreboard(myScore) {
     start     = Math.max(0, end - 4);
     const visible = players.slice(start, end + 1);
 
+    // Current-game summary banner
+    const currentScoreRank = players.filter(p => p.score > myScore).length + 1;
+    const totalForRank     = myIdx === -1 ? players.length + 1 : players.length;
+    const topPct           = Math.max(1, Math.ceil((currentScoreRank / totalForRank) * 100));
+    let html = `
+      <div class="sb-summary">
+        <div class="sb-summary-left">
+          <div class="sb-summary-label">${lang === 'he' ? 'המשחק הנוכחי' : 'This game'}</div>
+          <div class="sb-summary-pts">${myScore} <span class="sb-summary-pts-unit">pts</span></div>
+        </div>
+        <div class="sb-summary-right">
+          <div class="sb-top-pct">Top ${topPct}%</div>
+          <div class="sb-summary-label">#${currentScoreRank} ${lang === 'he' ? 'מתוך' : 'of'} ${totalForRank}</div>
+        </div>
+      </div>`;
+
     // Show "..." if not starting from rank 1
-    let html = '';
     if (start > 0) html += `<div class="sb-divider">· · ·</div>`;
 
     visible.forEach((p, i) => {
