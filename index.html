@@ -4307,7 +4307,11 @@ async function loadScoreboard(myScore) {
     // Current-game summary banner
     const currentScoreRank = players.filter(p => p.score > myScore).length + 1;
     const totalForRank     = myIdx === -1 ? players.length + 1 : players.length;
-    const topPct           = Math.max(1, Math.ceil((currentScoreRank / totalForRank) * 100));
+    const showTopPct       = totalForRank >= 10;
+    const topPct           = showTopPct ? Math.max(1, Math.ceil((currentScoreRank / totalForRank) * 100)) : null;
+    const rankLabel        = lang === 'he'
+      ? `<span dir="rtl">מקום ${currentScoreRank} מתוך ${totalForRank}</span>`
+      : `#${currentScoreRank} of ${totalForRank}`;
     let html = `
       <div class="sb-summary">
         <div class="sb-summary-left">
@@ -4315,8 +4319,8 @@ async function loadScoreboard(myScore) {
           <div class="sb-summary-pts">${myScore} <span class="sb-summary-pts-unit">pts</span></div>
         </div>
         <div class="sb-summary-right">
-          <div class="sb-top-pct">Top ${topPct}%</div>
-          <div class="sb-summary-label">#${currentScoreRank} ${lang === 'he' ? 'מתוך' : 'of'} ${totalForRank}</div>
+          ${showTopPct ? `<div class="sb-top-pct">Top ${topPct}%</div>` : ''}
+          <div class="sb-summary-label">${rankLabel}</div>
         </div>
       </div>`;
 
