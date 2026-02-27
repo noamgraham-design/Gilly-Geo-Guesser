@@ -2456,6 +2456,12 @@ function applyLang() {
   } else if (overlayVisible || sequence.length === 0) {
     document.getElementById('town-desc').textContent = t('placeholder_desc');
   }
+  // Swap street tile layer to match the new language
+  if (currentLayer === 'street') {
+    map.removeLayer(streetLayer);
+    map.removeLayer(streetLayerEn);
+    activeStreetLayer().addTo(map);
+  }
 }
 
 let lang = "he";
@@ -2492,10 +2498,22 @@ const satelliteLayer = L.tileLayer(
   { attribution: 'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics', maxZoom: 18 }
 );
 
+// Hebrew street map (OSM default — labels in Hebrew)
 const streetLayer = L.tileLayer(
   'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors', maxZoom: 18 }
 );
+
+// English street map (CartoDB Positron — labels in English)
+const streetLayerEn = L.tileLayer(
+  'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+  { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>', maxZoom: 19 }
+);
+
+// Returns whichever street tile layer matches the current UI language
+function activeStreetLayer() {
+  return lang === 'en' ? streetLayerEn : streetLayer;
+}
 
 // Start with satellite view
 satelliteLayer.addTo(map);
@@ -2932,7 +2950,7 @@ function toggleMapLayer(suppressBanner = false) {
   closeMobileDropdown();
   if (currentLayer === 'satellite') {
     map.removeLayer(satelliteLayer);
-    streetLayer.addTo(map);
+    activeStreetLayer().addTo(map);
     currentLayer = 'street';
     streetUsedThisRound = true;
     document.getElementById('btn-layer').innerHTML = t('layer_satellite');
@@ -2944,7 +2962,7 @@ function toggleMapLayer(suppressBanner = false) {
       showEasyModeBanner();
     }
   } else {
-    map.removeLayer(streetLayer);
+    map.removeLayer(activeStreetLayer());
     satelliteLayer.addTo(map);
     currentLayer = 'satellite';
     document.getElementById('btn-layer').innerHTML = t('layer_street');
