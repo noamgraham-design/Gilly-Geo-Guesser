@@ -938,14 +938,15 @@
     background: rgba(244,246,249,0.92);
     backdrop-filter: blur(8px);
     z-index: 8000;
-    display: flex; align-items: center; justify-content: center;
+    display: flex; align-items: flex-start; justify-content: center;
     padding: 20px;
+    overflow-y: auto;
   }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 14px 28px 18px; max-width: 440px; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 10px 28px 14px; max-width: 440px; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 4px; }
   .card h2 { font-family: 'Playfair Display', 'Alef', serif; font-size: 1.8rem; font-weight: 900; margin-bottom: 10px; background: linear-gradient(90deg, #1a6fd4, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   .card p { color: var(--muted); font-size: 1.05rem; line-height: 1.75; margin-bottom: 22px; }
-  .diff-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 8px; }
-  .diff-btn { padding: 8px 20px; border-radius: 50px; border: 2px solid rgba(255,255,255,0.12); background: transparent; color: var(--muted); font-family: 'Source Serif 4', 'Alef', serif; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+  .diff-row { display: flex; gap: 8px; justify-content: center; }
+  .diff-btn { padding: 5px 16px; border-radius: 50px; border: 2px solid rgba(255,255,255,0.12); background: transparent; color: var(--muted); font-family: 'Source Serif 4', 'Alef', serif; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
   .diff-btn.active-easy   { border-color: var(--green); color: var(--green); background: rgba(26,127,55,0.08); }
   .diff-btn.active-medium { border-color: var(--gold);  color: var(--gold);  background: rgba(154,103,0,0.08); }
   .diff-btn.active-hard   { border-color: var(--red);   color: var(--red);   background: rgba(207,35,22,0.08); }
@@ -1309,8 +1310,8 @@
 
     /* Menu logo smaller on mobile */
     #menu-card img {
-      width: 180px !important;
-      height: 180px !important;
+      width: 110px !important;
+      height: 110px !important;
     }
 
     /* Tighten dividers */
@@ -1494,8 +1495,8 @@
     }
     
     #menu-card img {
-      width: 220px !important;
-      height: 220px !important;
+      width: 100px !important;
+      height: 100px !important;
     }
     
     #results-panel {
@@ -1750,7 +1751,7 @@
     <div class="logo-wrapper">
       <div class="sky-scene">
         <!-- Sun with perfect perpendicular rays -->
-        <svg class="sun" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" style="width:52px;height:52px;">
+        <svg class="sun" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" style="width:36px;height:36px;">
           <defs>
             <radialGradient id="sunGrad" cx="38%" cy="35%" r="60%">
               <stop offset="0%" stop-color="#fff7a0"/>
@@ -1778,7 +1779,7 @@
         <div class="cloud cloud2"><div class="cloud-body"></div></div>
         <div class="cloud cloud3"><div class="cloud-body"></div></div>
       </div>
-      <img src="logo.png" width="200" height="200" alt="Gilly Geo Guesser">
+      <img src="logo.png" width="130" height="130" alt="Gilly Geo Guesser">
     </div>
     <div style="width:100%;border-top:1px solid var(--border);margin:4px 0 2px"></div>
     <div style="font-size:0.82rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:600;margin-bottom:2px">🌐 שפה / Language</div>
@@ -1804,7 +1805,7 @@
       <button class="diff-btn" id="r-center" onclick="setRegion('center')">🏙️ Center</button>
       <button class="diff-btn" id="r-south"  onclick="setRegion('south')">🏜️ South</button>
     </div>
-    <button id="start-btn" class="btn btn-primary" style="font-size:1.1rem;padding:12px 44px" onclick="startGame()">← התחל משחק</button>
+    <button id="start-btn" class="btn btn-primary" style="font-size:1.1rem;padding:8px 36px" onclick="startGame()">← התחל משחק</button>
     <button id="learn-btn" class="btn btn-learn" onclick="startLearning()">📚 מצב למידה</button>
   </div>
 
