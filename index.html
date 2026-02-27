@@ -1135,15 +1135,18 @@
     }
     #mobile-topbar-town .mob-town-text {
       font-family: 'Playfair Display', serif;
-      font-size: 1.25rem;
+      font-size: 1.05rem;
       font-weight: 900;
-      line-height: 1.1;
+      line-height: 1.2;
       background: linear-gradient(90deg, #1a6fd4, #7c3aed);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      white-space: nowrap;
+      white-space: normal;
       overflow: hidden;
-      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      word-break: break-word;
     }
 
     /* HUD — override desktop absolute positioning, sit on the left */
@@ -1473,6 +1476,9 @@
     }
     .hud-value {
       font-size: 1.1rem;
+    }
+    #mobile-topbar-town .mob-town-text {
+      font-size: 0.9rem;
     }
     
     #town-name {
