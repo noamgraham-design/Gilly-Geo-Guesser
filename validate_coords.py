@@ -128,7 +128,9 @@ def parse_towns(html_path):
             for m in pattern.finditer(content)]
 
 def main():
-    towns = parse_towns("/home/user/Gilly-Geo-Guesser/index.html")
+    import os
+    html_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "index.html")
+    towns = parse_towns(html_path)
     non_polygon = [(n, la, ln) for n, la, ln in towns
                    if n not in POLYGON_TOWNS and n not in SKIP_NAMES]
 
