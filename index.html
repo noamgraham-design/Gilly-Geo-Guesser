@@ -1899,7 +1899,6 @@
     </div>
 
     <div id="settings-save-msg"></div>
-    <button class="btn-auth-submit" onclick="saveSettings()" id="settings-save-btn">Save</button>
   </div>
 </div>
 
@@ -2465,7 +2464,6 @@ function applyLang() {
     document.getElementById('gender-male').innerHTML   = lang === 'he' ? '👨 זכר'   : '👨 Male';
     document.getElementById('gender-female').innerHTML = lang === 'he' ? '👩 נקבה'  : '👩 Female';
     document.getElementById('gender-other').innerHTML  = lang === 'he' ? '🧑 אחר'   : '🧑 Other';
-    document.getElementById('settings-save-btn').textContent = lang === 'he' ? 'שמור' : 'Save';
   }
   // Update live town name/desc if a game is in progress
   const overlayVisible = document.getElementById('overlay').style.display !== 'none';
@@ -4476,6 +4474,7 @@ function selectGender(g) {
     const el = document.getElementById(`gender-${opt}`);
     if (el) el.classList.toggle('selected', opt === g);
   });
+  saveSettings();
 }
 
 function selectSettingsLang(l) {
@@ -4483,6 +4482,7 @@ function selectSettingsLang(l) {
     const el = document.getElementById(`settings-lang-${opt}`);
     if (el) el.classList.toggle('selected', opt === l);
   });
+  saveSettings();
 }
 
 async function openSettingsModal() {
@@ -4521,6 +4521,17 @@ function closeSettingsModal() {
 }
 document.getElementById('settings-modal').addEventListener('click', e => {
   if (e.target === document.getElementById('settings-modal')) closeSettingsModal();
+});
+
+// Auto-save nickname: debounce while typing, save immediately on blur
+let _nicknameSaveTimer = null;
+document.getElementById('settings-nickname').addEventListener('input', () => {
+  clearTimeout(_nicknameSaveTimer);
+  _nicknameSaveTimer = setTimeout(saveSettings, 800);
+});
+document.getElementById('settings-nickname').addEventListener('blur', () => {
+  clearTimeout(_nicknameSaveTimer);
+  saveSettings();
 });
 
 async function saveSettings() {
