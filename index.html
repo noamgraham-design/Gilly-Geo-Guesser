@@ -452,20 +452,20 @@
   #hud {
     display: flex;
     align-items: center;
-    gap: 32px;
+    gap: 20px;
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
   }
   .hud-block {
     text-align: center;
-    padding: 0px 14px 9px;
+    padding: 2px 12px 5px;
     background: rgba(0,0,0,0.05);
     border-radius: 10px;
     border: 1px solid rgba(0,0,0,0.08);
   }
-  .hud-label { font-size: 1rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); display: block; font-weight: 600; }
-  .hud-value { font-family: 'Playfair Display', 'Alef', serif; font-size: 2.4rem; font-weight: 900; line-height: 1; }
+  .hud-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); display: block; font-weight: 600; }
+  .hud-value { font-family: 'Playfair Display', 'Alef', serif; font-size: 1.7rem; font-weight: 900; line-height: 1; }
   #progress-bar-wrap { min-width: 140px; }
   #progress-bar-bg { height: 5px; background: rgba(255,255,255,0.07); border-radius: 99px; overflow: hidden; }
   #progress-bar-fill { height: 100%; background: linear-gradient(90deg, #58a6ff, #bc8cff); border-radius: 99px; transition: width 0.4s ease; width: 0%; }
@@ -504,8 +504,8 @@
     background: transparent;
     border: 2px solid #7c3aed;
     color: #7c3aed;
-    font-size: 1rem;
-    padding: 10px 36px;
+    font-size: 0.82rem;
+    padding: 4px 20px;
     transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
   }
   .btn-learn:hover {
@@ -942,16 +942,16 @@
     padding: 20px;
     overflow-y: auto;
   }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 10px 28px 14px; max-width: 440px; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 6px 28px 8px; max-width: 440px; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 2px; }
   .card h2 { font-family: 'Playfair Display', 'Alef', serif; font-size: 1.8rem; font-weight: 900; margin-bottom: 10px; background: linear-gradient(90deg, #1a6fd4, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   .card p { color: var(--muted); font-size: 1.05rem; line-height: 1.75; margin-bottom: 22px; }
   .diff-row { display: flex; gap: 8px; justify-content: center; }
-  .diff-btn { padding: 5px 16px; border-radius: 50px; border: 2px solid rgba(255,255,255,0.12); background: transparent; color: var(--muted); font-family: 'Source Serif 4', 'Alef', serif; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+  .diff-btn { padding: 2px 10px; border-radius: 50px; border: 2px solid rgba(255,255,255,0.12); background: transparent; color: var(--muted); font-family: 'Source Serif 4', 'Alef', serif; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
   .diff-btn.active-easy   { border-color: var(--green); color: var(--green); background: rgba(26,127,55,0.08); }
   .diff-btn.active-medium { border-color: var(--gold);  color: var(--gold);  background: rgba(154,103,0,0.08); }
   .diff-btn.active-hard   { border-color: var(--red);   color: var(--red);   background: rgba(207,35,22,0.08); }
   .diff-btn.active-region { border-color: #1a6fd4; color: #1a6fd4; background: rgba(26,111,212,0.08); }
-  .diff-note { font-size: 1rem; color: #777; margin-bottom: 2px; }
+  .diff-note { font-size: 0.78rem; color: #777; margin-bottom: 0; }
   #results-list { margin: 8px 0; width: 100%; text-align: start; }
   #results-list::-webkit-scrollbar { width: 4px; }
   #results-list::-webkit-scrollbar-thumb { background: #c8ccd2; border-radius: 99px; }
@@ -1310,8 +1310,8 @@
 
     /* Menu logo smaller on mobile */
     #menu-card img {
-      width: 110px !important;
-      height: 110px !important;
+      width: 180px !important;
+      height: 180px !important;
     }
 
     /* Tighten dividers */
@@ -1495,8 +1495,8 @@
     }
     
     #menu-card img {
-      width: 100px !important;
-      height: 100px !important;
+      width: 155px !important;
+      height: 155px !important;
     }
     
     #results-panel {
@@ -1751,7 +1751,7 @@
     <div class="logo-wrapper">
       <div class="sky-scene">
         <!-- Sun with perfect perpendicular rays -->
-        <svg class="sun" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" style="width:36px;height:36px;">
+        <svg class="sun" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" style="width:57px;height:57px;">
           <defs>
             <radialGradient id="sunGrad" cx="38%" cy="35%" r="60%">
               <stop offset="0%" stop-color="#fff7a0"/>
@@ -1779,16 +1779,16 @@
         <div class="cloud cloud2"><div class="cloud-body"></div></div>
         <div class="cloud cloud3"><div class="cloud-body"></div></div>
       </div>
-      <img src="logo.png" width="130" height="130" alt="Gilly Geo Guesser">
+      <img src="logo.png" width="215" height="215" alt="Gilly Geo Guesser">
     </div>
-    <div style="width:100%;border-top:1px solid var(--border);margin:4px 0 2px"></div>
-    <div style="font-size:0.82rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:600;margin-bottom:2px">🌐 שפה / Language</div>
-    <div class="diff-row" style="margin-bottom:4px">
+    <div style="width:100%;border-top:1px solid var(--border);margin:2px 0 1px"></div>
+    <div style="font-size:0.82rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:600">🌐 שפה / Language</div>
+    <div class="diff-row">
       <button class="diff-btn active-region" id="lang-he" onclick="setLang('he')">עברית</button>
       <button class="diff-btn" id="lang-en" onclick="setLang('en')">English</button>
     </div>
-    <div style="width:100%;border-top:1px solid var(--border);margin:2px 0 4px"></div>
-    <p id="menu-desc" style="margin:0;font-size:1.05rem;line-height:1.6;text-align:center;direction:rtl;">
+    <div style="width:100%;border-top:1px solid var(--border);margin:1px 0 2px"></div>
+    <p id="menu-desc" style="margin:0;font-size:0.88rem;line-height:1.35;text-align:center;direction:rtl;">
       לחצ/י על העיר המוצגת על המפה.<br>עד 8 ערים בסיבוב.
     </p>
     <div class="diff-row">
@@ -1797,15 +1797,15 @@
       <button class="diff-btn" id="d-hard"   onclick="setDiff('hard')">Hard</button>
     </div>
     <div class="diff-note" id="diff-note">Moderate target radius — recommended</div>
-    <div style="width:100%;border-top:1px solid var(--border);margin:2px 0 4px"></div>
-    <div style="font-size:0.82rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:600;margin-bottom:2px" id="lbl-region">Region</div>
+    <div style="width:100%;border-top:1px solid var(--border);margin:1px 0 2px"></div>
+    <div style="font-size:0.82rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:600" id="lbl-region">Region</div>
     <div class="diff-row">
       <button class="diff-btn active-region" id="r-all"    onclick="setRegion('all')">🇮🇱 All</button>
       <button class="diff-btn" id="r-north"  onclick="setRegion('north')">🏔️ North</button>
       <button class="diff-btn" id="r-center" onclick="setRegion('center')">🏙️ Center</button>
       <button class="diff-btn" id="r-south"  onclick="setRegion('south')">🏜️ South</button>
     </div>
-    <button id="start-btn" class="btn btn-primary" style="font-size:1.1rem;padding:8px 36px" onclick="startGame()">← התחל משחק</button>
+    <button id="start-btn" class="btn btn-primary" style="font-size:0.9rem;padding:5px 24px" onclick="startGame()">← התחל משחק</button>
     <button id="learn-btn" class="btn btn-learn" onclick="startLearning()">📚 מצב למידה</button>
   </div>
 
