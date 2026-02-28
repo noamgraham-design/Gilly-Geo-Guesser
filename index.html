@@ -446,6 +446,7 @@
     font-family: 'Playfair Display', 'Alef', serif;
     font-size: 1.7rem;
     font-weight: 900;
+    margin: 0;
     background: linear-gradient(90deg, #1a6fd4, #7c3aed);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -460,14 +461,16 @@
     transform: translateX(-50%);
   }
   .hud-block {
-    text-align: center;
-    padding: 2px 12px 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
     background: rgba(0,0,0,0.05);
     border-radius: 10px;
     border: 1px solid rgba(0,0,0,0.08);
   }
-  .hud-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); display: block; font-weight: 600; }
-  .hud-value { font-family: 'Playfair Display', 'Alef', serif; font-size: 1.7rem; font-weight: 900; line-height: 1; }
+  .hud-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); font-weight: 600; }
+  .hud-value { font-family: 'Playfair Display', 'Alef', serif; font-size: 1.1rem; font-weight: 900; line-height: 1; }
   #progress-bar-wrap { min-width: 140px; }
   #progress-bar-bg { height: 5px; background: rgba(255,255,255,0.07); border-radius: 99px; overflow: hidden; }
   #progress-bar-fill { height: 100%; background: linear-gradient(90deg, #58a6ff, #bc8cff); border-radius: 99px; transition: width 0.4s ease; width: 0%; }
@@ -1454,8 +1457,6 @@
     
     /* HUD blocks smaller */
     .hud-block {
-      min-width: 44px;
-      text-align: center;
       padding: 2px 6px;
       background: rgba(26,111,212,0.06);
       border-radius: 8px;
@@ -1465,7 +1466,7 @@
       font-size: 0.7rem;
     }
     .hud-value {
-      font-size: 1.3rem;
+      font-size: 1.1rem;
     }
     
     /* Town card adjustments */
