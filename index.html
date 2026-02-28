@@ -1143,7 +1143,6 @@
     transition: all 0.15s;
   }
   .overlay-lang-btn:hover { border-color: rgba(0,0,0,0.2); background: var(--bg); }
-  .overlay-lang-btn.active { border-color: #1a6fd4; color: #1a6fd4; background: rgba(26,111,212,0.06); }
 
   /* Background clouds (in overlay, not in card) */
   .overlay-bg-clouds {
@@ -2000,8 +1999,7 @@
       <span class="overlay-topbar-title" id="overlay-title-text">Gilly Israel Quiz</span>
     </div>
     <div class="overlay-topbar-right">
-      <button class="overlay-lang-btn active" id="lang-he" onclick="setLang('he')">🌐 עברית</button>
-      <button class="overlay-lang-btn" id="lang-en" onclick="setLang('en')">English</button>
+      <button class="overlay-lang-btn" id="lang-toggle" onclick="toggleLang()">🌐 English</button>
       <div id="auth-wrap" style="position:relative;flex-shrink:0;">
         <button id="auth-btn" onclick="handleAuthBtnClick()">
           <span class="auth-avatar" id="auth-avatar">👤</span>
@@ -2050,13 +2048,13 @@
       <div class="menu-mode-title" id="menu-mode-title">מצב משחק</div>
       <div class="menu-mode-subtitle" id="menu-mode-subtitle">ערים ועיירות</div>
     </div>
-    <p id="menu-desc" style="margin:0;font-size:0.88rem;line-height:1.35;text-align:center;direction:rtl;">
+    <p id="menu-desc" style="margin:0;font-size:0.88rem;line-height:1.35;text-align:center;">
       לחצ/י על העיר המוצגת על המפה.<br>עד 8 ערים בסיבוב.
     </p>
-    <div class="diff-row">
-      <button class="diff-btn" id="d-hard"   onclick="setDiff('hard')">קשה</button>
-      <button class="diff-btn active-medium" id="d-medium" onclick="setDiff('medium')">בינוני</button>
+    <div class="diff-row" id="diff-row">
       <button class="diff-btn" id="d-easy"   onclick="setDiff('easy')">קל</button>
+      <button class="diff-btn active-medium" id="d-medium" onclick="setDiff('medium')">בינוני</button>
+      <button class="diff-btn" id="d-hard"   onclick="setDiff('hard')">קשה</button>
     </div>
     <div class="diff-note" id="diff-note">ערים ועיירות</div>
     <div style="width:100%;border-top:1px solid var(--border);margin:4px 0 2px"></div>
@@ -2698,6 +2696,9 @@ function setLang(l) {
   lang = l;
   applyLang();
 }
+function toggleLang() {
+  setLang(lang === 'he' ? 'en' : 'he');
+}
 
 function applyLang() {
   document.body.dir = 'ltr';
@@ -2729,13 +2730,11 @@ function applyLang() {
   document.getElementById('mobile-btn-back').textContent = t('back_btn');
   document.querySelector('#mobile-topbar-town .mob-find-label').textContent = lang === 'he' ? '📍 מצא' : '📍 Find';
   document.getElementById('mobile-btn-layer').innerHTML = currentLayer === 'satellite' ? t('layer_street') : t('layer_satellite');
-  // Update lang toggle button styles (new overlay-topbar lang buttons)
-  document.getElementById('lang-he').className = `overlay-lang-btn${lang === 'he' ? ' active' : ''}`;
-  document.getElementById('lang-en').className = `overlay-lang-btn${lang === 'en' ? ' active' : ''}`;
-  document.getElementById('lang-he').textContent = lang === 'he' ? '🌐 עברית' : 'עברית';
-  document.getElementById('lang-en').textContent = lang === 'en' ? '🌐 English' : 'English';
-  // Set card direction based on language
-  document.getElementById('menu-card').dir = lang === 'he' ? 'rtl' : 'ltr';
+  // Update single lang toggle button — shows the OTHER language to switch to
+  document.getElementById('lang-toggle').textContent = lang === 'he' ? '🌐 English' : '🌐 עברית';
+  // Set text direction for text-heavy elements only (not the card itself, to keep button order stable)
+  document.getElementById('menu-desc').style.direction = lang === 'he' ? 'rtl' : 'ltr';
+  document.getElementById('menu-mode-title').style.direction = lang === 'he' ? 'rtl' : 'ltr';
   document.getElementById('results-card').dir = lang === 'he' ? 'rtl' : 'ltr';
   updateHintBtn();
   // Update layer toggle button text based on current layer
