@@ -145,7 +145,7 @@
     #auth-btn { padding: 4px; border-radius: 50%; }
     #auth-label { display: none; }
     #auth-dropdown {
-      top: calc(100% + 8px); bottom: auto; right: 0;
+      top: auto; bottom: calc(100% + 8px); right: 0;
       min-width: 200px; border-radius: 12px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.15);
     }
@@ -1049,45 +1049,45 @@
     animation: cloudDrift1 7s ease-in-out infinite;
   }
   .cloud1 .cloud-body {
-    width: 240px; height: 78px;
+    width: 80px; height: 26px;
   }
   .cloud1 .cloud-body::before {
-    width: 120px; height: 120px;
-    top: -60px; left: 36px;
+    width: 40px; height: 40px;
+    top: -20px; left: 12px;
   }
   .cloud1 .cloud-body::after {
-    width: 84px; height: 84px;
-    top: -36px; left: 114px;
+    width: 28px; height: 28px;
+    top: -12px; left: 38px;
   }
   .cloud2 {
     top: 8px; right: 2%;
     animation: cloudDrift2 9s ease-in-out infinite;
   }
   .cloud2 .cloud-body {
-    width: 270px; height: 84px;
+    width: 90px; height: 28px;
   }
   .cloud2 .cloud-body::before {
-    width: 132px; height: 132px;
-    top: -66px; left: 42px;
+    width: 44px; height: 44px;
+    top: -22px; left: 14px;
   }
   .cloud2 .cloud-body::after {
-    width: 90px; height: 90px;
-    top: -42px; left: 144px;
+    width: 30px; height: 30px;
+    top: -14px; left: 48px;
   }
   .cloud3 {
     top: 50px; left: 18%;
     animation: cloudDrift3 11s ease-in-out infinite;
   }
   .cloud3 .cloud-body {
-    width: 180px; height: 60px;
+    width: 60px; height: 20px;
   }
   .cloud3 .cloud-body::before {
-    width: 90px; height: 90px;
-    top: -45px; left: 24px;
+    width: 30px; height: 30px;
+    top: -15px; left: 8px;
   }
   .cloud3 .cloud-body::after {
-    width: 60px; height: 60px;
-    top: -24px; left: 90px;
+    width: 20px; height: 20px;
+    top: -8px; left: 30px;
   }
 
   /* ── REDESIGNED MENU ────────────────────────────────────────────── */
@@ -1110,9 +1110,10 @@
     gap: 10px;
   }
   .overlay-topbar-left img {
-    width: 128px;
-    height: 128px;
-    object-fit: contain;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
   }
   .overlay-topbar-title {
     font-family: 'Playfair Display', 'Alef', serif;
@@ -1171,25 +1172,25 @@
     border-radius: 50%;
   }
   .bg-cloud1 { top: 15%; left: 3%; animation: cloudDrift1 12s ease-in-out infinite; }
-  .bg-cloud1 .cloud-body { width: 300px; height: 96px; }
-  .bg-cloud1 .cloud-body::before { width: 150px; height: 150px; top: -78px; left: 42px; }
-  .bg-cloud1 .cloud-body::after  { width: 108px; height: 108px; top: -48px; left: 144px; }
+  .bg-cloud1 .cloud-body { width: 100px; height: 32px; }
+  .bg-cloud1 .cloud-body::before { width: 50px; height: 50px; top: -26px; left: 14px; }
+  .bg-cloud1 .cloud-body::after  { width: 36px; height: 36px; top: -16px; left: 48px; }
   .bg-cloud2 { top: 22%; right: 5%; animation: cloudDrift2 15s ease-in-out infinite; }
-  .bg-cloud2 .cloud-body { width: 330px; height: 102px; }
-  .bg-cloud2 .cloud-body::before { width: 162px; height: 162px; top: -84px; left: 48px; }
-  .bg-cloud2 .cloud-body::after  { width: 114px; height: 114px; top: -54px; left: 168px; }
+  .bg-cloud2 .cloud-body { width: 110px; height: 34px; }
+  .bg-cloud2 .cloud-body::before { width: 54px; height: 54px; top: -28px; left: 16px; }
+  .bg-cloud2 .cloud-body::after  { width: 38px; height: 38px; top: -18px; left: 56px; }
   .bg-cloud3 { top: 55%; left: 8%; animation: cloudDrift4 18s ease-in-out infinite; }
-  .bg-cloud3 .cloud-body { width: 210px; height: 72px; }
-  .bg-cloud3 .cloud-body::before { width: 108px; height: 108px; top: -54px; left: 30px; }
-  .bg-cloud3 .cloud-body::after  { width: 72px; height: 72px; top: -30px; left: 108px; }
+  .bg-cloud3 .cloud-body { width: 70px; height: 24px; }
+  .bg-cloud3 .cloud-body::before { width: 36px; height: 36px; top: -18px; left: 10px; }
+  .bg-cloud3 .cloud-body::after  { width: 24px; height: 24px; top: -10px; left: 36px; }
   .bg-cloud4 { top: 68%; right: 6%; animation: cloudDrift5 14s ease-in-out infinite; }
-  .bg-cloud4 .cloud-body { width: 255px; height: 84px; }
-  .bg-cloud4 .cloud-body::before { width: 126px; height: 126px; top: -66px; left: 36px; }
-  .bg-cloud4 .cloud-body::after  { width: 90px; height: 90px; top: -42px; left: 126px; }
+  .bg-cloud4 .cloud-body { width: 85px; height: 28px; }
+  .bg-cloud4 .cloud-body::before { width: 42px; height: 42px; top: -22px; left: 12px; }
+  .bg-cloud4 .cloud-body::after  { width: 30px; height: 30px; top: -14px; left: 42px; }
   .bg-cloud5 { top: 82%; left: 15%; animation: cloudDrift3 16s ease-in-out infinite; }
-  .bg-cloud5 .cloud-body { width: 180px; height: 60px; }
-  .bg-cloud5 .cloud-body::before { width: 90px; height: 90px; top: -45px; left: 24px; }
-  .bg-cloud5 .cloud-body::after  { width: 66px; height: 66px; top: -30px; left: 84px; }
+  .bg-cloud5 .cloud-body { width: 60px; height: 20px; }
+  .bg-cloud5 .cloud-body::before { width: 30px; height: 30px; top: -15px; left: 8px; }
+  .bg-cloud5 .cloud-body::after  { width: 22px; height: 22px; top: -10px; left: 28px; }
 
   /* Menu card title area */
   .menu-title-section {
@@ -1279,6 +1280,89 @@
     transform: translateY(-1px);
     box-shadow: 0 6px 20px rgba(26,111,212,0.5);
     background: linear-gradient(135deg, #2a7fe4, #1a6fd4);
+  }
+
+  #menu-card.card {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    position: relative;
+    overflow: hidden;
+  }
+  #menu-card.card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('israel_flag.png') center/contain no-repeat;
+    opacity: 0.10;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  /* DESKTOP – enlarge menu card & contents */
+  @media (min-width: 769px) {
+    .card {
+      max-width: 500px;
+      padding: 14px 34px 16px;
+      gap: 4px;
+    }
+    .card h2 {
+      font-size: 1.9rem;
+      margin-bottom: 8px;
+    }
+    .card p {
+      font-size: 1.05rem;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .menu-mode-title {
+      font-size: 1.7rem;
+      margin-bottom: 1px;
+    }
+    .diff-row {
+      gap: 10px;
+    }
+    .diff-btn {
+      padding: 4px 18px;
+      font-size: 0.92rem;
+      min-width: 82px;
+    }
+    .diff-note {
+      font-size: 0.82rem;
+    }
+    .region-grid {
+      gap: 12px;
+      margin: 4px 0;
+    }
+    .region-card {
+      min-width: 76px;
+      gap: 4px;
+      padding: 4px;
+    }
+    .region-icon {
+      width: 52px;
+      height: 52px;
+      font-size: 1.55rem;
+    }
+    .region-label {
+      font-size: 0.82rem;
+    }
+    .btn-start-gold {
+      font-size: 1rem;
+      padding: 9px 30px;
+      min-width: 200px;
+    }
+    .btn-learn {
+      font-size: 0.92rem;
+      padding: 7px 22px;
+    }
+    #menu-desc {
+      font-size: 0.92rem !important;
+      line-height: 1.4 !important;
+    }
+    #lbl-region {
+      font-size: 0.85rem !important;
+    }
   }
 
   /* MOBILE RESPONSIVE STYLES */
@@ -1522,8 +1606,8 @@
       font-size: 1rem;
     }
     .overlay-topbar-left img {
-      width: 104px;
-      height: 104px;
+      width: 34px;
+      height: 34px;
     }
     .overlay-lang-btn {
       padding: 5px 10px;
@@ -1741,8 +1825,8 @@
       font-size: 0.9rem;
     }
     .overlay-topbar-left img {
-      width: 88px;
-      height: 88px;
+      width: 30px;
+      height: 30px;
     }
     .overlay-lang-btn {
       padding: 4px 8px;
@@ -1986,7 +2070,7 @@
   <!-- Top navigation bar -->
   <div class="overlay-topbar">
     <div class="overlay-topbar-left">
-      <img src="GGG_logo_nobg.png" width="128" height="128" alt="Gilly Geo Guesser">
+      <img src="logo_head.png" width="42" height="42" alt="Gilly Geo Guesser">
       <span class="overlay-topbar-title" id="overlay-title-text">Gilly Israel Quiz</span>
     </div>
     <div class="overlay-topbar-right">
@@ -2029,10 +2113,9 @@
   </div>
 
   <!-- Main menu card -->
-  <div class="card" id="menu-card" style="z-index:2;">
+  <div class="card" id="menu-card" style="z-index:2;background:transparent;border:none;box-shadow:none;">
     <div class="menu-title-section">
       <div class="menu-mode-title" id="menu-mode-title">מצב משחק</div>
-      <div class="menu-mode-subtitle" id="menu-mode-subtitle">ערים ועיירות</div>
     </div>
     <p id="menu-desc" style="margin:0;font-size:0.88rem;line-height:1.35;text-align:center;">
       לחצ/י על העיר המוצגת על המפה.<br>עד 8 ערים בסיבוב.
@@ -2696,7 +2779,6 @@ function applyLang() {
   document.getElementById('fact-modal-close').textContent = t('fact_close');
   document.getElementById('menu-desc').innerHTML = t('menu_desc');
   document.getElementById('menu-mode-title').textContent = t('game_mode');
-  document.getElementById('menu-mode-subtitle').textContent = t(`note_${difficulty}`);
   document.getElementById('d-easy').textContent   = t('diff_easy');
   document.getElementById('d-medium').textContent = t('diff_medium');
   document.getElementById('d-hard').textContent   = t('diff_hard');
@@ -3754,7 +3836,6 @@ function setDiff(d) {
     document.getElementById(`d-${k}`).className = `diff-btn${k === d ? ` active-${k}` : ''}`;
   });
   document.getElementById('diff-note').textContent = t(`note_${d}`);
-  document.getElementById('menu-mode-subtitle').textContent = t(`note_${d}`);
 }
 
 // Region filter: 'all' | 'north' | 'center' | 'south'
