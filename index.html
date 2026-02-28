@@ -1294,7 +1294,7 @@
     position: absolute;
     inset: 0;
     background: url('israel_flag.png') center/contain no-repeat;
-    opacity: 0.10;
+    opacity: 0.25;
     z-index: -1;
     pointer-events: none;
   }
@@ -2118,7 +2118,7 @@
       <div class="menu-mode-title" id="menu-mode-title">מצב משחק</div>
     </div>
     <p id="menu-desc" style="margin:0;font-size:0.88rem;line-height:1.35;text-align:center;">
-      לחצ/י על העיר המוצגת על המפה.<br>עד 8 ערים בסיבוב.
+      מצא/י את המיקום על המפה
     </p>
     <div class="diff-row" id="diff-row">
       <button class="diff-btn" id="d-easy"   onclick="setDiff('easy')">קל</button>
@@ -2691,7 +2691,7 @@ const STRINGS = {
     layer_street:     "🗺️ Street map",
     layer_satellite:  "🛰️ Satellite",
     fact_close:       "Close",
-    menu_desc:        "Click the town shown on the map.<br>Up to 8 towns per round.",
+    menu_desc:        "Pin the location on the map.",
     diff_easy:        "Easy",
     diff_medium:      "Medium",
     diff_hard:        "Hard",
@@ -2729,7 +2729,7 @@ const STRINGS = {
     layer_street:     "🗺️ מפת רחוב",
     layer_satellite:  "🛰️ לוויין",
     fact_close:       "סגור",
-    menu_desc:        "לחצ/י על העיר המוצגת על המפה.<br>עד 8 ערים בסיבוב.",
+    menu_desc:        "מצא/י את המיקום על המפה",
     diff_easy:        "קל",
     diff_medium:      "בינוני",
     diff_hard:        "קשה",
@@ -4415,6 +4415,16 @@ setDiff('medium');
 setRegion('all');
 applyLang();
 
+// ── RANDOM DEFAULT NICKNAME ────────────────────────────────────────────────
+function generateRandomNickname() {
+  const prefixes = ['Bamba','Bisli','Krembo','Klik','Shoko','Pesek','Mekupelet','Taami'];
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+  let suffix = '';
+  for (let i = 0; i < 4; i++) suffix += chars[Math.floor(Math.random() * chars.length)];
+  return prefix + '_' + suffix;
+}
+
 // ── FIREBASE AUTH & SCORING ────────────────────────────────────────────────
 
 let _authMode = 'signin'; // 'signin' | 'signup'
@@ -4435,8 +4445,8 @@ window._onAuthChange = function(user) {
     document.getElementById('auth-dropdown-email').textContent = user.email || '';
 
     // Load ALL settings from Firestore and apply immediately
-    Promise.resolve(window._fbFns).then(({ getDoc, doc }) => {
-      getDoc(doc(window._fbDb, 'users', user.uid)).then(snap => {
+    Promise.resolve(window._fbFns).then(({ getDoc, setDoc, doc }) => {
+      getDoc(doc(window._fbDb, 'users', user.uid)).then(async snap => {
         if (snap.exists()) {
           const data = snap.data();
           if (data.language) setLang(data.language);
@@ -4450,7 +4460,15 @@ window._onAuthChange = function(user) {
               if (el) el.classList.toggle('selected', opt === data.gender);
             });
           }
-          // nickname is display-only in the modal, no need to apply globally
+          // Assign a default nickname if the user doesn't have one
+          if (!data.nickname) {
+            const defaultNick = generateRandomNickname();
+            await setDoc(doc(window._fbDb, 'users', user.uid), { nickname: defaultNick }, { merge: true });
+          }
+        } else {
+          // New user with no doc yet — create one with a default nickname
+          const defaultNick = generateRandomNickname();
+          await setDoc(doc(window._fbDb, 'users', user.uid), { nickname: defaultNick }, { merge: true });
         }
       });
     });
@@ -4865,15 +4883,22 @@ async function openSettingsModal() {
   try {
     if (window._fbUser) {
       try {
-        const { getDoc, doc } = window._fbFns;
+        const { getDoc, setDoc, doc } = window._fbFns;
         const snap = await getDoc(doc(window._fbDb, 'users', window._fbUser.uid));
         if (snap.exists()) {
           const data = snap.data();
-          document.getElementById('settings-nickname').value = data.nickname || '';
+          let nick = data.nickname || '';
+          if (!nick) {
+            nick = generateRandomNickname();
+            setDoc(doc(window._fbDb, 'users', window._fbUser.uid), { nickname: nick }, { merge: true });
+          }
+          document.getElementById('settings-nickname').value = nick;
           selectGender(data.gender || 'male');
           selectSettingsLang(data.language || lang);
         } else {
-          document.getElementById('settings-nickname').value = '';
+          const nick = generateRandomNickname();
+          document.getElementById('settings-nickname').value = nick;
+          setDoc(doc(window._fbDb, 'users', window._fbUser.uid), { nickname: nick }, { merge: true });
           selectGender('male');
           selectSettingsLang(lang);
         }
@@ -4912,7 +4937,11 @@ document.getElementById('settings-nickname').addEventListener('blur', () => {
 
 async function saveSettings() {
   if (!window._fbUser) return;
-  const nickname = document.getElementById('settings-nickname').value.trim();
+  let nickname = document.getElementById('settings-nickname').value.trim();
+  if (!nickname) {
+    nickname = generateRandomNickname();
+    document.getElementById('settings-nickname').value = nickname;
+  }
   const selectedLang = document.getElementById('settings-lang-he').classList.contains('selected') ? 'he' : 'en';
   const msgEl = document.getElementById('settings-save-msg');
   msgEl.style.color = 'var(--muted)';
