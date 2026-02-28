@@ -1202,6 +1202,8 @@
     font-size: 1.6rem;
     font-weight: 900;
     color: var(--text);
+    -webkit-text-fill-color: var(--text);
+    background: none;
     margin-bottom: 2px;
   }
   .menu-mode-subtitle {
@@ -2046,7 +2048,7 @@
     <div style="font-size:0.82rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:600" id="lbl-region">אזור</div>
     <div class="region-grid">
       <div class="region-card active" id="r-all" onclick="setRegion('all')">
-        <div class="region-icon"><svg width="28" height="28" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg"><rect width="38" height="38" fill="#fff"/><rect y="5.5" width="38" height="6" fill="#0038b8"/><rect y="26.5" width="38" height="6" fill="#0038b8"/><polygon points="19.0,12.5 24.6,22.2 13.4,22.2" fill="none" stroke="#0038b8" stroke-width="1.6"/><polygon points="19.0,25.5 13.4,15.8 24.6,15.8" fill="none" stroke="#0038b8" stroke-width="1.6"/></svg></div>
+        <div class="region-icon"><svg width="32" height="32" viewBox="0 0 38 38" style="border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,0.15);" xmlns="http://www.w3.org/2000/svg"><rect width="38" height="38" fill="#fff"/><rect y="5" width="38" height="6.5" fill="#0038b8"/><rect y="26.5" width="38" height="6.5" fill="#0038b8"/><polygon points="19,11.5 25.2,22.2 12.8,22.2" fill="none" stroke="#0038b8" stroke-width="1.8"/><polygon points="19,26.5 12.8,15.8 25.2,15.8" fill="none" stroke="#0038b8" stroke-width="1.8"/></svg></div>
         <div class="region-label" id="r-all-label">הכל</div>
       </div>
       <div class="region-card" id="r-north" onclick="setRegion('north')">
@@ -2611,7 +2613,7 @@ const STRINGS = {
     diff_easy:        "Easy",
     diff_medium:      "Medium",
     diff_hard:        "Hard",
-    region_all:       "🇮🇱 All",
+    region_all:       "All",
     region_north:     "🏔️ North",
     region_center:    "🏙️ Center",
     region_south:     "🏜️ South",
@@ -2649,7 +2651,7 @@ const STRINGS = {
     diff_easy:        "קל",
     diff_medium:      "בינוני",
     diff_hard:        "קשה",
-    region_all:       "🇮🇱 הכל",
+    region_all:       "הכל",
     region_north:     "🏔️ צפון",
     region_center:    "🏙️ מרכז",
     region_south:     "🏜️ דרום",
