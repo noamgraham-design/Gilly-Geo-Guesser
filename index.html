@@ -1487,7 +1487,52 @@
     #mobile-menu-btn:active {
       background: var(--bg);
     }
-    
+
+    /* Mobile tools (binoculars) button + dropdown */
+    #mobile-tools-wrap {
+      display: block !important;
+      position: relative;
+      flex-shrink: 0;
+    }
+    #mobile-tools-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      padding: 6px 10px;
+      margin-right: 4px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    #mobile-tools-btn:active {
+      background: var(--bg);
+    }
+    #mobile-tools-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 200px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      z-index: 5000;
+      padding: 8px;
+    }
+    #mobile-tools-dropdown.show {
+      display: flex !important;
+      flex-direction: column;
+      gap: 8px;
+    }
+    #mobile-tools-dropdown button {
+      width: 100%;
+      justify-content: center;
+    }
+
     /* Mobile dropdown styling */
     #mobile-dropdown {
       position: absolute;
@@ -2036,6 +2081,13 @@
     </div>
   </div>
   <div id="mobile-topbar-town" style="display:none"><span class="mob-find-label">📍 Find</span><span class="mob-town-text">—</span></div>
+  <div id="mobile-tools-wrap" style="display:none">
+    <button id="mobile-tools-btn" onclick="toggleMobileTools()">🔭</button>
+    <div id="mobile-tools-dropdown">
+      <button class="btn btn-hint" id="mobile-tools-hint" onclick="useHint()">💡 Hint (−10 pts) · 3 left</button>
+      <button class="btn btn-hint" id="mobile-tools-layer" onclick="toggleMapLayer()">🗺️ מפת רחוב</button>
+    </div>
+  </div>
   <button class="btn btn-hint" id="mobile-menu-btn" onclick="toggleMobileMenu()" style="display:none">☰</button>
 </div>
 
@@ -2817,6 +2869,7 @@ function applyLang() {
   document.getElementById('mobile-btn-back').textContent = t('back_btn');
   document.querySelector('#mobile-topbar-town .mob-find-label').textContent = lang === 'he' ? '📍 מצא' : '📍 Find';
   document.getElementById('mobile-btn-layer').innerHTML = currentLayer === 'satellite' ? t('layer_street') : t('layer_satellite');
+  document.getElementById('mobile-tools-layer').innerHTML = currentLayer === 'satellite' ? t('layer_street') : t('layer_satellite');
   // Update single lang toggle button — shows the OTHER language to switch to
   document.getElementById('lang-toggle').textContent = lang === 'he' ? '🌐 English' : '🌐 עברית';
   // Set text direction for text-heavy elements only (not the card itself, to keep button order stable)
@@ -3369,6 +3422,7 @@ function closeMobileDropdown() {
 
 function toggleMapLayer(suppressBanner = false) {
   closeMobileDropdown();
+  closeMobileTools();
   if (currentLayer === 'satellite') {
     map.removeLayer(satelliteLayer);
     activeStreetLayer().addTo(map);
@@ -3376,6 +3430,7 @@ function toggleMapLayer(suppressBanner = false) {
     streetUsedThisRound = true;
     document.getElementById('btn-layer').innerHTML = t('layer_satellite');
     document.getElementById('mobile-btn-layer').innerHTML = t('layer_satellite');
+    document.getElementById('mobile-tools-layer').innerHTML = t('layer_satellite');
     // Reset streak when switching to street view (labels make it too easy)
     streak = 0;
     // Show funny "easy mode" banner (unless suppressed for auto-switches)
@@ -3388,11 +3443,13 @@ function toggleMapLayer(suppressBanner = false) {
     currentLayer = 'satellite';
     document.getElementById('btn-layer').innerHTML = t('layer_street');
     document.getElementById('mobile-btn-layer').innerHTML = t('layer_street');
+    document.getElementById('mobile-tools-layer').innerHTML = t('layer_street');
   }
   updateArabVillageLabels();
 }
 
 function toggleMobileMenu() {
+  closeMobileTools();
   const dropdown = document.getElementById('mobile-dropdown');
   if (dropdown) {
     dropdown.classList.toggle('show');
@@ -3402,14 +3459,30 @@ function toggleMobileMenu() {
   }
 }
 
-// Close mobile menu when clicking outside - wait for DOM
+function toggleMobileTools() {
+  closeMobileDropdown();
+  const dropdown = document.getElementById('mobile-tools-dropdown');
+  if (dropdown) dropdown.classList.toggle('show');
+}
+function closeMobileTools() {
+  const dropdown = document.getElementById('mobile-tools-dropdown');
+  if (dropdown) dropdown.classList.remove('show');
+}
+
+// Close mobile menus when clicking outside - wait for DOM
 window.addEventListener('DOMContentLoaded', function() {
   document.addEventListener('click', function(e) {
     const dropdown = document.getElementById('mobile-dropdown');
     const menuBtn = document.getElementById('mobile-menu-btn');
-    if (dropdown && dropdown.classList.contains('show') && 
+    if (dropdown && dropdown.classList.contains('show') &&
         !dropdown.contains(e.target) && !menuBtn.contains(e.target)) {
       dropdown.classList.remove('show');
+    }
+    const toolsWrap = document.getElementById('mobile-tools-wrap');
+    const toolsDD = document.getElementById('mobile-tools-dropdown');
+    if (toolsDD && toolsDD.classList.contains('show') &&
+        !toolsWrap.contains(e.target)) {
+      toolsDD.classList.remove('show');
     }
   });
 });
@@ -3837,16 +3910,15 @@ function loadTown() {
 function updateHintBtn() {
   const btn = document.getElementById('btn-hint');
   const mobileBtn = document.getElementById('mobile-btn-hint');
-  if (hintsLeft <= 0 || hintUsed || waiting) {
-    btn.disabled = true;
-    mobileBtn.disabled = true;
-  } else {
-    btn.disabled = false;
-    mobileBtn.disabled = false;
-  }
+  const toolsBtn = document.getElementById('mobile-tools-hint');
+  const disabled = hintsLeft <= 0 || hintUsed || waiting;
+  btn.disabled = disabled;
+  mobileBtn.disabled = disabled;
+  toolsBtn.disabled = disabled;
   const text = STRINGS[lang].hint_btn(hintsLeft);
   btn.textContent = text;
   mobileBtn.textContent = text;
+  toolsBtn.textContent = text;
 }
 
 function setDiff(d) {
@@ -3882,6 +3954,7 @@ function setRegion(r) {
 function useHint() {
   if (hintUsed || waiting || hintsLeft <= 0) return;
   closeMobileDropdown();
+  closeMobileTools();
   hintUsed = true;
   hintsLeft--;
   document.getElementById('hint-badge').style.display = 'inline';
