@@ -508,6 +508,8 @@
     color: #7c3aed;
     font-size: 0.82rem;
     padding: 4px 20px;
+    min-width: 180px;
+    text-align: center;
     transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
   }
   .btn-learn:hover {
@@ -949,7 +951,7 @@
   .card h2 { font-family: 'Playfair Display', 'Alef', serif; font-size: 1.8rem; font-weight: 900; margin-bottom: 10px; background: linear-gradient(90deg, #1a6fd4, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   .card p { color: var(--muted); font-size: 1.05rem; line-height: 1.75; margin-bottom: 22px; }
   .diff-row { display: flex; gap: 8px; justify-content: center; }
-  .diff-btn { padding: 4px 14px; border-radius: 50px; border: 2px solid var(--border); background: transparent; color: var(--muted); font-family: 'Source Serif 4', 'Alef', serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+  .diff-btn { padding: 4px 14px; border-radius: 50px; border: 2px solid var(--border); background: transparent; color: var(--muted); font-family: 'Source Serif 4', 'Alef', serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.15s; min-width: 74px; text-align: center; }
   .diff-btn.active-easy   { border-color: var(--green); color: var(--green); background: rgba(26,127,55,0.08); }
   .diff-btn.active-medium { border-color: var(--gold);  color: var(--gold);  background: rgba(154,103,0,0.08); }
   .diff-btn.active-hard   { border-color: var(--red);   color: var(--red);   background: rgba(207,35,22,0.08); }
@@ -1240,7 +1242,7 @@
     transition: all 0.2s;
     padding: 4px;
     border-radius: 16px;
-    min-width: 68px;
+    min-width: 74px;
   }
   .region-card:hover {
     background: rgba(26,111,212,0.04);
@@ -1283,6 +1285,8 @@
     box-shadow: 0 4px 14px rgba(212,148,10,0.35);
     font-size: 0.95rem;
     padding: 8px 28px;
+    min-width: 180px;
+    text-align: center;
   }
   .btn-start-gold:hover {
     transform: translateY(-1px);
