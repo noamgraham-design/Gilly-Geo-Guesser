@@ -1286,6 +1286,17 @@
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
+    position: relative;
+    overflow: hidden;
+  }
+  #menu-card.card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('israel_flag.png') center/contain no-repeat;
+    opacity: 0.10;
+    z-index: -1;
+    pointer-events: none;
   }
 
   /* DESKTOP – enlarge menu card & contents */
