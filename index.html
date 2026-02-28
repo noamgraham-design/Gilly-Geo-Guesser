@@ -88,8 +88,13 @@
     display: flex; align-items: center; justify-content: center;
     color: #555; font-size: 0.78rem; font-weight: 700; flex-shrink: 0;
     overflow: hidden; border: 1px solid rgba(0,0,0,0.08);
+    position: relative;
   }
-  #auth-btn .auth-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  #auth-btn .auth-avatar img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+  }
 
   /* ── AUTH DROPDOWN ────────────────────────────────────────────────────── */
   #auth-dropdown {
