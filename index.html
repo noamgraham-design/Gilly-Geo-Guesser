@@ -1109,12 +1109,6 @@
     align-items: center;
     gap: 10px;
   }
-  .overlay-topbar-left img {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-  }
   .overlay-topbar-title {
     font-family: 'Playfair Display', 'Alef', serif;
     font-size: 1.25rem;
@@ -1299,6 +1293,18 @@
     pointer-events: none;
   }
 
+  /* Menu logo under Learning mode button */
+  .menu-logo {
+    margin-top: 12px;
+    width: auto;
+    height: auto;
+    max-width: 180px;
+    max-height: 28vh;
+    object-fit: contain;
+    flex-shrink: 1;
+    display: block;
+  }
+
   /* DESKTOP – enlarge menu card & contents */
   @media (min-width: 769px) {
     .card {
@@ -1355,6 +1361,11 @@
     .btn-learn {
       font-size: 0.92rem;
       padding: 7px 22px;
+    }
+    .menu-logo {
+      max-width: 220px;
+      max-height: 30vh;
+      margin-top: 16px;
     }
     #menu-desc {
       font-size: 0.92rem !important;
@@ -1605,10 +1616,6 @@
     .overlay-topbar-title {
       font-size: 1rem;
     }
-    .overlay-topbar-left img {
-      width: 34px;
-      height: 34px;
-    }
     .overlay-lang-btn {
       padding: 5px 10px;
       font-size: 0.78rem;
@@ -1666,6 +1673,13 @@
     #learn-btn {
       font-size: 1rem !important;
       padding: 10px 36px !important;
+    }
+
+    /* Menu logo on mobile */
+    .menu-logo {
+      max-width: 140px;
+      max-height: 22vh;
+      margin-top: 10px;
     }
 
     /* Restore menu description text to original size on mobile */
@@ -1824,9 +1838,10 @@
     .overlay-topbar-title {
       font-size: 0.9rem;
     }
-    .overlay-topbar-left img {
-      width: 30px;
-      height: 30px;
+    .menu-logo {
+      max-width: 110px;
+      max-height: 18vh;
+      margin-top: 8px;
     }
     .overlay-lang-btn {
       padding: 4px 8px;
@@ -2070,7 +2085,6 @@
   <!-- Top navigation bar -->
   <div class="overlay-topbar">
     <div class="overlay-topbar-left">
-      <img src="logo_head.png" width="42" height="42" alt="Gilly Geo Guesser">
       <span class="overlay-topbar-title" id="overlay-title-text">Gilly Israel Quiz</span>
     </div>
     <div class="overlay-topbar-right">
@@ -2148,6 +2162,7 @@
     </div>
     <button id="start-btn" class="btn btn-start-gold" onclick="startGame()">← התחל משחק</button>
     <button id="learn-btn" class="btn btn-learn" onclick="startLearning()">🗺️ מצב למידה</button>
+    <img src="GGG_logo_nobg.png" alt="Gilly Geo Guesser" class="menu-logo" id="menu-logo">
   </div>
 
 </div>
