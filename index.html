@@ -496,7 +496,7 @@
   #town-name { font-family: 'Playfair Display', 'Alef', serif; font-size: 2.4rem; font-weight: 900; line-height: 1; background: linear-gradient(90deg, #1a6fd4, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   #town-desc { font-size: 0.95rem; color: var(--muted); font-style: italic; margin-top: 4px; }
   #town-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-  .btn {  border-radius: 50px; padding: 7px 16px; font-family: 'Source Serif 4', 'Alef', serif; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+  .btn {  border-radius: 50px; padding: 7px 16px; border: none; font-family: 'Source Serif 4', 'Alef', serif; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
   .btn-hint { background: transparent; border: 1px dashed #444; color: var(--muted); }
   .btn-hint:hover { border-color: var(--gold); color: var(--gold); }
   .btn-hint:disabled { opacity: 0.4; cursor: default; }
@@ -937,18 +937,19 @@
   /* OVERLAY */
   #overlay {
     position: fixed; inset: 0;
-    background: rgba(244,246,249,0.92);
+    background: rgba(244,246,249,0.95);
     backdrop-filter: blur(8px);
     z-index: 8000;
     display: flex; align-items: flex-start; justify-content: center;
     padding: 20px;
+    padding-top: 80px;
     overflow-y: auto;
   }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 6px 28px 8px; max-width: 440px; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 14px 28px 16px; max-width: 440px; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 4px; box-shadow: 0 8px 40px rgba(0,0,0,0.08); }
   .card h2 { font-family: 'Playfair Display', 'Alef', serif; font-size: 1.8rem; font-weight: 900; margin-bottom: 10px; background: linear-gradient(90deg, #1a6fd4, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   .card p { color: var(--muted); font-size: 1.05rem; line-height: 1.75; margin-bottom: 22px; }
   .diff-row { display: flex; gap: 8px; justify-content: center; }
-  .diff-btn { padding: 2px 10px; border-radius: 50px; border: 2px solid rgba(255,255,255,0.12); background: transparent; color: var(--muted); font-family: 'Source Serif 4', 'Alef', serif; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+  .diff-btn { padding: 4px 14px; border-radius: 50px; border: 2px solid var(--border); background: transparent; color: var(--muted); font-family: 'Source Serif 4', 'Alef', serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
   .diff-btn.active-easy   { border-color: var(--green); color: var(--green); background: rgba(26,127,55,0.08); }
   .diff-btn.active-medium { border-color: var(--gold);  color: var(--gold);  background: rgba(154,103,0,0.08); }
   .diff-btn.active-hard   { border-color: var(--red);   color: var(--red);   background: rgba(207,35,22,0.08); }
@@ -992,7 +993,17 @@
     50%  { transform: translateX(18px); }
     100% { transform: translateX(0); }
   }
-  /* logo-wrapper: logo + sky overlay */
+  @keyframes cloudDrift4 {
+    0%   { transform: translateX(0); }
+    50%  { transform: translateX(-15px); }
+    100% { transform: translateX(0); }
+  }
+  @keyframes cloudDrift5 {
+    0%   { transform: translateX(0); }
+    50%  { transform: translateX(20px); }
+    100% { transform: translateX(0); }
+  }
+  /* logo-wrapper: logo + sky overlay (kept for compatibility) */
   .logo-wrapper {
     position: relative;
     display: block;
@@ -1075,6 +1086,209 @@
   .cloud3 .cloud-body::after {
     width: 20px; height: 20px;
     top: -8px; left: 30px;
+  }
+
+  /* ── REDESIGNED MENU ────────────────────────────────────────────── */
+  /* Overlay top bar */
+  .overlay-topbar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 24px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+    z-index: 10;
+  }
+  .overlay-topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .overlay-topbar-left img {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  }
+  .overlay-topbar-title {
+    font-family: 'Playfair Display', 'Alef', serif;
+    font-size: 1.25rem;
+    font-weight: 900;
+    background: linear-gradient(90deg, #1a6fd4, #7c3aed);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    white-space: nowrap;
+  }
+  .overlay-topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .overlay-lang-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 50px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-family: 'Source Serif 4', 'Alef', serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .overlay-lang-btn:hover { border-color: rgba(0,0,0,0.2); background: var(--bg); }
+  .overlay-lang-btn.active { border-color: #1a6fd4; color: #1a6fd4; background: rgba(26,111,212,0.06); }
+
+  /* Background clouds (in overlay, not in card) */
+  .overlay-bg-clouds {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 1;
+  }
+  .bg-cloud {
+    position: absolute;
+    display: flex;
+    align-items: flex-end;
+  }
+  .bg-cloud .cloud-body {
+    position: relative;
+    background: rgba(255,255,255,0.7);
+    border-radius: 50px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  }
+  .bg-cloud .cloud-body::before, .bg-cloud .cloud-body::after {
+    content: '';
+    position: absolute;
+    background: rgba(255,255,255,0.7);
+    border-radius: 50%;
+  }
+  .bg-cloud1 { top: 15%; left: 3%; animation: cloudDrift1 12s ease-in-out infinite; }
+  .bg-cloud1 .cloud-body { width: 100px; height: 32px; }
+  .bg-cloud1 .cloud-body::before { width: 50px; height: 50px; top: -26px; left: 14px; }
+  .bg-cloud1 .cloud-body::after  { width: 36px; height: 36px; top: -16px; left: 48px; }
+  .bg-cloud2 { top: 22%; right: 5%; animation: cloudDrift2 15s ease-in-out infinite; }
+  .bg-cloud2 .cloud-body { width: 110px; height: 34px; }
+  .bg-cloud2 .cloud-body::before { width: 54px; height: 54px; top: -28px; left: 16px; }
+  .bg-cloud2 .cloud-body::after  { width: 38px; height: 38px; top: -18px; left: 56px; }
+  .bg-cloud3 { top: 55%; left: 8%; animation: cloudDrift4 18s ease-in-out infinite; }
+  .bg-cloud3 .cloud-body { width: 70px; height: 24px; }
+  .bg-cloud3 .cloud-body::before { width: 36px; height: 36px; top: -18px; left: 10px; }
+  .bg-cloud3 .cloud-body::after  { width: 24px; height: 24px; top: -10px; left: 36px; }
+  .bg-cloud4 { top: 68%; right: 6%; animation: cloudDrift5 14s ease-in-out infinite; }
+  .bg-cloud4 .cloud-body { width: 85px; height: 28px; }
+  .bg-cloud4 .cloud-body::before { width: 42px; height: 42px; top: -22px; left: 12px; }
+  .bg-cloud4 .cloud-body::after  { width: 30px; height: 30px; top: -14px; left: 42px; }
+  .bg-cloud5 { top: 82%; left: 15%; animation: cloudDrift3 16s ease-in-out infinite; }
+  .bg-cloud5 .cloud-body { width: 60px; height: 20px; }
+  .bg-cloud5 .cloud-body::before { width: 30px; height: 30px; top: -15px; left: 8px; }
+  .bg-cloud5 .cloud-body::after  { width: 22px; height: 22px; top: -10px; left: 28px; }
+
+  /* Israel map silhouette in background */
+  .israel-silhouette {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 220px;
+    opacity: 0.06;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* Menu card title area */
+  .menu-title-section {
+    text-align: center;
+    margin-bottom: 2px;
+  }
+  .menu-mode-title {
+    font-family: 'Playfair Display', 'Alef', serif;
+    font-size: 1.6rem;
+    font-weight: 900;
+    background: linear-gradient(90deg, #1a6fd4, #7c3aed);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 2px;
+  }
+  .menu-mode-subtitle {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  /* Region icon cards */
+  .region-grid {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 4px 0;
+  }
+  .region-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 4px;
+    border-radius: 16px;
+    min-width: 68px;
+  }
+  .region-card:hover {
+    background: rgba(26,111,212,0.04);
+  }
+  .region-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    background: var(--bg);
+    border: 2.5px solid transparent;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .region-card.active .region-icon {
+    border-color: #1a6fd4;
+    background: rgba(26,111,212,0.08);
+    box-shadow: 0 0 0 3px rgba(26,111,212,0.15), 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .region-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-align: center;
+    white-space: nowrap;
+  }
+  .region-card.active .region-label {
+    color: #1a6fd4;
+    font-weight: 700;
+  }
+
+  /* Gold start button */
+  .btn-start-gold {
+    background: linear-gradient(135deg, #e8a817, #d4940a);
+    color: #fff;
+    border: none;
+    box-shadow: 0 4px 14px rgba(212,148,10,0.35);
+    font-size: 0.95rem;
+    padding: 8px 28px;
+  }
+  .btn-start-gold:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(212,148,10,0.5);
+    background: linear-gradient(135deg, #f0b420, #d4940a);
   }
 
   /* MOBILE RESPONSIVE STYLES */
@@ -1310,20 +1524,33 @@
       line-height: 1.5;
     }
 
-    /* Menu logo size — independent of PC */
-    #menu-card .logo-wrapper img {
-      width: 234px !important;
-      height: 234px !important;
+    /* Overlay topbar mobile */
+    .overlay-topbar {
+      padding: 10px 14px;
+    }
+    .overlay-topbar-title {
+      font-size: 1rem;
+    }
+    .overlay-topbar-left img {
+      width: 34px;
+      height: 34px;
+    }
+    .overlay-lang-btn {
+      padding: 5px 10px;
+      font-size: 0.78rem;
     }
 
-    /* Tighten dividers */
-    #menu-card > div[style*="border-top"] {
-      margin: 2px 0 !important;
+    /* Region icons smaller on mobile */
+    .region-icon {
+      width: 46px;
+      height: 46px;
+      font-size: 1.3rem;
     }
-
-    /* Language / section labels smaller */
-    #menu-card > div[style*="font-size:0.82rem"] {
-      margin-bottom: 1px !important;
+    .region-grid {
+      gap: 8px;
+    }
+    .region-card {
+      min-width: 60px;
     }
 
     /* Difficulty buttons more compact */
@@ -1344,15 +1571,21 @@
       margin-bottom: 10px;
     }
 
+    /* Menu mode title */
+    .menu-mode-title {
+      font-size: 1.35rem;
+    }
+
     /* Start button tighter */
     #start-btn {
       padding: 10px 32px !important;
       font-size: 1rem !important;
     }
 
-    /* Restore overlay centering on mobile */
+    /* Overlay on mobile */
     #overlay {
-      align-items: center;
+      padding-top: 70px;
+      align-items: flex-start;
     }
 
     /* Restore btn-learn to original size on mobile */
@@ -1512,10 +1745,29 @@
     .card h2 {
       font-size: 1.3rem;
     }
-    
-    #menu-card .logo-wrapper img {
-      width: 202px !important;
-      height: 202px !important;
+
+    /* Overlay topbar even more compact */
+    .overlay-topbar-title {
+      font-size: 0.9rem;
+    }
+    .overlay-topbar-left img {
+      width: 30px;
+      height: 30px;
+    }
+    .overlay-lang-btn {
+      padding: 4px 8px;
+      font-size: 0.72rem;
+    }
+    .region-icon {
+      width: 42px;
+      height: 42px;
+      font-size: 1.2rem;
+    }
+    .region-label {
+      font-size: 0.7rem;
+    }
+    .menu-mode-title {
+      font-size: 1.2rem;
     }
     
     #results-panel {
@@ -1741,46 +1993,16 @@
 </div>
 
 <div id="overlay">
-  <div class="card" id="menu-card">
-    <div class="logo-wrapper">
-      <div class="sky-scene">
-        <!-- Sun with perfect perpendicular rays -->
-        <svg class="sun" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" style="width:57px;height:57px;">
-          <defs>
-            <radialGradient id="sunGrad" cx="38%" cy="35%" r="60%">
-              <stop offset="0%" stop-color="#fff7a0"/>
-              <stop offset="100%" stop-color="#ffb700"/>
-            </radialGradient>
-            <filter id="glow">
-              <feGaussianBlur stdDeviation="2.5" result="blur"/>
-              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-          </defs>
-          <g style="transform-origin:32px 32px;animation:sunSpin 8s linear infinite;">
-          <line x1="32.00" y1="14.00" x2="32.00" y2="2.00" stroke="#ffb700" stroke-width="4" stroke-linecap="round"/>
-          <line x1="44.73" y1="19.27" x2="53.21" y2="10.79" stroke="#ffb700" stroke-width="4" stroke-linecap="round"/>
-          <line x1="50.00" y1="32.00" x2="62.00" y2="32.00" stroke="#ffb700" stroke-width="4" stroke-linecap="round"/>
-          <line x1="44.73" y1="44.73" x2="53.21" y2="53.21" stroke="#ffb700" stroke-width="4" stroke-linecap="round"/>
-          <line x1="32.00" y1="50.00" x2="32.00" y2="62.00" stroke="#ffb700" stroke-width="4" stroke-linecap="round"/>
-          <line x1="19.27" y1="44.73" x2="10.79" y2="53.21" stroke="#ffb700" stroke-width="4" stroke-linecap="round"/>
-          <line x1="14.00" y1="32.00" x2="2.00" y2="32.00" stroke="#ffb700" stroke-width="4" stroke-linecap="round"/>
-          <line x1="19.27" y1="19.27" x2="10.79" y2="10.79" stroke="#ffb700" stroke-width="4" stroke-linecap="round"/>
-          </g>
-          <circle cx="32" cy="32" r="14" fill="url(#sunGrad)" filter="url(#glow)"/>
-        </svg>
-        <!-- Clouds -->
-        <div class="cloud cloud1"><div class="cloud-body"></div></div>
-        <div class="cloud cloud2"><div class="cloud-body"></div></div>
-        <div class="cloud cloud3"><div class="cloud-body"></div></div>
-      </div>
-      <img src="logo.png" width="215" height="215" alt="Gilly Geo Guesser">
+  <!-- Top navigation bar -->
+  <div class="overlay-topbar">
+    <div class="overlay-topbar-left">
+      <img src="logo.png" width="42" height="42" alt="Gilly Geo Guesser">
+      <span class="overlay-topbar-title" id="overlay-title-text">Gilly Israel Quiz</span>
     </div>
-    <div style="width:100%;border-top:1px solid var(--border);margin:2px 0 1px"></div>
-    <div style="font-size:0.82rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:600">🌐 שפה / Language</div>
-    <div class="diff-row" style="align-items:center;">
-      <button class="diff-btn active-region" id="lang-he" onclick="setLang('he')">עברית</button>
-      <button class="diff-btn" id="lang-en" onclick="setLang('en')">English</button>
-      <div id="auth-wrap" style="position:relative;flex-shrink:0;margin-left:4px;">
+    <div class="overlay-topbar-right">
+      <button class="overlay-lang-btn active" id="lang-he" onclick="setLang('he')">🌐 עברית</button>
+      <button class="overlay-lang-btn" id="lang-en" onclick="setLang('en')">English</button>
+      <div id="auth-wrap" style="position:relative;flex-shrink:0;">
         <button id="auth-btn" onclick="handleAuthBtnClick()">
           <span class="auth-avatar" id="auth-avatar">👤</span>
           <span id="auth-label">התחברות</span>
@@ -1806,26 +2028,59 @@
         </div>
       </div>
     </div>
-    <div style="width:100%;border-top:1px solid var(--border);margin:1px 0 2px"></div>
+  </div>
+
+  <!-- Background decorations -->
+  <div class="overlay-bg-clouds">
+    <div class="bg-cloud bg-cloud1"><div class="cloud-body"></div></div>
+    <div class="bg-cloud bg-cloud2"><div class="cloud-body"></div></div>
+    <div class="bg-cloud bg-cloud3"><div class="cloud-body"></div></div>
+    <div class="bg-cloud bg-cloud4"><div class="cloud-body"></div></div>
+    <div class="bg-cloud bg-cloud5"><div class="cloud-body"></div></div>
+  </div>
+
+  <!-- Israel map silhouette -->
+  <svg class="israel-silhouette" viewBox="0 0 200 500" xmlns="http://www.w3.org/2000/svg">
+    <path d="M100,10 L115,20 L120,40 L130,60 L135,80 L140,100 L138,120 L130,140 L125,160 L120,180 L118,200 L122,220 L128,240 L130,260 L125,280 L118,300 L110,320 L105,340 L100,360 L95,380 L88,400 L80,420 L75,440 L72,460 L78,480 L85,490 L80,480 L70,460 L65,440 L60,420 L55,400 L58,380 L62,360 L68,340 L72,320 L75,300 L78,280 L80,260 L78,240 L75,220 L72,200 L70,180 L68,160 L72,140 L78,120 L82,100 L80,80 L78,60 L85,40 L90,20 Z" fill="currentColor"/>
+  </svg>
+
+  <!-- Main menu card -->
+  <div class="card" id="menu-card" style="z-index:2;">
+    <div class="menu-title-section">
+      <div class="menu-mode-title" id="menu-mode-title">מצב משחק</div>
+      <div class="menu-mode-subtitle" id="menu-mode-subtitle">ערים ועיירות</div>
+    </div>
     <p id="menu-desc" style="margin:0;font-size:0.88rem;line-height:1.35;text-align:center;direction:rtl;">
       לחצ/י על העיר המוצגת על המפה.<br>עד 8 ערים בסיבוב.
     </p>
     <div class="diff-row">
-      <button class="diff-btn" id="d-easy"   onclick="setDiff('easy')">Easy</button>
-      <button class="diff-btn active-medium" id="d-medium" onclick="setDiff('medium')">Medium</button>
-      <button class="diff-btn" id="d-hard"   onclick="setDiff('hard')">Hard</button>
+      <button class="diff-btn" id="d-hard"   onclick="setDiff('hard')">קשה</button>
+      <button class="diff-btn active-medium" id="d-medium" onclick="setDiff('medium')">בינוני</button>
+      <button class="diff-btn" id="d-easy"   onclick="setDiff('easy')">קל</button>
     </div>
-    <div class="diff-note" id="diff-note">Moderate target radius — recommended</div>
-    <div style="width:100%;border-top:1px solid var(--border);margin:1px 0 2px"></div>
-    <div style="font-size:0.82rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:600" id="lbl-region">Region</div>
-    <div class="diff-row">
-      <button class="diff-btn active-region" id="r-all"    onclick="setRegion('all')">🇮🇱 All</button>
-      <button class="diff-btn" id="r-north"  onclick="setRegion('north')">🏔️ North</button>
-      <button class="diff-btn" id="r-center" onclick="setRegion('center')">🏙️ Center</button>
-      <button class="diff-btn" id="r-south"  onclick="setRegion('south')">🏜️ South</button>
+    <div class="diff-note" id="diff-note">ערים ועיירות</div>
+    <div style="width:100%;border-top:1px solid var(--border);margin:4px 0 2px"></div>
+    <div style="font-size:0.82rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:600" id="lbl-region">אזור</div>
+    <div class="region-grid">
+      <div class="region-card active" id="r-all" onclick="setRegion('all')">
+        <div class="region-icon">🇮🇱</div>
+        <div class="region-label" id="r-all-label">הכל</div>
+      </div>
+      <div class="region-card" id="r-north" onclick="setRegion('north')">
+        <div class="region-icon">🏔️</div>
+        <div class="region-label" id="r-north-label">צפון</div>
+      </div>
+      <div class="region-card" id="r-center" onclick="setRegion('center')">
+        <div class="region-icon">🏙️</div>
+        <div class="region-label" id="r-center-label">מרכז</div>
+      </div>
+      <div class="region-card" id="r-south" onclick="setRegion('south')">
+        <div class="region-icon">🏜️</div>
+        <div class="region-label" id="r-south-label">דרום</div>
+      </div>
     </div>
-    <button id="start-btn" class="btn btn-primary" style="font-size:0.9rem;padding:5px 24px" onclick="startGame()">← התחל משחק</button>
-    <button id="learn-btn" class="btn btn-learn" onclick="startLearning()">📚 מצב למידה</button>
+    <button id="start-btn" class="btn btn-start-gold" onclick="startGame()">← התחל משחק</button>
+    <button id="learn-btn" class="btn btn-learn" onclick="startLearning()">🗺️ מצב למידה</button>
   </div>
 
 </div>
@@ -2381,8 +2636,14 @@ const STRINGS = {
     note_easy:        "Major cities only",
     note_medium:      "Cities & towns",
     note_hard:        "All settlements + road interchanges",
+    game_mode:        "Game Mode",
+    cities_towns:     "Cities & Towns",
     start_btn:        "Start Game →",
-    learn_btn:        "📚 Learning Mode",
+    learn_btn:        "🗺️ Learning Mode",
+    region_all_short: "All",
+    region_north_short: "North",
+    region_center_short: "Center",
+    region_south_short: "South",
     result_excellent: "Excellent!",
     result_good:      "Good Job!",
     result_practice:  "Keep Practicing!",
@@ -2413,8 +2674,14 @@ const STRINGS = {
     note_easy:        'ערים גדולות בלבד',
     note_medium:      'ערים ועיירות',
     note_hard:        'כל הישובים + מחלפים',
+    game_mode:        "מצב משחק",
+    cities_towns:     "ערים ועיירות",
     start_btn:        "← התחל משחק",
-    learn_btn:        "📚 מצב למידה",
+    learn_btn:        "🗺️ מצב למידה",
+    region_all_short: "הכל",
+    region_north_short: "צפון",
+    region_center_short: "מרכז",
+    region_south_short: "דרום",
     result_excellent: "מצוין!",
     result_good:      "כל הכבוד!",
     result_practice:  "כדאי להמשיך להתאמן!",
@@ -2435,20 +2702,23 @@ function setLang(l) {
 function applyLang() {
   document.body.dir = 'ltr';
   document.getElementById('title-text').textContent = t('title');
+  document.getElementById('overlay-title-text').textContent = t('title');
   document.getElementById('lbl-score').textContent = t('score');
   document.getElementById('lbl-round').textContent = t('round');
   document.getElementById('hint-badge').textContent = t('hint_badge');
   document.getElementById('fact-modal-close').textContent = t('fact_close');
   document.getElementById('menu-desc').innerHTML = t('menu_desc');
+  document.getElementById('menu-mode-title').textContent = t('game_mode');
+  document.getElementById('menu-mode-subtitle').textContent = t(`note_${difficulty}`);
   document.getElementById('d-easy').textContent   = t('diff_easy');
   document.getElementById('d-medium').textContent = t('diff_medium');
   document.getElementById('d-hard').textContent   = t('diff_hard');
   document.getElementById('diff-note').textContent = t(`note_${difficulty}`);
   document.getElementById('lbl-region').textContent = t('lbl_region');
-  document.getElementById('r-all').textContent    = t('region_all');
-  document.getElementById('r-north').textContent  = t('region_north');
-  document.getElementById('r-center').textContent = t('region_center');
-  document.getElementById('r-south').textContent  = t('region_south');
+  document.getElementById('r-all-label').textContent    = t('region_all_short');
+  document.getElementById('r-north-label').textContent  = t('region_north_short');
+  document.getElementById('r-center-label').textContent = t('region_center_short');
+  document.getElementById('r-south-label').textContent  = t('region_south_short');
   document.getElementById('start-btn').textContent    = t('start_btn');
   document.getElementById('learn-btn').textContent    = t('learn_btn');
   document.getElementById('btn-play-again').textContent = t('play_again');
@@ -2459,9 +2729,13 @@ function applyLang() {
   document.getElementById('mobile-btn-back').textContent = t('back_btn');
   document.querySelector('#mobile-topbar-town .mob-find-label').textContent = lang === 'he' ? '📍 מצא' : '📍 Find';
   document.getElementById('mobile-btn-layer').innerHTML = currentLayer === 'satellite' ? t('layer_street') : t('layer_satellite');
-  // Update lang toggle button styles
-  document.getElementById('lang-he').className = `diff-btn${lang === 'he' ? ' active-region' : ''}`;
-  document.getElementById('lang-en').className = `diff-btn${lang === 'en' ? ' active-region' : ''}`;
+  // Update lang toggle button styles (new overlay-topbar lang buttons)
+  document.getElementById('lang-he').className = `overlay-lang-btn${lang === 'he' ? ' active' : ''}`;
+  document.getElementById('lang-en').className = `overlay-lang-btn${lang === 'en' ? ' active' : ''}`;
+  document.getElementById('lang-he').textContent = lang === 'he' ? '🌐 עברית' : 'עברית';
+  document.getElementById('lang-en').textContent = lang === 'en' ? '🌐 English' : 'English';
+  // Set card direction based on language
+  document.getElementById('menu-card').dir = lang === 'he' ? 'rtl' : 'ltr';
   document.getElementById('results-card').dir = lang === 'he' ? 'rtl' : 'ltr';
   updateHintBtn();
   // Update layer toggle button text based on current layer
@@ -3495,6 +3769,7 @@ function setDiff(d) {
     document.getElementById(`d-${k}`).className = `diff-btn${k === d ? ` active-${k}` : ''}`;
   });
   document.getElementById('diff-note').textContent = t(`note_${d}`);
+  document.getElementById('menu-mode-subtitle').textContent = t(`note_${d}`);
 }
 
 // Region filter: 'all' | 'north' | 'center' | 'south'
@@ -3515,7 +3790,7 @@ const REGION_VIEWS = {
 function setRegion(r) {
   region = r;
   ['all','north','center','south'].forEach(k => {
-    document.getElementById(`r-${k}`).className = `diff-btn${k === r ? ' active-region' : ''}`;
+    document.getElementById(`r-${k}`).className = `region-card${k === r ? ' active' : ''}`;
   });
 }
 
