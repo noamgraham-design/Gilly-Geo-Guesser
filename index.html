@@ -277,6 +277,22 @@
     cursor: pointer; color: var(--muted); line-height: 1;
   }
 
+  /* ── NICKNAME VALIDATION POPUP ────────────────────────────────────────── */
+  #nickname-error-popup {
+    display: none; position: fixed; top: 0; left: 0; right: 0;
+    z-index: 10000; padding: 14px 20px;
+    background: #cf2316; color: #fff;
+    font-size: 0.92rem; font-weight: 600; text-align: center;
+    font-family: 'Source Serif 4', 'Alef', serif;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    animation: nickErrSlide 0.3s cubic-bezier(.34,1.2,.64,1);
+  }
+  #nickname-error-popup.show { display: block; }
+  @keyframes nickErrSlide {
+    from { opacity: 0; transform: translateY(-100%); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
   /* ── NEW RECORD BANNER ────────────────────────────────────────────────── */
   #new-record-banner {
     display: none; text-align: center;
@@ -2265,6 +2281,9 @@
 </div>
 
 <!-- ── MODALS (placed before script so getElementById works) ────────── -->
+<!-- ── NICKNAME VALIDATION POPUP ──────────────────────────────────────────── -->
+<div id="nickname-error-popup"></div>
+
 <!-- ── SETTINGS MODAL ─────────────────────────────────────────────────────── -->
 <div id="settings-modal">
   <div id="settings-card">
@@ -2273,7 +2292,7 @@
 
     <div class="settings-field">
       <label class="settings-label" id="settings-lbl-nickname">Nickname</label>
-      <input class="login-input" id="settings-nickname" type="text" placeholder="Your nickname…" maxlength="30"/>
+      <input class="login-input" id="settings-nickname" type="text" placeholder="Your nickname…" maxlength="15" pattern="[A-Za-z0-9_]{1,15}"/>
     </div>
 
     <div class="settings-field">
@@ -4993,6 +5012,24 @@ document.getElementById('settings-modal').addEventListener('click', e => {
   if (e.target === document.getElementById('settings-modal')) closeSettingsModal();
 });
 
+// ── NICKNAME VALIDATION ──────────────────────────────────────────────────
+const _nicknameRegex = /^[A-Za-z0-9_]{1,15}$/;
+let _nickErrTimer = null;
+
+function isValidNickname(nick) {
+  return _nicknameRegex.test(nick);
+}
+
+function showNicknameError() {
+  const popup = document.getElementById('nickname-error-popup');
+  popup.textContent = lang === 'he'
+    ? 'הכינוי חייב להכיל עד 15 תווים: אותיות (a-z), ספרות (0-9) וקו תחתון (_) בלבד.'
+    : 'Nickname must be up to 15 characters: letters (a-z), digits (0-9), and underscore (_) only.';
+  popup.classList.add('show');
+  clearTimeout(_nickErrTimer);
+  _nickErrTimer = setTimeout(() => { popup.classList.remove('show'); }, 4000);
+}
+
 // Auto-save nickname: debounce while typing, save immediately on blur
 let _nicknameSaveTimer = null;
 document.getElementById('settings-nickname').addEventListener('input', () => {
@@ -5010,6 +5047,10 @@ async function saveSettings() {
   if (!nickname) {
     nickname = generateRandomNickname();
     document.getElementById('settings-nickname').value = nickname;
+  }
+  if (!isValidNickname(nickname)) {
+    showNicknameError();
+    return;
   }
   const selectedLang = document.getElementById('settings-lang-he').classList.contains('selected') ? 'he' : 'en';
   const msgEl = document.getElementById('settings-save-msg');
