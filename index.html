@@ -4843,11 +4843,17 @@ async function loadScoreboard(myScore) {
       ? `<span dir="rtl">מקום ${currentScoreRank} מתוך ${totalForRank}</span>`
       : `#${currentScoreRank} of ${totalForRank}`;
 
+    // Player's current level
+    const myLevel = myIdx !== -1 ? players[myIdx].level : (getLearningTier() || 4);
+    const myLvl   = PLAYER_LEVEL_NAMES[myLevel] || PLAYER_LEVEL_NAMES[1];
+    const myLvlText = lang === 'he' ? myLvl.he : myLvl.en;
+
     // "This Game" banner (placed inline at its correct rank)
     const summaryHtml = `
       <div class="sb-summary">
         <div class="sb-summary-left">
           <div class="sb-summary-label">${lang === 'he' ? 'המשחק הנוכחי' : 'This game'}</div>
+          <div class="sb-level-badge" dir="${lang === 'he' ? 'rtl' : 'ltr'}">${myLvlText}</div>
           <div class="sb-summary-pts">${myScore} <span class="sb-summary-pts-unit">pts</span></div>
         </div>
         <div class="sb-summary-right">
