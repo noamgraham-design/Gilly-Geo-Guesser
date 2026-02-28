@@ -1287,9 +1287,10 @@
     pointer-events: none;
   }
 
-  /* Menu logo under Learning mode button */
+  /* Menu logo at top of menu card */
   .menu-logo {
-    margin-top: 2px;
+    margin-top: 0;
+    margin-bottom: 2px;
     width: auto;
     height: auto;
     max-width: 300px;
@@ -1359,7 +1360,8 @@
     .menu-logo {
       max-width: 320px;
       max-height: 36vh;
-      margin-top: 2px;
+      margin-top: 0;
+      margin-bottom: 2px;
     }
     #menu-desc {
       font-size: 0.92rem !important;
@@ -1673,7 +1675,8 @@
     .menu-logo {
       max-width: 280px;
       max-height: 34vh;
-      margin-top: 2px;
+      margin-top: 0;
+      margin-bottom: 2px;
     }
 
     /* Restore menu description text to original size on mobile */
@@ -1835,7 +1838,8 @@
     .menu-logo {
       max-width: 220px;
       max-height: 28vh;
-      margin-top: 2px;
+      margin-top: 0;
+      margin-bottom: 2px;
     }
     .overlay-lang-btn {
       padding: 4px 8px;
@@ -2123,6 +2127,7 @@
   <!-- Main menu card -->
   <div class="card" id="menu-card" style="z-index:2;background:transparent;border:none;box-shadow:none;">
     <div class="menu-title-section">
+      <img src="GGG_logo_nobg.png" alt="Gilly Geo Guesser" class="menu-logo" id="menu-logo">
       <div class="menu-mode-title" id="menu-mode-title">מצב משחק</div>
     </div>
     <p id="menu-desc" style="margin:0;font-size:0.88rem;line-height:1.35;text-align:center;">
@@ -2156,7 +2161,6 @@
     </div>
     <button id="start-btn" class="btn btn-start-gold" onclick="startGame()">← התחל משחק</button>
     <button id="learn-btn" class="btn btn-learn" onclick="startLearning()">🗺️ מצב למידה</button>
-    <img src="GGG_logo_nobg.png" alt="Gilly Geo Guesser" class="menu-logo" id="menu-logo">
   </div>
 
 </div>
