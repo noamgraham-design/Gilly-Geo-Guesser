@@ -2032,7 +2032,6 @@
   <div class="card" id="menu-card" style="z-index:2;">
     <div class="menu-title-section">
       <div class="menu-mode-title" id="menu-mode-title">מצב משחק</div>
-      <div class="menu-mode-subtitle" id="menu-mode-subtitle">ערים ועיירות</div>
     </div>
     <p id="menu-desc" style="margin:0;font-size:0.88rem;line-height:1.35;text-align:center;">
       לחצ/י על העיר המוצגת על המפה.<br>עד 8 ערים בסיבוב.
@@ -2696,7 +2695,6 @@ function applyLang() {
   document.getElementById('fact-modal-close').textContent = t('fact_close');
   document.getElementById('menu-desc').innerHTML = t('menu_desc');
   document.getElementById('menu-mode-title').textContent = t('game_mode');
-  document.getElementById('menu-mode-subtitle').textContent = t(`note_${difficulty}`);
   document.getElementById('d-easy').textContent   = t('diff_easy');
   document.getElementById('d-medium').textContent = t('diff_medium');
   document.getElementById('d-hard').textContent   = t('diff_hard');
@@ -3754,7 +3752,6 @@ function setDiff(d) {
     document.getElementById(`d-${k}`).className = `diff-btn${k === d ? ` active-${k}` : ''}`;
   });
   document.getElementById('diff-note').textContent = t(`note_${d}`);
-  document.getElementById('menu-mode-subtitle').textContent = t(`note_${d}`);
 }
 
 // Region filter: 'all' | 'north' | 'center' | 'south'
