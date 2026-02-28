@@ -4097,7 +4097,16 @@ window._onAuthChange = function(user) {
         if (snap.exists()) {
           const data = snap.data();
           if (data.language) setLang(data.language);
-          if (data.gender)   { _selectedGender = data.gender; selectGender(data.gender); }
+          if (data.gender) {
+            // Update in-memory state and gender button UI without triggering a save.
+            // saveSettings() must not run here: the settings modal is closed and the
+            // nickname input is empty, so calling it would wipe the saved nickname.
+            _selectedGender = data.gender;
+            ['male','female','other'].forEach(opt => {
+              const el = document.getElementById(`gender-${opt}`);
+              if (el) el.classList.toggle('selected', opt === data.gender);
+            });
+          }
           // nickname is display-only in the modal, no need to apply globally
         }
       });
