@@ -1470,8 +1470,8 @@
       display: none !important;
     }
 
-    /* Show mobile menu button — right of HUD */
-    #mobile-menu-btn {
+    /* Show mobile home button — right of HUD */
+    #mobile-home-btn {
       display: flex !important;
       align-items: center;
       justify-content: center;
@@ -1484,60 +1484,89 @@
       cursor: pointer;
       flex-shrink: 0;
     }
-    #mobile-menu-btn:active {
+    #mobile-home-btn:active {
       background: var(--bg);
     }
-    
-    /* Mobile dropdown styling */
-    #mobile-dropdown {
+
+    /* Mobile tools (binoculars) button + dropdown */
+    #mobile-tools-wrap {
+      display: block !important;
+      position: relative;
+      flex-shrink: 0;
+    }
+    #mobile-tools-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      padding: 6px 10px;
+      margin-right: 4px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    #mobile-tools-btn:active {
+      background: var(--bg);
+    }
+    #mobile-tools-dropdown {
+      display: none;
       position: absolute;
-      top: 60px;
-      left: 0;
+      top: calc(100% + 8px);
       right: 0;
-      margin: 0 12px;
+      min-width: 200px;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 12px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.15);
       z-index: 5000;
-      padding: 12px;
+      padding: 8px;
     }
-    #mobile-dropdown.show {
-      display: block !important;
-    }
-    
-    #mobile-town-info {
-      padding: 8px 12px;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 12px;
-    }
-    #mobile-town-name {
-      font-family: 'Playfair Display', 'Alef', serif;
-      font-size: 1.2rem;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-    #mobile-town-desc {
-      font-size: 0.85rem;
-      color: var(--muted);
-    }
-    
-    #mobile-actions {
-      display: flex;
+    #mobile-tools-dropdown.show {
+      display: flex !important;
       flex-direction: column;
       gap: 8px;
     }
-    #mobile-actions button {
+    #mobile-tools-dropdown button {
       width: 100%;
       justify-content: center;
     }
-    #mobile-hint-badge {
-      font-size: 0.85rem;
-      color: var(--gold);
-      font-weight: 600;
-      display: none;
+
+    /* Mobile confirm modal */
+    #mobile-confirm-modal {
+      display: none; position: fixed; inset: 0; z-index: 9500;
+      background: rgba(0,0,0,0.55); backdrop-filter: blur(4px);
+      align-items: center; justify-content: center;
+    }
+    #mobile-confirm-modal.open { display: flex; }
+    #mobile-confirm-card {
+      background: var(--surface); border-radius: 18px;
+      padding: 28px 24px 22px; width: min(320px, 88vw);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
       text-align: center;
-      padding: 4px;
+      animation: ddPop 0.22s cubic-bezier(.34,1.4,.64,1);
+    }
+    #mobile-confirm-title {
+      font-family: 'Playfair Display', 'Alef', serif;
+      font-size: 1.25rem; font-weight: 800; margin-bottom: 6px;
+    }
+    #mobile-confirm-sub {
+      font-size: 0.88rem; color: var(--muted); margin-bottom: 18px;
+    }
+    #mobile-confirm-actions {
+      display: flex; gap: 10px; justify-content: center;
+    }
+    #mobile-confirm-yes {
+      background: var(--red); color: #fff; border: none;
+      padding: 10px 20px; border-radius: 10px; font-weight: 700;
+      cursor: pointer; font-size: 0.9rem;
+    }
+    #mobile-confirm-no {
+      background: var(--surface); color: var(--text);
+      border: 1px solid var(--border);
+      padding: 10px 20px; border-radius: 10px; font-weight: 700;
+      cursor: pointer; font-size: 0.9rem;
     }
     
     /* Topbar adjustments */
@@ -2036,20 +2065,25 @@
     </div>
   </div>
   <div id="mobile-topbar-town" style="display:none"><span class="mob-find-label">📍 Find</span><span class="mob-town-text">—</span></div>
-  <button class="btn btn-hint" id="mobile-menu-btn" onclick="toggleMobileMenu()" style="display:none">☰</button>
+  <div id="mobile-tools-wrap" style="display:none">
+    <button id="mobile-tools-btn" onclick="toggleMobileTools()">🔭</button>
+    <div id="mobile-tools-dropdown">
+      <button class="btn btn-hint" id="mobile-tools-hint" onclick="useHint()">💡 Hint (−10 pts) · 3 left</button>
+      <button class="btn btn-hint" id="mobile-tools-layer" onclick="toggleMapLayer()">🗺️ מפת רחוב</button>
+    </div>
+  </div>
+  <button id="mobile-home-btn" onclick="mobileGoHome()" style="display:none">🏠</button>
 </div>
 
-<!-- Mobile-only dropdown menu -->
-<div id="mobile-dropdown" style="display:none">
-  <div id="mobile-town-info">
-    <div id="mobile-town-name">—</div>
-    <div id="mobile-town-desc">בחר/י רמת קושי והתחל/י את המשחק</div>
-  </div>
-  <div id="mobile-actions">
-    <button class="btn btn-hint" id="mobile-btn-back" onclick="showMenu()" style="display:none">← תפריט</button>
-    <span id="mobile-hint-badge">📍 האזור מסומן על המפה</span>
-    <button class="btn btn-hint" id="mobile-btn-hint" onclick="useHint()">💡 Hint (−10 pts) · 3 left</button>
-    <button class="btn btn-hint" id="mobile-btn-layer" onclick="toggleMapLayer()">🗺️ מפת רחוב</button>
+<!-- Mobile "Are you sure?" confirmation modal -->
+<div id="mobile-confirm-modal">
+  <div id="mobile-confirm-card">
+    <div id="mobile-confirm-title">Are you sure?</div>
+    <div id="mobile-confirm-sub">Your current game progress will be lost.</div>
+    <div id="mobile-confirm-actions">
+      <button class="btn" id="mobile-confirm-yes" onclick="confirmGoHome()">Yes, go home</button>
+      <button class="btn" id="mobile-confirm-no" onclick="closeConfirmModal()">Cancel</button>
+    </div>
   </div>
 </div>
 
@@ -2813,10 +2847,8 @@ function applyLang() {
   document.getElementById('btn-menu').textContent      = t('menu_btn');
   document.getElementById('btn-back').textContent      = t('back_btn');
   // Update mobile elements
-  document.getElementById('mobile-hint-badge').textContent = t('hint_badge');
-  document.getElementById('mobile-btn-back').textContent = t('back_btn');
   document.querySelector('#mobile-topbar-town .mob-find-label').textContent = lang === 'he' ? '📍 מצא' : '📍 Find';
-  document.getElementById('mobile-btn-layer').innerHTML = currentLayer === 'satellite' ? t('layer_street') : t('layer_satellite');
+  document.getElementById('mobile-tools-layer').innerHTML = currentLayer === 'satellite' ? t('layer_street') : t('layer_satellite');
   // Update single lang toggle button — shows the OTHER language to switch to
   document.getElementById('lang-toggle').textContent = lang === 'he' ? '🌐 English' : '🌐 עברית';
   // Set text direction for text-heavy elements only (not the card itself, to keep button order stable)
@@ -3363,19 +3395,15 @@ const israelBorderCoords = [
 ];
 addBorderLine(israelBorderCoords);
 
-function closeMobileDropdown() {
-  document.getElementById('mobile-dropdown').classList.remove('show');
-}
-
 function toggleMapLayer(suppressBanner = false) {
-  closeMobileDropdown();
+  closeMobileTools();
   if (currentLayer === 'satellite') {
     map.removeLayer(satelliteLayer);
     activeStreetLayer().addTo(map);
     currentLayer = 'street';
     streetUsedThisRound = true;
     document.getElementById('btn-layer').innerHTML = t('layer_satellite');
-    document.getElementById('mobile-btn-layer').innerHTML = t('layer_satellite');
+    document.getElementById('mobile-tools-layer').innerHTML = t('layer_satellite');
     // Reset streak when switching to street view (labels make it too easy)
     streak = 0;
     // Show funny "easy mode" banner (unless suppressed for auto-switches)
@@ -3387,29 +3415,67 @@ function toggleMapLayer(suppressBanner = false) {
     satelliteLayer.addTo(map);
     currentLayer = 'satellite';
     document.getElementById('btn-layer').innerHTML = t('layer_street');
-    document.getElementById('mobile-btn-layer').innerHTML = t('layer_street');
+    document.getElementById('mobile-tools-layer').innerHTML = t('layer_street');
   }
   updateArabVillageLabels();
 }
 
-function toggleMobileMenu() {
-  const dropdown = document.getElementById('mobile-dropdown');
-  if (dropdown) {
-    dropdown.classList.toggle('show');
-    console.log('Mobile menu toggled, show class:', dropdown.classList.contains('show'));
+function isGameInProgress() {
+  const overlay = document.getElementById('overlay');
+  const resultsPanel = document.getElementById('results-panel');
+  const learningResults = document.getElementById('learning-results-panel');
+  const menuVisible = overlay && overlay.style.display !== 'none';
+  const resultsVisible = resultsPanel && resultsPanel.classList.contains('show');
+  const learningResultsVisible = learningResults && learningResults.classList.contains('show');
+  // In-progress = not on menu AND not on any results screen
+  return !menuVisible && !resultsVisible && !learningResultsVisible;
+}
+
+function mobileGoHome() {
+  closeMobileTools();
+  if (isGameInProgress()) {
+    // Show confirmation modal
+    const modal = document.getElementById('mobile-confirm-modal');
+    document.getElementById('mobile-confirm-title').textContent =
+      lang === 'he' ? 'בטוח?' : 'Are you sure?';
+    document.getElementById('mobile-confirm-sub').textContent =
+      lang === 'he' ? 'ההתקדמות במשחק הנוכחי תאבד.' : 'Your current game progress will be lost.';
+    document.getElementById('mobile-confirm-yes').textContent =
+      lang === 'he' ? 'כן, חזרה הביתה' : 'Yes, go home';
+    document.getElementById('mobile-confirm-no').textContent =
+      lang === 'he' ? 'ביטול' : 'Cancel';
+    modal.classList.add('open');
   } else {
-    console.error('mobile-dropdown element not found');
+    showMenu();
   }
 }
 
-// Close mobile menu when clicking outside - wait for DOM
+function confirmGoHome() {
+  document.getElementById('mobile-confirm-modal').classList.remove('open');
+  showMenu();
+}
+
+function closeConfirmModal() {
+  document.getElementById('mobile-confirm-modal').classList.remove('open');
+}
+
+function toggleMobileTools() {
+  const dropdown = document.getElementById('mobile-tools-dropdown');
+  if (dropdown) dropdown.classList.toggle('show');
+}
+function closeMobileTools() {
+  const dropdown = document.getElementById('mobile-tools-dropdown');
+  if (dropdown) dropdown.classList.remove('show');
+}
+
+// Close mobile tools dropdown when clicking outside
 window.addEventListener('DOMContentLoaded', function() {
   document.addEventListener('click', function(e) {
-    const dropdown = document.getElementById('mobile-dropdown');
-    const menuBtn = document.getElementById('mobile-menu-btn');
-    if (dropdown && dropdown.classList.contains('show') && 
-        !dropdown.contains(e.target) && !menuBtn.contains(e.target)) {
-      dropdown.classList.remove('show');
+    const toolsWrap = document.getElementById('mobile-tools-wrap');
+    const toolsDD = document.getElementById('mobile-tools-dropdown');
+    if (toolsDD && toolsDD.classList.contains('show') &&
+        !toolsWrap.contains(e.target)) {
+      toolsDD.classList.remove('show');
     }
   });
 });
@@ -3820,11 +3886,8 @@ function loadTown() {
   document.getElementById('town-name').textContent = townName;
   document.getElementById('town-desc').textContent = townDesc;
   // Also update mobile versions
-  document.getElementById('mobile-town-name').textContent = townName;
-  document.getElementById('mobile-town-desc').textContent = townDesc;
   document.querySelector('#mobile-topbar-town .mob-town-text').textContent = townName;
   document.getElementById('hint-badge').style.display = 'none';
-  document.getElementById('mobile-hint-badge').style.display = 'none';
   hintUsed = false;
   streetUsedThisRound = false;
   roundStartTime = Date.now();
@@ -3836,17 +3899,13 @@ function loadTown() {
 
 function updateHintBtn() {
   const btn = document.getElementById('btn-hint');
-  const mobileBtn = document.getElementById('mobile-btn-hint');
-  if (hintsLeft <= 0 || hintUsed || waiting) {
-    btn.disabled = true;
-    mobileBtn.disabled = true;
-  } else {
-    btn.disabled = false;
-    mobileBtn.disabled = false;
-  }
+  const toolsBtn = document.getElementById('mobile-tools-hint');
+  const disabled = hintsLeft <= 0 || hintUsed || waiting;
+  btn.disabled = disabled;
+  toolsBtn.disabled = disabled;
   const text = STRINGS[lang].hint_btn(hintsLeft);
   btn.textContent = text;
-  mobileBtn.textContent = text;
+  toolsBtn.textContent = text;
 }
 
 function setDiff(d) {
@@ -3881,11 +3940,10 @@ function setRegion(r) {
 
 function useHint() {
   if (hintUsed || waiting || hintsLeft <= 0) return;
-  closeMobileDropdown();
+  closeMobileTools();
   hintUsed = true;
   hintsLeft--;
   document.getElementById('hint-badge').style.display = 'inline';
-  document.getElementById('mobile-hint-badge').style.display = 'block';
   updateHintBtn();
 
   const town = sequence[currentIdx];
@@ -3948,10 +4006,9 @@ function showMenu() {
   document.getElementById('results-panel').className = '';
   document.getElementById('scoreboard-panel').className = '';
   document.getElementById('btn-back').style.display = 'none';
-  document.getElementById('mobile-btn-back').style.display = 'none';
-  document.getElementById('mobile-dropdown').classList.remove('show');
+  closeMobileTools();
   clearAllMarkers();
-  ['btn-hint', 'mobile-btn-hint', 'btn-layer', 'mobile-btn-layer'].forEach(id => {
+  ['btn-hint', 'btn-layer'].forEach(id => {
     document.getElementById(id).style.display = '';
   });
 }
@@ -4051,8 +4108,6 @@ function loadLearningTown() {
 
   document.getElementById('town-name').textContent = townName;
   document.getElementById('town-desc').textContent = townDesc;
-  document.getElementById('mobile-town-name').textContent = townName;
-  document.getElementById('mobile-town-desc').textContent = townDesc;
   document.querySelector('#mobile-topbar-town .mob-town-text').textContent = townName;
 
   // Update learning HUD
@@ -4062,7 +4117,6 @@ function loadLearningTown() {
   updateLearningDots(0);
 
   document.getElementById('hint-badge').style.display = 'none';
-  document.getElementById('mobile-hint-badge').style.display = 'none';
   hintUsed = false;
   streetUsedThisRound = false;
   learningAttempt = 0;
@@ -4251,9 +4305,7 @@ async function startLearning() {
   document.getElementById('results-panel').className = '';
   document.getElementById('learning-results-panel').className = '';
   document.getElementById('scoreboard-panel').className = '';
-  document.getElementById('mobile-dropdown').classList.remove('show');
   document.getElementById('btn-back').style.display = 'inline-block';
-  document.getElementById('mobile-btn-back').style.display = 'block';
 
   const v = REGION_VIEWS['all'];
   map.setView(v.center, v.zoom);
@@ -4261,7 +4313,7 @@ async function startLearning() {
   showKnownPins();
   document.getElementById('hud').style.display = 'none';
   document.getElementById('learning-hud').classList.add('active');
-  ['btn-hint', 'mobile-btn-hint', 'btn-layer', 'mobile-btn-layer'].forEach(id => {
+  ['btn-hint', 'btn-layer'].forEach(id => {
     document.getElementById(id).style.display = 'none';
   });
 
@@ -4289,9 +4341,7 @@ function startGame() {
   document.getElementById('overlay').style.display = 'none';
   document.getElementById('results-panel').className = '';
   document.getElementById('scoreboard-panel').className = '';
-  document.getElementById('mobile-dropdown').classList.remove('show');
   document.getElementById('btn-back').style.display = 'inline-block';
-  document.getElementById('mobile-btn-back').style.display = 'block';
   const v = REGION_VIEWS[region];
   map.setView(v.center, v.zoom);
   loadTown();
