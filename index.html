@@ -1201,9 +1201,7 @@
     font-family: 'Playfair Display', 'Alef', serif;
     font-size: 1.6rem;
     font-weight: 900;
-    background: linear-gradient(90deg, #1a6fd4, #7c3aed);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--text);
     margin-bottom: 2px;
   }
   .menu-mode-subtitle {
@@ -2048,7 +2046,7 @@
     <div style="font-size:0.82rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:600" id="lbl-region">אזור</div>
     <div class="region-grid">
       <div class="region-card active" id="r-all" onclick="setRegion('all')">
-        <div class="region-icon">🇮🇱</div>
+        <div class="region-icon"><svg width="28" height="28" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg"><rect width="38" height="38" fill="#fff"/><rect y="5.5" width="38" height="6" fill="#0038b8"/><rect y="26.5" width="38" height="6" fill="#0038b8"/><polygon points="19.0,12.5 24.6,22.2 13.4,22.2" fill="none" stroke="#0038b8" stroke-width="1.6"/><polygon points="19.0,25.5 13.4,15.8 24.6,15.8" fill="none" stroke="#0038b8" stroke-width="1.6"/></svg></div>
         <div class="region-label" id="r-all-label">הכל</div>
       </div>
       <div class="region-card" id="r-north" onclick="setRegion('north')">
