@@ -4485,6 +4485,7 @@ showResults = async function() {
 // ── SETTINGS ──────────────────────────────────────────────────────────────
 
 let _selectedGender = 'male';
+let _settingsLoading = false;
 
 function selectGender(g) {
   _selectedGender = g;
@@ -4492,7 +4493,7 @@ function selectGender(g) {
     const el = document.getElementById(`gender-${opt}`);
     if (el) el.classList.toggle('selected', opt === g);
   });
-  saveSettings();
+  if (!_settingsLoading) saveSettings();
 }
 
 function selectSettingsLang(l) {
@@ -4500,37 +4501,42 @@ function selectSettingsLang(l) {
     const el = document.getElementById(`settings-lang-${opt}`);
     if (el) el.classList.toggle('selected', opt === l);
   });
-  saveSettings();
+  if (!_settingsLoading) saveSettings();
 }
 
 async function openSettingsModal() {
   closeAuthDropdown();
   document.getElementById('settings-save-msg').textContent = '';
   document.getElementById('settings-modal').classList.add('open');
+  _settingsLoading = true;
 
-  if (window._fbUser) {
-    try {
-      const { getDoc, doc } = window._fbFns;
-      const snap = await getDoc(doc(window._fbDb, 'users', window._fbUser.uid));
-      if (snap.exists()) {
-        const data = snap.data();
-        document.getElementById('settings-nickname').value = data.nickname || '';
-        selectGender(data.gender || 'male');
-        selectSettingsLang(data.language || lang);
-      } else {
-        document.getElementById('settings-nickname').value = '';
-        selectGender('male');
+  try {
+    if (window._fbUser) {
+      try {
+        const { getDoc, doc } = window._fbFns;
+        const snap = await getDoc(doc(window._fbDb, 'users', window._fbUser.uid));
+        if (snap.exists()) {
+          const data = snap.data();
+          document.getElementById('settings-nickname').value = data.nickname || '';
+          selectGender(data.gender || 'male');
+          selectSettingsLang(data.language || lang);
+        } else {
+          document.getElementById('settings-nickname').value = '';
+          selectGender('male');
+          selectSettingsLang(lang);
+        }
+      } catch(e) {
+        // Fall back to current in-memory values
+        selectGender(_selectedGender || 'male');
         selectSettingsLang(lang);
+        console.error('Load settings failed:', e);
       }
-    } catch(e) {
-      // Fall back to current in-memory values
+    } else {
       selectGender(_selectedGender || 'male');
       selectSettingsLang(lang);
-      console.error('Load settings failed:', e);
     }
-  } else {
-    selectGender(_selectedGender || 'male');
-    selectSettingsLang(lang);
+  } finally {
+    _settingsLoading = false;
   }
 }
 
