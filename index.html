@@ -4834,13 +4834,7 @@ async function loadScoreboard(myScore) {
     players.sort((a, b) => b.score - a.score);
     const myIdx = players.findIndex(p => p.isMe);
 
-    // Pick 5 neighbours: 2 above, me, 2 below (clamped to array bounds)
-    let start = Math.max(0, myIdx - 2);
-    let end   = Math.min(players.length - 1, start + 4);
-    start     = Math.max(0, end - 4);
-    const visible = players.slice(start, end + 1);
-
-    // Current-game summary banner
+    // Current-game rank among all best scores
     const currentScoreRank = players.filter(p => p.score > myScore).length + 1;
     const totalForRank     = myIdx === -1 ? players.length + 1 : players.length;
     const showTopPct       = totalForRank >= 10;
@@ -4848,10 +4842,18 @@ async function loadScoreboard(myScore) {
     const rankLabel        = lang === 'he'
       ? `<span dir="rtl">מקום ${currentScoreRank} מתוך ${totalForRank}</span>`
       : `#${currentScoreRank} of ${totalForRank}`;
-    let html = `
+
+    // Player's current level
+    const myLevel = myIdx !== -1 ? players[myIdx].level : (getLearningTier() || 4);
+    const myLvl   = PLAYER_LEVEL_NAMES[myLevel] || PLAYER_LEVEL_NAMES[1];
+    const myLvlText = lang === 'he' ? myLvl.he : myLvl.en;
+
+    // "This Game" banner (placed inline at its correct rank)
+    const summaryHtml = `
       <div class="sb-summary">
         <div class="sb-summary-left">
           <div class="sb-summary-label">${lang === 'he' ? 'המשחק הנוכחי' : 'This game'}</div>
+          <div class="sb-level-badge" dir="${lang === 'he' ? 'rtl' : 'ltr'}">${myLvlText}</div>
           <div class="sb-summary-pts">${myScore} <span class="sb-summary-pts-unit">pts</span></div>
         </div>
         <div class="sb-summary-right">
@@ -4860,11 +4862,31 @@ async function loadScoreboard(myScore) {
         </div>
       </div>`;
 
+    // Insertion index: where "This Game" ranks among players (0-based)
+    const insertIdx = currentScoreRank - 1;
+
+    // Pick 4 player rows around the insertion point (+ the banner = 5 visible items)
+    let start = Math.max(0, insertIdx - 2);
+    let end   = Math.min(players.length - 1, start + 3);
+    start     = Math.max(0, end - 3);
+    const visible = players.slice(start, end + 1);
+
+    let html = '';
+    let gameInserted = false;
+
     // Show "..." if not starting from rank 1
     if (start > 0) html += `<div class="sb-divider">· · ·</div>`;
 
     visible.forEach((p, i) => {
-      const globalRank = start + i + 1;
+      const globalIdx  = start + i;
+      const globalRank = globalIdx + 1;
+
+      // Insert "This Game" at its correct ranked position
+      if (!gameInserted && globalIdx >= insertIdx) {
+        html += summaryHtml;
+        gameInserted = true;
+      }
+
       let rankHtml;
       if      (globalRank === 1) rankHtml = `<span class="sb-rank gold">🥇</span>`;
       else if (globalRank === 2) rankHtml = `<span class="sb-rank silver">🥈</span>`;
@@ -4884,23 +4906,12 @@ async function loadScoreboard(myScore) {
         </div>`;
     });
 
-    if (end < players.length - 1) html += `<div class="sb-divider">· · ·</div>`;
-
-    // If user isn't in the list yet (no previous score), append them at the bottom
-    if (myIdx === -1) {
-      const myTier = getLearningTier() || 4;
-      const myLvl = PLAYER_LEVEL_NAMES[myTier] || PLAYER_LEVEL_NAMES[1];
-      const myLvlText = lang === 'he' ? myLvl.he : myLvl.en;
-      html += `<div class="sb-divider">· · ·</div>`;
-      html += `<div class="sb-row sb-me">
-        <span class="sb-rank">#${players.length + 1}</span>
-        <span class="sb-name">
-          <span class="sb-name-text"><strong>${lang === 'he' ? 'את/ה' : 'You'}</strong></span>
-          <span class="sb-level-badge" dir="${lang === 'he' ? 'rtl' : 'ltr'}">${myLvlText}</span>
-        </span>
-        <span class="sb-score">${myScore}</span>
-      </div>`;
+    // If "This Game" goes after all visible players (lowest score)
+    if (!gameInserted) {
+      html += summaryHtml;
     }
+
+    if (end < players.length - 1) html += `<div class="sb-divider">· · ·</div>`;
 
     list.innerHTML = html;
   } catch(e) {
