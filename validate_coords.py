@@ -37,8 +37,10 @@ import sys
 import time
 import math
 import json
+import io
 import urllib.request
 import urllib.parse
+import urllib.error
 
 # ── OSM search aliases for names that need rewording to match OSM ─────────────
 OSM_ALIASES = {
@@ -73,6 +75,13 @@ OVERPASS_ALIASES = {
     "Tel Sheva":       ["Tel as-Sabi"],
     "Laqiya":          ["Laqye"],
     "Hurfeish":        ["Ḥurfeish"],
+    "Ma'ale Adumim":   ["Ma'ale Adummim", "Maale Adumim"],
+    "Zemer":           ["Tzemer"],
+    "Oranit":          ["Oranit"],
+    "Sha'ab":          ["Sha'b", "Shab"],
+    "Yirka":           ["Yirka", "Yarka"],
+    "Ilut":            ["Ilut", "'Ilut"],
+    "Kabul":           ["Kabul"],
 }
 
 # ── interchanges / junctions — no OSM city record, skip entirely ──────────────
@@ -164,19 +173,29 @@ def overpass_lookup(name, stored_lat=None, stored_lng=None):
                 data=data,
                 headers={"User-Agent": "GillyGeoGuesser-validator/1.0"},
             )
-            try:
-                with urllib.request.urlopen(req, timeout=20) as resp:
-                    result = json.loads(resp.read())
-                    elements = result.get("elements", [])
-                    if elements:
-                        best = _pick_closest(elements, stored_lat, stored_lng)
-                        lat, lng = _element_coords(best)
-                        tags = best.get("tags", {})
-                        display = tags.get("name:en", tags.get("name", candidate))
-                        return lat, lng, f"{display} [matched {tag}]"
-            except Exception as e:
-                last_err = str(e)
-            time.sleep(1.5)   # Overpass rate limit
+            for attempt in range(4):
+                try:
+                    with urllib.request.urlopen(req, timeout=30) as resp:
+                        result = json.loads(resp.read())
+                        elements = result.get("elements", [])
+                        if elements:
+                            best = _pick_closest(elements, stored_lat, stored_lng)
+                            lat, lng = _element_coords(best)
+                            tags = best.get("tags", {})
+                            display = tags.get("name:en", tags.get("name", candidate))
+                            return lat, lng, f"{display} [matched {tag}]"
+                        break  # empty results — no point retrying
+                except urllib.error.HTTPError as e:
+                    last_err = str(e)
+                    if e.code in (429, 504) and attempt < 3:
+                        wait = 3 * (2 ** attempt)  # 3s, 6s, 12s, 24s
+                        time.sleep(wait)
+                        continue
+                    break
+                except Exception as e:
+                    last_err = str(e)
+                    break
+            time.sleep(2.5)   # Overpass rate limit — generous spacing
 
     return None, None, f"No Overpass match{': ' + last_err if last_err else ''}"
 
@@ -225,11 +244,26 @@ def apply_fix(html_path, name, old_lat, old_lng, new_lat, new_lng):
         f.write(new_content)
     return True
 
+class TeeWriter:
+    """Write to both stdout and a log file simultaneously."""
+    def __init__(self, logfile, original_stdout):
+        self.logfile = logfile
+        self.stdout = original_stdout
+    def write(self, text):
+        self.stdout.write(text)
+        self.logfile.write(text)
+    def flush(self):
+        self.stdout.flush()
+        self.logfile.flush()
+
 def main():
     import os
     apply_mode = "--apply" in sys.argv
     unmatched_only = "--unmatched-only" in sys.argv
     html_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "index.html")
+    log_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "validate_coords.log")
+    log_file = open(log_path, "w", encoding="utf-8")
+    sys.stdout = TeeWriter(log_file, sys.__stdout__)
 
     all_towns = parse_towns(html_path)
 
@@ -297,6 +331,10 @@ def main():
             print("LOOKUP FAILURES:")
             for name, err in failed_list:
                 print(f"  {name}: {err}")
+
+    log_file.close()
+    sys.stdout = sys.__stdout__
+    print(f"\nLog written to: {log_path}")
 
 if __name__ == "__main__":
     main()
