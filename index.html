@@ -4603,6 +4603,9 @@ async function showLearningResults() {
   }
   menuBtn.textContent = lang === 'he' ? '← תפריט' : '← Menu';
 
+  document.getElementById('town-name').textContent = '';
+  document.getElementById('town-desc').textContent = '';
+
   document.getElementById('learning-results-panel').classList.add('show');
   document.getElementById('learning-hud').classList.remove('active');
   document.getElementById('hud').style.display = '';
