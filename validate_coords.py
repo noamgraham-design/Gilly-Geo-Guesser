@@ -63,16 +63,16 @@ OVERPASS_ALIASES = {
     "Mazra'a":         ["Mazra'a ash-Sharqiyya"],
     "Kisra-Sumei":     ["Kisra-Sumi'a"],
     "Kfar Vradim":     ["Kefar Weradim"],
-    "Kochav Yair":     ["Kokhav Ya'ir", "Kokhav Ya'ir – Tzur Yig'al"],
+    "Kochav Yair":     ["Kochav Yair Tzur Yigal", "Kokhav Ya'ir", "Kokhav Ya'ir – Tzur Yig'al"],
     "Tuba-Zangariyye": ["Tuba-Zangariyya"],
     "Rehasim":         ["Rekhasim"],
     "Ilabun":          ["Eilabun", "'Ilabun"],
-    "Kadima-Zoran":    ["Kadima Zoran"],
+    "Kadima-Zoran":    ["Kadima", "Kadima Zoran"],
     "Yavne'el":        ["Yavneel"],
     "Neve Shalom":     ["Neve Shalom/Wahat al-Salam"],
-    "Buq'ata":         ["Buqata"],
+    "Buq'ata":         ["Buq'atha", "Buqata"],
     "Tayibe":          ["at-Tayibe"],
-    "Tel Sheva":       ["Tel as-Sabi"],
+    "Tel Sheva":       ["Tal as-Sabi", "Tel as-Sabi"],
     "Laqiya":          ["Laqye"],
     "Hurfeish":        ["Ḥurfeish"],
     "Ma'ale Adumim":   ["Ma'ale Adummim", "Maale Adumim"],
@@ -155,47 +155,49 @@ def overpass_lookup(name, stored_lat=None, stored_lng=None):
     """
     candidates = [name] + OVERPASS_ALIASES.get(name, [])
     last_err = ""
+    hit_rate_limit = False
 
     for tag in ("name:en", "int_name", "name"):
+        # Batch all candidates into a single Overpass query using union
+        unions = []
         for candidate in candidates:
-            query = (
-                f'[out:json][timeout:15];'
-                f'('
+            unions.append(
                 f'node["place"]["{tag}"="{candidate}"]({ISRAEL_BBOX});'
                 f'way["place"]["{tag}"="{candidate}"]({ISRAEL_BBOX});'
                 f'relation["place"]["{tag}"="{candidate}"]({ISRAEL_BBOX});'
-                f');'
-                f'out center;'
             )
-            data = urllib.parse.urlencode({"data": query}).encode("utf-8")
-            req = urllib.request.Request(
-                "https://overpass-api.de/api/interpreter",
-                data=data,
-                headers={"User-Agent": "GillyGeoGuesser-validator/1.0"},
-            )
-            for attempt in range(4):
-                try:
-                    with urllib.request.urlopen(req, timeout=30) as resp:
-                        result = json.loads(resp.read())
-                        elements = result.get("elements", [])
-                        if elements:
-                            best = _pick_closest(elements, stored_lat, stored_lng)
-                            lat, lng = _element_coords(best)
-                            tags = best.get("tags", {})
-                            display = tags.get("name:en", tags.get("name", candidate))
-                            return lat, lng, f"{display} [matched {tag}]"
-                        break  # empty results — no point retrying
-                except urllib.error.HTTPError as e:
-                    last_err = str(e)
-                    if e.code in (429, 504) and attempt < 3:
-                        wait = 3 * (2 ** attempt)  # 3s, 6s, 12s, 24s
-                        time.sleep(wait)
-                        continue
-                    break
-                except Exception as e:
-                    last_err = str(e)
-                    break
-            time.sleep(2.5)   # Overpass rate limit — generous spacing
+        query = f'[out:json][timeout:30];({"".join(unions)});out center tags;'
+        data = urllib.parse.urlencode({"data": query}).encode("utf-8")
+        req = urllib.request.Request(
+            "https://overpass-api.de/api/interpreter",
+            data=data,
+            headers={"User-Agent": "GillyGeoGuesser-validator/1.0"},
+        )
+        for attempt in range(4):
+            try:
+                with urllib.request.urlopen(req, timeout=45) as resp:
+                    result = json.loads(resp.read())
+                    elements = result.get("elements", [])
+                    if elements:
+                        best = _pick_closest(elements, stored_lat, stored_lng)
+                        lat, lng = _element_coords(best)
+                        tags = best.get("tags", {})
+                        display = tags.get("name:en", tags.get("name", name))
+                        return lat, lng, f"{display} [matched {tag}]"
+                    break  # empty results — no point retrying
+            except urllib.error.HTTPError as e:
+                last_err = str(e)
+                if e.code in (429, 504) and attempt < 3:
+                    hit_rate_limit = True
+                    wait = 10 * (2 ** attempt)  # 10s, 20s, 40s, 80s
+                    time.sleep(wait)
+                    continue
+                break
+            except Exception as e:
+                last_err = str(e)
+                break
+        # After a rate-limit hit, wait longer before next request
+        time.sleep(15 if hit_rate_limit else 5)
 
     return None, None, f"No Overpass match{': ' + last_err if last_err else ''}"
 
