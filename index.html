@@ -3451,12 +3451,14 @@ function mobileGoHome() {
   if (isGameInProgress()) {
     // Show confirmation modal
     const modal = document.getElementById('mobile-confirm-modal');
+    const card = document.getElementById('mobile-confirm-card');
+    card.dir = lang === 'he' ? 'rtl' : 'ltr';
     document.getElementById('mobile-confirm-title').textContent =
       lang === 'he' ? 'בטוח?' : 'Are you sure?';
     document.getElementById('mobile-confirm-sub').textContent =
       lang === 'he' ? 'ההתקדמות במשחק הנוכחי תאבד.' : 'Your current game progress will be lost.';
     document.getElementById('mobile-confirm-yes').textContent =
-      lang === 'he' ? 'כן, חזרה הביתה' : 'Yes, go home';
+      lang === 'he' ? 'כן, המשך' : 'Yes, go home';
     document.getElementById('mobile-confirm-no').textContent =
       lang === 'he' ? 'ביטול' : 'Cancel';
     modal.classList.add('open');
