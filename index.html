@@ -1556,6 +1556,11 @@
       -webkit-box-orient: vertical;
       word-break: break-word;
     }
+    #mobile-topbar-town .mob-town-text.mob-size-xl { font-size: 1.6rem; }
+    #mobile-topbar-town .mob-town-text.mob-size-lg { font-size: 1.35rem; }
+    #mobile-topbar-town .mob-town-text.mob-size-md { font-size: 1.15rem; }
+    #mobile-topbar-town .mob-town-text.mob-size-sm { font-size: 1.0rem; }
+    #mobile-topbar-town .mob-town-text.mob-size-xs { font-size: 0.85rem; }
 
     /* HUD — override desktop absolute positioning, sit on the left */
     #hud {
@@ -1960,6 +1965,11 @@
     #mobile-topbar-town .mob-town-text {
       font-size: 0.9rem;
     }
+    #mobile-topbar-town .mob-town-text.mob-size-xl { font-size: 1.35rem; }
+    #mobile-topbar-town .mob-town-text.mob-size-lg { font-size: 1.15rem; }
+    #mobile-topbar-town .mob-town-text.mob-size-md { font-size: 1.0rem; }
+    #mobile-topbar-town .mob-town-text.mob-size-sm { font-size: 0.88rem; }
+    #mobile-topbar-town .mob-town-text.mob-size-xs { font-size: 0.75rem; }
     
     #town-name {
       font-size: 1.1rem;
@@ -4226,6 +4236,18 @@ function showEasyModeBanner() {
   }, 2500);
 }
 
+function adjustMobileTownFontSize(name) {
+  const el = document.querySelector('#mobile-topbar-town .mob-town-text');
+  if (!el) return;
+  el.classList.remove('mob-size-xl', 'mob-size-lg', 'mob-size-md', 'mob-size-sm', 'mob-size-xs');
+  const len = name.length;
+  if (len <= 5) el.classList.add('mob-size-xl');
+  else if (len <= 10) el.classList.add('mob-size-lg');
+  else if (len <= 16) el.classList.add('mob-size-md');
+  else if (len <= 22) el.classList.add('mob-size-sm');
+  else el.classList.add('mob-size-xs');
+}
+
 function loadTown() {
   const t = sequence[currentIdx];
   const townName = lang === 'he' ? t.nameHe : t.name;
@@ -4239,6 +4261,7 @@ function loadTown() {
   document.getElementById('town-desc').textContent = townDesc;
   // Also update mobile versions
   document.querySelector('#mobile-topbar-town .mob-town-text').textContent = townName;
+  adjustMobileTownFontSize(townName);
   hintUsed = false;
   streetUsedThisRound = false;
   roundStartTime = Date.now();
@@ -4447,6 +4470,7 @@ function loadLearningTown() {
   document.getElementById('town-name').textContent = townName;
   document.getElementById('town-desc').textContent = townDesc;
   document.querySelector('#mobile-topbar-town .mob-town-text').textContent = townName;
+  adjustMobileTownFontSize(townName);
 
   // Update learning HUD
   document.getElementById('lr-prog-label').textContent = lang === 'he' ? 'מיקום' : 'Location';
