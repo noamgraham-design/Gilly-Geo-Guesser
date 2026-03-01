@@ -3868,6 +3868,22 @@ fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/coun
 
 map.on('click', onMapClick);
 
+// ── DEV: coordinate extractor (add ?devcoords to URL) ────────────────────────
+if (new URLSearchParams(window.location.search).has('devcoords')) {
+  const coordBox = document.createElement('div');
+  coordBox.style.cssText = 'position:fixed;top:10px;right:10px;z-index:9999;background:#222;color:#0f0;padding:8px 14px;border-radius:6px;font:14px monospace;pointer-events:none;opacity:0.9;';
+  coordBox.textContent = 'Click map to copy coords';
+  document.body.appendChild(coordBox);
+  map.on('click', function(e) {
+    const lat = e.latlng.lat.toFixed(4);
+    const lng = e.latlng.lng.toFixed(4);
+    const text = `${lat},${lng}`;
+    coordBox.textContent = text + ' (copied!)';
+    navigator.clipboard.writeText(text);
+    L.popup().setLatLng(e.latlng).setContent(`<b>${text}</b><br><small>copied to clipboard</small>`).openOn(map);
+  });
+}
+
 // ── FUN FACTS MODAL ──────────────────────────────────────────────────────────
 let factModalOpen = false;
 
