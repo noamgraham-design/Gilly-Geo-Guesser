@@ -544,7 +544,6 @@
     animation: gentlePulse 2.5s ease-in-out infinite;
   }
   #btn-play-again:hover { animation: none; }
-  #hint-badge { font-size: 0.95rem; color: var(--gold); font-weight: 600; display: none; }
 
   /* MAP */
   @keyframes rainbowBg {
@@ -2085,7 +2084,7 @@
   <div id="mobile-tools-wrap" style="display:none">
     <button id="mobile-tools-btn" onclick="toggleMobileTools()">🔭</button>
     <div id="mobile-tools-dropdown">
-      <button class="btn btn-hint" id="mobile-tools-hint" onclick="useHint()">💡 Hint (−10 pts) · 3 left</button>
+      <button class="btn btn-hint" id="mobile-tools-hint" onclick="useHint()">💡 Hint · 3 left</button>
       <button class="btn btn-hint" id="mobile-tools-layer" onclick="toggleMapLayer()">🗺️ מפת רחוב</button>
     </div>
   </div>
@@ -2113,8 +2112,7 @@
     <div id="town-desc">בחר/י רמת קושי והתחל/י את המשחק</div>
   </div>
   <div id="town-actions">
-    <span id="hint-badge">📍 האזור מסומן על המפה</span>
-    <button class="btn btn-hint" id="btn-hint" onclick="useHint()">💡 Hint (−10 pts) · 3 left</button>
+    <button class="btn btn-hint" id="btn-hint" onclick="useHint()">💡 Hint · 3 left</button>
     <button class="btn btn-hint" id="btn-layer" onclick="toggleMapLayer()">🗺️ מפת רחוב</button>
   </div>
 </div>
@@ -2759,8 +2757,7 @@ const STRINGS = {
     score:            "Score",
     round:            "Round",
     placeholder_desc: "Select a difficulty and start the game",
-    hint_badge:       "📍 Area shown on map",
-    hint_btn:         n => `💡 Hint (−10 pts) · ${n} left`,
+    hint_btn:         n => `💡 Hint · ${n} left`,
     layer_street:     "🗺️ Street map",
     layer_satellite:  "🛰️ Satellite",
     fact_close:       "Close",
@@ -2797,8 +2794,7 @@ const STRINGS = {
     score:            "ניקוד",
     round:            "סיבוב",
     placeholder_desc: "בחר/י רמת קושי והתחל/י את המשחק",
-    hint_badge:       "📍 האזור מסומן על המפה",
-    hint_btn:         n => `💡 רמז (−10 נקודות) · ${n} נשארו`,
+    hint_btn:         n => `💡 רמז · ${n} נשארו`,
     layer_street:     "🗺️ מפת רחוב",
     layer_satellite:  "🛰️ לוויין",
     fact_close:       "סגור",
@@ -2848,7 +2844,6 @@ function applyLang() {
   document.getElementById('overlay-title-text').textContent = t('title');
   document.getElementById('lbl-score').textContent = t('score');
   document.getElementById('lbl-round').textContent = t('round');
-  document.getElementById('hint-badge').textContent = t('hint_badge');
   document.getElementById('fact-modal-close').textContent = t('fact_close');
   document.getElementById('menu-desc').innerHTML = t('menu_desc');
   document.getElementById('menu-mode-title').textContent = t('game_mode');
@@ -3907,7 +3902,6 @@ function loadTown() {
   document.getElementById('town-desc').textContent = townDesc;
   // Also update mobile versions
   document.querySelector('#mobile-topbar-town .mob-town-text').textContent = townName;
-  document.getElementById('hint-badge').style.display = 'none';
   hintUsed = false;
   streetUsedThisRound = false;
   roundStartTime = Date.now();
@@ -3963,7 +3957,6 @@ function useHint() {
   closeMobileTools();
   hintUsed = true;
   hintsLeft--;
-  document.getElementById('hint-badge').style.display = 'inline';
   updateHintBtn();
 
   const town = sequence[currentIdx];
@@ -4011,7 +4004,7 @@ function useHint() {
     });
   }, 600);
 
-  map.flyTo([centerLat, centerLng], Math.max(map.getZoom(), 8), { duration: 0.8 });
+  map.fitBounds(hintCircle.getBounds(), { padding: [40, 40], duration: 0.8 });
 }
 
 function showMenu() {
@@ -4136,7 +4129,6 @@ function loadLearningTown() {
   document.getElementById('lr-att-label').textContent = lang === 'he' ? 'נסיונות' : 'Tries';
   updateLearningDots(0);
 
-  document.getElementById('hint-badge').style.display = 'none';
   hintUsed = false;
   streetUsedThisRound = false;
   learningAttempt = 0;
