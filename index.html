@@ -5011,6 +5011,13 @@ async function signInGoogle() {
     const provider = new GoogleAuthProvider();
     await signInWithPopup(window._fbAuth, provider);
     closeLoginModal();
+    // If game just ended (scoreboard visible), save score and refresh leaderboard
+    if (document.getElementById('scoreboard-panel').classList.contains('show')) {
+      const hits = results.filter(r => r.pts >= 90).length;
+      await saveScore({ score, difficulty, region, rounds: roundCount, hits });
+      loadHistory();
+      loadScoreboard(score);
+    }
   } catch (e) {
     document.getElementById('login-error').textContent = e.message;
   }
@@ -5034,6 +5041,13 @@ async function submitEmailAuth() {
       await signInWithEmailAndPassword(window._fbAuth, email, password);
     }
     closeLoginModal();
+    // If game just ended (scoreboard visible), save score and refresh leaderboard
+    if (document.getElementById('scoreboard-panel').classList.contains('show')) {
+      const hits = results.filter(r => r.pts >= 90).length;
+      await saveScore({ score, difficulty, region, rounds: roundCount, hits });
+      loadHistory();
+      loadScoreboard(score);
+    }
   } catch (e) {
     const msgs = {
       'auth/email-already-in-use': 'Email already in use.',
