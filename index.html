@@ -4512,8 +4512,12 @@ async function showLearningResults() {
   const mastered = learningSessionResults.filter(r => r.mastered).length;
   const total = learningSessionResults.length;
 
+  const heDir = lang === 'he' ? 'rtl' : 'ltr';
+
   document.getElementById('lr-emoji').textContent = mastered === total ? '🏆' : mastered > 0 ? '🌟' : '📚';
-  document.getElementById('lr-title').textContent = lang === 'he'
+  const lrTitle = document.getElementById('lr-title');
+  lrTitle.dir = heDir;
+  lrTitle.textContent = lang === 'he'
     ? `${mastered} / ${total} מיקומים נלמדו`
     : `${mastered} / ${total} Mastered`;
 
@@ -4524,11 +4528,15 @@ async function showLearningResults() {
   const pct = tierTotal > 0 ? Math.round((tierKnown / tierTotal) * 100) : 100;
   const tierName = LEARNING_TIER_NAMES[tierForDisplay];
 
-  document.getElementById('lr-subtitle').textContent = lang === 'he'
+  const lrSubtitle = document.getElementById('lr-subtitle');
+  lrSubtitle.dir = heDir;
+  lrSubtitle.textContent = lang === 'he'
     ? `שלב ${tierForDisplay}: ${tierName.he}`
     : `Level ${tierForDisplay}: ${tierName.en}`;
 
-  document.getElementById('lr-progress-label').textContent = lang === 'he'
+  const lrProgLabel = document.getElementById('lr-progress-label');
+  lrProgLabel.dir = heDir;
+  lrProgLabel.textContent = lang === 'he'
     ? `${tierKnown} / ${tierTotal} מיקומים לשלב הבא`
     : `${tierKnown} / ${tierTotal} to next level`;
   document.getElementById('lr-progress-text').textContent = `${pct}%`;
@@ -4546,11 +4554,13 @@ async function showLearningResults() {
 
   document.getElementById('lr-list').innerHTML = learningSessionResults.map(r => {
     const name = lang === 'he' ? r.town.nameHe : r.town.name;
-    return `<div class="lr-row">
+    return `<div class="lr-row" dir="${heDir}">
       <span>${r.mastered ? '✅' : '❌'} ${name}</span>
       <span class="${r.mastered ? 'lr-badge-mastered' : 'lr-badge-next'}">${r.mastered ? (lang === 'he' ? 'שולט!' : 'Mastered!') : (lang === 'he' ? 'בפעם הבאה' : 'Next Time')}</span>
     </div>`;
   }).join('');
+
+  document.getElementById('learning-results-card').dir = heDir;
 
   const continueBtn = document.getElementById('lr-continue-btn');
   const menuBtn = document.getElementById('lr-menu-btn');
@@ -4570,23 +4580,32 @@ async function showLearningResults() {
 function showLevelUpPopup(newTier) {
   const overlay = document.getElementById('lr-levelup-overlay');
   const isAllMastered = newTier === null;
+  const heDir = lang === 'he' ? 'rtl' : 'ltr';
+
+  const titleEl = document.getElementById('lr-levelup-title');
+  const levelEl = document.getElementById('lr-levelup-level');
+  const nameEl = document.getElementById('lr-levelup-name');
+  const closeEl = document.getElementById('lr-levelup-close');
+  titleEl.dir = heDir;
+  levelEl.dir = heDir;
+  nameEl.dir = heDir;
 
   if (isAllMastered) {
-    document.getElementById('lr-levelup-title').textContent = lang === 'he' ? '!שלטת בהכל' : 'All Mastered!';
+    titleEl.textContent = lang === 'he' ? 'שלטת בהכל!' : 'All Mastered!';
     document.querySelector('.lr-levelup-icon').textContent = '🏆';
-    document.getElementById('lr-levelup-level').textContent = lang === 'he' ? 'אלוף!' : 'Champion!';
-    document.getElementById('lr-levelup-name').textContent = '';
-    document.getElementById('lr-levelup-close').textContent = lang === 'he' ? '💪 יאללה!' : '💪 Let\'s Go!';
+    levelEl.textContent = lang === 'he' ? 'אלוף!' : 'Champion!';
+    nameEl.textContent = '';
+    closeEl.textContent = lang === 'he' ? '💪 יאללה!' : '💪 Let\'s Go!';
   } else {
     const tierName = LEARNING_TIER_NAMES[newTier];
     const levelName = PLAYER_LEVEL_NAMES[newTier];
-    document.getElementById('lr-levelup-title').textContent = lang === 'he' ? '!עלית שלב' : 'Level Up!';
+    titleEl.textContent = lang === 'he' ? 'עלית שלב!' : 'Level Up!';
     document.querySelector('.lr-levelup-icon').textContent = '🚀';
-    document.getElementById('lr-levelup-level').textContent = lang === 'he'
+    levelEl.textContent = lang === 'he'
       ? `שלב ${newTier}` : `Level ${newTier}`;
-    document.getElementById('lr-levelup-name').textContent = lang === 'he'
+    nameEl.textContent = lang === 'he'
       ? `${tierName.he} — ${levelName.he}` : `${tierName.en} — ${levelName.en}`;
-    document.getElementById('lr-levelup-close').textContent = lang === 'he' ? '💪 יאללה!' : '💪 Let\'s Go!';
+    closeEl.textContent = lang === 'he' ? '💪 יאללה!' : '💪 Let\'s Go!';
   }
 
   // Spawn particles
