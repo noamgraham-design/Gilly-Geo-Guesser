@@ -100,6 +100,14 @@ SKIP_NAMES = {
 
 ISRAEL_COUNTRY_CODES = "IL,PS"  # include West Bank (PS)
 
+# ── Hebrew names for towns that have no name:en in OSM ────────────────────────
+HEBREW_NAMES = {
+    "Shfar'am":    "שפרעם",
+    "Tayibe":      "טייבה",
+    "Laqiya":      "לקיה",
+    "Yanuh-Jat":   "ינוח-ג'ת",
+}
+
 # ── Previously unmatched towns (> 3 km Nominatim delta) ──────────────────────
 UNMATCHED_TOWNS = {
     "Masade", "Ariel", "Givat Ze'ev", "Julis", "Oranit", "Efrat",
@@ -157,10 +165,19 @@ def overpass_lookup(name, stored_lat=None, stored_lng=None):
     last_err = ""
     hit_rate_limit = False
 
-    for tag in ("name:en", "int_name", "name"):
+    for tag in ("name:en", "int_name", "name", "name:he"):
+        # For name:he, use the Hebrew name instead of English aliases
+        if tag == "name:he":
+            he_name = HEBREW_NAMES.get(name)
+            if not he_name:
+                continue
+            tag_candidates = [he_name]
+        else:
+            tag_candidates = candidates
+
         # Batch all candidates into a single Overpass query using union
         unions = []
-        for candidate in candidates:
+        for candidate in tag_candidates:
             unions.append(
                 f'node["place"]["{tag}"="{candidate}"]({ISRAEL_BBOX});'
                 f'way["place"]["{tag}"="{candidate}"]({ISRAEL_BBOX});'
