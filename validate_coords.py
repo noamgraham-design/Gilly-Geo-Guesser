@@ -13,8 +13,15 @@ so answer pins land exactly where the street-view map renders each place.
 
 USAGE
 -----
-    python3 validate_coords.py            # dry run — show stored vs OSM for all towns
-    python3 validate_coords.py --apply    # patch index.html with OSM coords for all towns
+    python3 validate_coords.py                          # dry run — all towns via Nominatim
+    python3 validate_coords.py --apply                  # patch index.html via Nominatim
+    python3 validate_coords.py --unmatched-only         # dry run — only previously-unmatched towns via Overpass name:en
+    python3 validate_coords.py --unmatched-only --apply # patch unmatched towns using Overpass results
+
+The --unmatched-only flag targets the 38 towns whose Nominatim results were
+> 3 km off (wrong place returned).  Instead of Nominatim free-text search it
+uses the Overpass API to find OSM places whose English name (name:en tag)
+matches — the same data rendered by the CartoDB Positron English map layer.
 
 Nominatim requires a 1 req/sec rate limit (enforced automatically).
 Interchanges/junctions are skipped — they have no OSM city record.
@@ -44,6 +51,30 @@ OSM_ALIASES = {
     "Meona":           "Me'ona",
 }
 
+# ── Overpass name:en aliases — English names that differ in OSM ───────────────
+OVERPASS_ALIASES = {
+    "Masade":          ["Mas'ade", "Mas'ada"],
+    "Givat Ze'ev":     ["Giv'at Ze'ev", "Givat Zeev"],
+    "Modi'in":         ["Modi'in-Maccabim-Re'ut", "Modiin"],
+    "Kiryat Arba":     ["Qiryat Arba"],
+    "Shfar'am":        ["Shefa-'Amr", "Shefar'am"],
+    "Mazra'a":         ["Mazra'a ash-Sharqiyya"],
+    "Kisra-Sumei":     ["Kisra-Sumi'a"],
+    "Kfar Vradim":     ["Kefar Weradim"],
+    "Kochav Yair":     ["Kokhav Ya'ir", "Kokhav Ya'ir – Tzur Yig'al"],
+    "Tuba-Zangariyye": ["Tuba-Zangariyya"],
+    "Rehasim":         ["Rekhasim"],
+    "Ilabun":          ["Eilabun", "'Ilabun"],
+    "Kadima-Zoran":    ["Kadima Zoran"],
+    "Yavne'el":        ["Yavneel"],
+    "Neve Shalom":     ["Neve Shalom/Wahat al-Salam"],
+    "Buq'ata":         ["Buqata"],
+    "Tayibe":          ["at-Tayibe"],
+    "Tel Sheva":       ["Tel as-Sabi"],
+    "Laqiya":          ["Laqye"],
+    "Hurfeish":        ["Ḥurfeish"],
+}
+
 # ── interchanges / junctions — no OSM city record, skip entirely ──────────────
 SKIP_NAMES = {
     "Gesher HaYarkon Interchange","Sha'ar HaGai Interchange","Qasem Interchange",
@@ -60,12 +91,94 @@ SKIP_NAMES = {
 
 ISRAEL_COUNTRY_CODES = "IL,PS"  # include West Bank (PS)
 
+# ── Previously unmatched towns (> 3 km Nominatim delta) ──────────────────────
+UNMATCHED_TOWNS = {
+    "Masade", "Ariel", "Givat Ze'ev", "Julis", "Oranit", "Efrat",
+    "Kiryat Arba", "Modi'in", "Jericho", "Mazra'a", "Shfar'am",
+    "Tel Sheva", "Hurfeish", "Sajur", "Yanuh-Jat", "Zarzir",
+    "Sha'ab", "Kisra-Sumei", "Kfar Vradim", "Ramot Naftali",
+    "Kochav Yair", "Mitzpe Netofa", "Kabul", "Ma'ale Adumim",
+    "Zemer", "Laqiya", "Ilut", "Tayibe", "Mishmar HaNegev",
+    "Buq'ata", "Yirka", "Yavne'el", "Neve Shalom", "Rehasim",
+    "Tuba-Zangariyye", "Ilabun", "Kadima-Zoran", "Netanya",
+}
+
+# ── Bounding box for Israel + occupied territories (S,W,N,E) ─────────────────
+ISRAEL_BBOX = "29.0,34.0,33.5,36.0"
+
 def haversine_km(lat1, lng1, lat2, lng2):
     R = 6371
     dlat = math.radians(lat2 - lat1)
     dlng = math.radians(lng2 - lng1)
     a = math.sin(dlat/2)**2 + math.cos(math.radians(lat1))*math.cos(math.radians(lat2))*math.sin(dlng/2)**2
     return R * 2 * math.asin(math.sqrt(a))
+
+# ── Overpass API helpers (query OSM name:en — same data as English map layer) ─
+
+def _element_coords(el):
+    """Extract (lat, lng) from an Overpass element (node, way center, or relation center)."""
+    if "center" in el:
+        return float(el["center"]["lat"]), float(el["center"]["lon"])
+    return float(el["lat"]), float(el["lon"])
+
+def _pick_closest(elements, stored_lat, stored_lng):
+    """When Overpass returns multiple results, pick the one closest to stored coords."""
+    if not stored_lat or not stored_lng or len(elements) == 1:
+        return elements[0]
+    best, best_dist = elements[0], float("inf")
+    for el in elements:
+        try:
+            lat, lng = _element_coords(el)
+            dist = haversine_km(stored_lat, stored_lng, lat, lng)
+            if dist < best_dist:
+                best, best_dist = el, dist
+        except (KeyError, TypeError):
+            continue
+    return best
+
+def overpass_lookup(name, stored_lat=None, stored_lng=None):
+    """
+    Search the OSM Overpass API for a place whose English name (name:en tag)
+    matches.  This queries the same OSM data rendered by the CartoDB Positron
+    English map layer used in the game.
+
+    Search order: name:en → int_name → name, trying aliases for each tag.
+    """
+    candidates = [name] + OVERPASS_ALIASES.get(name, [])
+    last_err = ""
+
+    for tag in ("name:en", "int_name", "name"):
+        for candidate in candidates:
+            query = (
+                f'[out:json][timeout:15];'
+                f'('
+                f'node["place"]["{tag}"="{candidate}"]({ISRAEL_BBOX});'
+                f'way["place"]["{tag}"="{candidate}"]({ISRAEL_BBOX});'
+                f'relation["place"]["{tag}"="{candidate}"]({ISRAEL_BBOX});'
+                f');'
+                f'out center;'
+            )
+            data = urllib.parse.urlencode({"data": query}).encode("utf-8")
+            req = urllib.request.Request(
+                "https://overpass-api.de/api/interpreter",
+                data=data,
+                headers={"User-Agent": "GillyGeoGuesser-validator/1.0"},
+            )
+            try:
+                with urllib.request.urlopen(req, timeout=20) as resp:
+                    result = json.loads(resp.read())
+                    elements = result.get("elements", [])
+                    if elements:
+                        best = _pick_closest(elements, stored_lat, stored_lng)
+                        lat, lng = _element_coords(best)
+                        tags = best.get("tags", {})
+                        display = tags.get("name:en", tags.get("name", candidate))
+                        return lat, lng, f"{display} [matched {tag}]"
+            except Exception as e:
+                last_err = str(e)
+            time.sleep(1.5)   # Overpass rate limit
+
+    return None, None, f"No Overpass match{': ' + last_err if last_err else ''}"
 
 def nominatim_lookup(name, country_codes=ISRAEL_COUNTRY_CODES):
     query = OSM_ALIASES.get(name, name)
@@ -115,22 +228,32 @@ def apply_fix(html_path, name, old_lat, old_lng, new_lat, new_lng):
 def main():
     import os
     apply_mode = "--apply" in sys.argv
+    unmatched_only = "--unmatched-only" in sys.argv
     html_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "index.html")
 
     all_towns = parse_towns(html_path)
-    towns = [(n, la, ln) for n, la, ln in all_towns if n not in SKIP_NAMES]
+
+    if unmatched_only:
+        towns = [(n, la, ln) for n, la, ln in all_towns if n in UNMATCHED_TOWNS]
+        method = "Overpass name:en"
+    else:
+        towns = [(n, la, ln) for n, la, ln in all_towns if n not in SKIP_NAMES]
+        method = "Nominatim"
 
     mode_label = " (APPLY MODE — patching index.html)" if apply_mode else " (dry run — use --apply to patch)"
-    print(f"Syncing {len(towns)} towns to OSM Nominatim coords...{mode_label}\n")
-    print(f"{'Location':<30} {'Stored':>22} {'OSM':>22} {'Diff km':>8}  Status")
-    print("-" * 100)
+    print(f"Checking {len(towns)} towns via {method}...{mode_label}\n")
+    print(f"{'Location':<30} {'Stored':>22} {method+' coords':>22} {'Diff km':>8}  Status")
+    print("-" * 110)
 
     patched_list = []
     failed_list = []
 
     for name, stored_lat, stored_lng in towns:
-        time.sleep(1.1)   # Nominatim rate limit: max 1 req/sec
-        osm_lat, osm_lng, display = nominatim_lookup(name)
+        if unmatched_only:
+            osm_lat, osm_lng, display = overpass_lookup(name, stored_lat, stored_lng)
+        else:
+            time.sleep(1.1)   # Nominatim rate limit: max 1 req/sec
+            osm_lat, osm_lng, display = nominatim_lookup(name)
 
         stored_str = f"({stored_lat:.4f},{stored_lng:.4f})"
 
@@ -148,11 +271,11 @@ def main():
             if patched:
                 patched_list.append((name, stored_lat, stored_lng, osm_lat, osm_lng, dist))
         else:
-            status = f"{dist:.1f}km delta"
+            status = f"{dist:.1f}km delta  ({display})"
 
         print(f"  {name:<28} {stored_str:>22} {osm_str:>22} {dist:>7.1f}km  {status}")
 
-    print("\n" + "=" * 100)
+    print("\n" + "=" * 110)
 
     if apply_mode:
         print(f"\nSUMMARY: {len(patched_list)} patched, {len(towns) - len(patched_list) - len(failed_list)} already matched, {len(failed_list)} lookup failures\n")
@@ -165,8 +288,11 @@ def main():
             for name, err in failed_list:
                 print(f"  {name}: {err}")
     else:
-        print(f"\nSUMMARY: {len(towns)} towns checked, {len(failed_list)} lookup failures")
-        print("Run with --apply to sync all coordinates to OSM values.\n")
+        print(f"\nSUMMARY: {len(towns)} towns checked via {method}, {len(failed_list)} lookup failures")
+        if unmatched_only:
+            print("Run with --unmatched-only --apply to patch these coordinates.\n")
+        else:
+            print("Run with --apply to sync all coordinates to OSM values.\n")
         if failed_list:
             print("LOOKUP FAILURES:")
             for name, err in failed_list:
