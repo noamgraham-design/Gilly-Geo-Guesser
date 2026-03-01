@@ -4448,7 +4448,12 @@ function onMapClick(e) {
     currentIdx++;
     waiting = false;
     if (currentIdx >= roundCount) showResults();
-    else loadTown();
+    else {
+      // Zoom out to the same view the game started with
+      const v = REGION_VIEWS[region];
+      map.setView(v.center, v.zoom);
+      loadTown();
+    }
   }, 3500);
 }
 
