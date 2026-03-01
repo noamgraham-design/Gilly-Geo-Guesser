@@ -4526,18 +4526,18 @@ async function showLearningResults() {
   const tierKnown = TOWNS.filter(t => t.tier === tierForDisplay && knownLocations.includes(t.name)).length;
   const tierTotal = TOWNS.filter(t => t.tier === tierForDisplay).length;
   const pct = tierTotal > 0 ? Math.round((tierKnown / tierTotal) * 100) : 100;
-  const tierName = LEARNING_TIER_NAMES[tierForDisplay];
+  const levelNameForDisplay = PLAYER_LEVEL_NAMES[tierForDisplay];
 
   const lrSubtitle = document.getElementById('lr-subtitle');
   lrSubtitle.dir = heDir;
   lrSubtitle.textContent = lang === 'he'
-    ? `שלב ${tierForDisplay}: ${tierName.he}`
-    : `Level ${tierForDisplay}: ${tierName.en}`;
+    ? `רמה ${tierForDisplay}: ${levelNameForDisplay.he}`
+    : `Level ${tierForDisplay}: ${levelNameForDisplay.en}`;
 
   const lrProgLabel = document.getElementById('lr-progress-label');
   lrProgLabel.dir = heDir;
   lrProgLabel.textContent = lang === 'he'
-    ? `${tierKnown} / ${tierTotal} מיקומים לשלב הבא`
+    ? `${tierKnown} / ${tierTotal} מיקומים לרמה הבאה`
     : `${tierKnown} / ${tierTotal} to next level`;
   document.getElementById('lr-progress-text').textContent = `${pct}%`;
   // Animate the bar from 0
@@ -4597,14 +4597,13 @@ function showLevelUpPopup(newTier) {
     nameEl.textContent = '';
     closeEl.textContent = lang === 'he' ? '💪 יאללה!' : '💪 Let\'s Go!';
   } else {
-    const tierName = LEARNING_TIER_NAMES[newTier];
     const levelName = PLAYER_LEVEL_NAMES[newTier];
-    titleEl.textContent = lang === 'he' ? 'עלית שלב!' : 'Level Up!';
+    titleEl.textContent = lang === 'he' ? 'עלית רמה!' : 'Level Up!';
     document.querySelector('.lr-levelup-icon').textContent = '🚀';
     levelEl.textContent = lang === 'he'
-      ? `שלב ${newTier}` : `Level ${newTier}`;
+      ? `רמה ${newTier}` : `Level ${newTier}`;
     nameEl.textContent = lang === 'he'
-      ? `${tierName.he} — ${levelName.he}` : `${tierName.en} — ${levelName.en}`;
+      ? levelName.he : levelName.en;
     closeEl.textContent = lang === 'he' ? '💪 יאללה!' : '💪 Let\'s Go!';
   }
 
@@ -4662,7 +4661,7 @@ async function startLearning() {
   const allInTier = TOWNS.filter(t => t.tier === tier);
   learningSequence = allInTier.filter(t => !knownLocations.includes(t.name)).slice(0, LEARNING_SESSION_SIZE);
   if (learningSequence.length === 0) {
-    showFeedback(lang === 'he' ? '🎉 כל המיקומים בשלב זה ידועים!' : '🎉 All locations in this level known!', '#1a7f37');
+    showFeedback(lang === 'he' ? '🎉 כל המיקומים ברמה זו ידועים!' : '🎉 All locations in this level known!', '#1a7f37');
     return;
   }
 
