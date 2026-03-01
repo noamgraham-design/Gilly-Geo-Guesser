@@ -2188,6 +2188,13 @@
     0%   { background-position: 0% center; }
     100% { background-position: 300% center; }
   }
+  .lr-levelup-nickname {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--text);
+    margin: 4px 0 0;
+    letter-spacing: 0.3px;
+  }
   .lr-levelup-level {
     font-size: 2.2rem;
     font-weight: 900;
@@ -2551,6 +2558,7 @@
 <div id="learning-results-panel">
   <div id="learning-results-card">
     <div id="lr-emoji" style="font-size:2.2rem">📚</div>
+    <div id="lr-nickname" style="font-size:1.1rem;font-weight:800;text-align:center;margin-bottom:0;letter-spacing:0.3px"></div>
     <h2 id="lr-title" style="margin:4px 0;text-align:center;font-size:1.15rem;line-height:1.3"></h2>
     <div id="lr-subtitle" style="color:var(--muted);font-size:0.88rem;text-align:center;margin-bottom:4px"></div>
     <div id="lr-progress-wrap">
@@ -2574,6 +2582,7 @@
     <div class="lr-levelup-particles" id="lr-levelup-particles"></div>
     <div class="lr-levelup-icon">🚀</div>
     <div class="lr-levelup-title" id="lr-levelup-title">Level Up!</div>
+    <div class="lr-levelup-nickname" id="lr-levelup-nickname"></div>
     <div class="lr-levelup-level" id="lr-levelup-level"></div>
     <div class="lr-levelup-name" id="lr-levelup-name"></div>
     <div class="lr-levelup-stars">⭐ ✨ ⭐</div>
@@ -4513,7 +4522,9 @@ async function showLearningResults() {
   const total = learningSessionResults.length;
 
   const heDir = lang === 'he' ? 'rtl' : 'ltr';
+  const nickname = document.getElementById('settings-nickname').value.trim() || '';
 
+  document.getElementById('lr-nickname').textContent = nickname;
   document.getElementById('lr-emoji').textContent = mastered === total ? '🏆' : mastered > 0 ? '🌟' : '📚';
   const lrTitle = document.getElementById('lr-title');
   lrTitle.dir = heDir;
@@ -4581,6 +4592,9 @@ function showLevelUpPopup(newTier) {
   const overlay = document.getElementById('lr-levelup-overlay');
   const isAllMastered = newTier === null;
   const heDir = lang === 'he' ? 'rtl' : 'ltr';
+
+  const nickname = document.getElementById('settings-nickname').value.trim() || '';
+  document.getElementById('lr-levelup-nickname').textContent = nickname;
 
   const titleEl = document.getElementById('lr-levelup-title');
   const levelEl = document.getElementById('lr-levelup-level');
