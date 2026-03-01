@@ -2056,44 +2056,61 @@
   .lr-badge-next { color: #9a6700; font-weight: 700; font-size: 0.82rem; flex-shrink: 0; margin-left: 6px; }
   #lr-list { width: 100%; overflow-y: auto; max-height: 260px; }
 
+  /* ── Learning Level Section ────────────────────────────────────────────── */
+  #lr-level-section {
+    width: 100%;
+    margin: 4px 0 6px;
+    text-align: center;
+  }
+  #lr-level-title {
+    font-family: 'Playfair Display', 'Alef', serif;
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  #lr-level-name {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #16a34a;
+    margin-bottom: 6px;
+  }
+
   /* ── Learning Progress Bar ─────────────────────────────────────────────── */
   #lr-progress-wrap {
     width: 100%;
-    margin: 6px 0 2px;
-  }
-  #lr-progress-label {
-    font-size: 0.78rem;
-    color: var(--muted);
-    margin-bottom: 4px;
-    text-align: center;
   }
   #lr-progress-track {
     width: 100%;
-    height: 18px;
-    background: #e8e8e8;
-    border-radius: 12px;
+    height: 22px;
+    background: #e2efe2;
+    border-radius: 14px;
     overflow: hidden;
     position: relative;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.1), 0 0 10px rgba(34,197,94,0.12);
+    border: 1.5px solid rgba(22,163,74,0.2);
   }
   #lr-progress-fill {
     height: 100%;
-    border-radius: 12px;
-    background: linear-gradient(90deg, #22c55e, #16a34a, #4ade80, #16a34a);
+    border-radius: 14px;
+    background: linear-gradient(90deg, #15803d, #22c55e, #4ade80, #22c55e, #15803d);
     background-size: 300% 100%;
-    animation: lrBarShimmer 2s linear infinite;
+    animation: lrBarShimmer 2.5s linear infinite;
     position: relative;
     transition: width 1.2s cubic-bezier(.34,1.2,.64,1);
     min-width: 0;
-    box-shadow: 0 0 12px rgba(34,197,94,0.5), inset 0 1px 2px rgba(255,255,255,0.4);
+    box-shadow:
+      0 0 18px rgba(34,197,94,0.55),
+      0 0 6px rgba(74,222,128,0.35),
+      inset 0 1px 2px rgba(255,255,255,0.35);
   }
   #lr-progress-fill::after {
     content: '';
     position: absolute;
-    top: 2px; left: 4px; right: 4px;
-    height: 5px;
+    top: 2px; left: 6px; right: 6px;
+    height: 6px;
     border-radius: 4px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.45), transparent);
+    background: linear-gradient(180deg, rgba(255,255,255,0.55), transparent);
   }
   #lr-progress-text {
     position: absolute;
@@ -2101,11 +2118,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.72rem;
+    font-size: 0.74rem;
     font-weight: 800;
     color: #fff;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
     pointer-events: none;
+  }
+  #lr-progress-label {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 4px;
+    text-align: center;
   }
   @keyframes lrBarShimmer {
     0%   { background-position: 0% 50%; }
@@ -2560,12 +2583,15 @@
     <div id="lr-emoji" style="font-size:2.2rem">📚</div>
     <div id="lr-nickname" style="font-size:1.1rem;font-weight:800;text-align:center;margin-bottom:0;letter-spacing:0.3px"></div>
     <h2 id="lr-title" style="margin:4px 0;text-align:center;font-size:1.15rem;line-height:1.3"></h2>
-    <div id="lr-subtitle" style="color:var(--muted);font-size:0.88rem;text-align:center;margin-bottom:4px"></div>
-    <div id="lr-progress-wrap">
-      <div id="lr-progress-label"></div>
-      <div id="lr-progress-track">
-        <div id="lr-progress-fill" style="width:0%"></div>
-        <div id="lr-progress-text"></div>
+    <div id="lr-level-section">
+      <div id="lr-level-title"></div>
+      <div id="lr-level-name"></div>
+      <div id="lr-progress-wrap">
+        <div id="lr-progress-track">
+          <div id="lr-progress-fill" style="width:0%"></div>
+          <div id="lr-progress-text"></div>
+        </div>
+        <div id="lr-progress-label"></div>
       </div>
     </div>
     <div id="lr-list"></div>
@@ -4539,18 +4565,24 @@ async function showLearningResults() {
   const pct = tierTotal > 0 ? Math.round((tierKnown / tierTotal) * 100) : 100;
   const levelNameForDisplay = PLAYER_LEVEL_NAMES[tierForDisplay];
 
-  const lrSubtitle = document.getElementById('lr-subtitle');
-  lrSubtitle.dir = heDir;
-  lrSubtitle.textContent = lang === 'he'
-    ? `רמה ${tierForDisplay}: ${levelNameForDisplay.he}`
-    : `Level ${tierForDisplay}: ${levelNameForDisplay.en}`;
+  const lrLevelTitle = document.getElementById('lr-level-title');
+  lrLevelTitle.dir = heDir;
+  lrLevelTitle.textContent = lang === 'he'
+    ? `רמה ${tierForDisplay}`
+    : `Level ${tierForDisplay}`;
+
+  const lrLevelName = document.getElementById('lr-level-name');
+  lrLevelName.dir = heDir;
+  lrLevelName.textContent = levelNameForDisplay
+    ? (lang === 'he' ? levelNameForDisplay.he : levelNameForDisplay.en)
+    : '';
 
   const lrProgLabel = document.getElementById('lr-progress-label');
   lrProgLabel.dir = heDir;
   lrProgLabel.textContent = lang === 'he'
     ? `${tierKnown} / ${tierTotal} מיקומים לרמה הבאה`
     : `${tierKnown} / ${tierTotal} to next level`;
-  document.getElementById('lr-progress-text').textContent = `${pct}%`;
+  document.getElementById('lr-progress-text').textContent = `${tierKnown} / ${tierTotal}`;
   // Animate the bar from 0
   const fillEl = document.getElementById('lr-progress-fill');
   fillEl.style.width = '0%';
