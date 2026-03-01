@@ -2054,8 +2054,206 @@
   .lr-row:last-child { border-bottom: none; }
   .lr-badge-mastered { color: #1a7f37; font-weight: 700; font-size: 0.82rem; flex-shrink: 0; margin-left: 6px; }
   .lr-badge-next { color: #9a6700; font-weight: 700; font-size: 0.82rem; flex-shrink: 0; margin-left: 6px; }
-  #lr-level-up-banner { background: linear-gradient(135deg, #f0a500, #e05c00); color: #fff; border-radius: 10px; padding: 10px 14px; text-align: center; font-size: 0.95rem; font-weight: 700; margin: 4px 0; width: 100%; box-sizing: border-box; }
   #lr-list { width: 100%; overflow-y: auto; max-height: 260px; }
+
+  /* ── Learning Progress Bar ─────────────────────────────────────────────── */
+  #lr-progress-wrap {
+    width: 100%;
+    margin: 6px 0 2px;
+  }
+  #lr-progress-label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 4px;
+    text-align: center;
+  }
+  #lr-progress-track {
+    width: 100%;
+    height: 18px;
+    background: #e8e8e8;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+  }
+  #lr-progress-fill {
+    height: 100%;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #22c55e, #16a34a, #4ade80, #16a34a);
+    background-size: 300% 100%;
+    animation: lrBarShimmer 2s linear infinite;
+    position: relative;
+    transition: width 1.2s cubic-bezier(.34,1.2,.64,1);
+    min-width: 0;
+    box-shadow: 0 0 12px rgba(34,197,94,0.5), inset 0 1px 2px rgba(255,255,255,0.4);
+  }
+  #lr-progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 2px; left: 4px; right: 4px;
+    height: 5px;
+    border-radius: 4px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.45), transparent);
+  }
+  #lr-progress-text {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    pointer-events: none;
+  }
+  @keyframes lrBarShimmer {
+    0%   { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+  }
+
+  /* ── Level-Up Popup ────────────────────────────────────────────────────── */
+  #lr-levelup-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 12000;
+    background: rgba(0,0,0,0.6);
+    align-items: center;
+    justify-content: center;
+  }
+  #lr-levelup-overlay.show {
+    display: flex;
+    animation: lrOverlayFadeIn 0.3s ease;
+  }
+  @keyframes lrOverlayFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  #lr-levelup-card {
+    position: relative;
+    background: var(--surface);
+    border-radius: 24px;
+    padding: 32px 28px 28px;
+    text-align: center;
+    max-width: 340px;
+    width: 90%;
+    box-shadow: 0 8px 60px rgba(0,0,0,0.35);
+    animation: lrLevelCardPop 0.6s cubic-bezier(.34,1.56,.64,1);
+    overflow: hidden;
+  }
+  #lr-levelup-card::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 27px;
+    z-index: -1;
+    background: linear-gradient(135deg, #22c55e, #4ade80, #fbbf24, #22c55e, #16a34a);
+    background-size: 400% 400%;
+    animation: lrLevelBorderShimmer 3s ease infinite;
+  }
+  @keyframes lrLevelBorderShimmer {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  @keyframes lrLevelCardPop {
+    0%   { opacity: 0; transform: scale(0.3) rotate(-8deg); }
+    60%  { opacity: 1; transform: scale(1.08) rotate(2deg); }
+    100% { opacity: 1; transform: scale(1) rotate(0deg); }
+  }
+  .lr-levelup-icon {
+    font-size: 4rem;
+    margin-bottom: 8px;
+    animation: lrLevelIconBounce 1s ease infinite;
+  }
+  @keyframes lrLevelIconBounce {
+    0%, 100% { transform: translateY(0) scale(1); }
+    30%      { transform: translateY(-14px) scale(1.2); }
+    50%      { transform: translateY(-6px) scale(1.05); }
+  }
+  .lr-levelup-title {
+    font-family: 'Playfair Display', 'Alef', serif;
+    font-size: 1.6rem;
+    font-weight: 900;
+    background: linear-gradient(90deg, #16a34a, #22c55e, #fbbf24, #22c55e, #16a34a);
+    background-size: 300% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: lrLevelTextShimmer 2s linear infinite;
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+  @keyframes lrLevelTextShimmer {
+    0%   { background-position: 0% center; }
+    100% { background-position: 300% center; }
+  }
+  .lr-levelup-level {
+    font-size: 2.2rem;
+    font-weight: 900;
+    font-family: 'Playfair Display', 'Alef', serif;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 8px 0;
+    animation: lrLevelNumPulse 1.5s ease-in-out infinite;
+  }
+  @keyframes lrLevelNumPulse {
+    0%, 100% { transform: scale(1); filter: brightness(1); }
+    50%      { transform: scale(1.1); filter: brightness(1.3); }
+  }
+  .lr-levelup-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .lr-levelup-stars {
+    font-size: 1.4rem;
+    letter-spacing: 6px;
+    margin: 8px 0 18px;
+    animation: lrLevelStarsSpin 2s ease-in-out infinite;
+  }
+  @keyframes lrLevelStarsSpin {
+    0%, 100% { transform: rotateY(0deg); }
+    50%      { transform: rotateY(360deg); }
+  }
+  #lr-levelup-close {
+    display: inline-block;
+    padding: 12px 36px;
+    border-radius: 14px;
+    border: none;
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 700;
+    font-family: 'Source Serif 4', 'Alef', serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 20px rgba(34,197,94,0.4);
+  }
+  #lr-levelup-close:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 6px 28px rgba(34,197,94,0.5);
+  }
+  .lr-levelup-particles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .lr-levelup-particle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    animation: lrParticleFly 1.6s ease-out forwards;
+    opacity: 0;
+  }
+  @keyframes lrParticleFly {
+    0%   { opacity: 1; transform: translate(0, 0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--px), var(--py)) scale(0); }
+  }
   #learning-preview-bar {
     position: fixed;
     bottom: 24px;
@@ -2355,12 +2553,31 @@
     <div id="lr-emoji" style="font-size:2.2rem">📚</div>
     <h2 id="lr-title" style="margin:4px 0;text-align:center;font-size:1.15rem;line-height:1.3"></h2>
     <div id="lr-subtitle" style="color:var(--muted);font-size:0.88rem;text-align:center;margin-bottom:4px"></div>
-    <div id="lr-level-up-banner" style="display:none"></div>
+    <div id="lr-progress-wrap">
+      <div id="lr-progress-label"></div>
+      <div id="lr-progress-track">
+        <div id="lr-progress-fill" style="width:0%"></div>
+        <div id="lr-progress-text"></div>
+      </div>
+    </div>
     <div id="lr-list"></div>
     <div class="btn-row" style="flex-direction:column;gap:8px;width:100%;margin-top:10px">
       <button class="btn btn-primary" id="lr-continue-btn" onclick="continueLearning()" style="width:100%">📚 Continue</button>
       <button class="btn-secondary" id="lr-menu-btn" onclick="showMenu()" style="width:100%;text-align:center;padding:9px 16px">← Menu</button>
     </div>
+  </div>
+</div>
+
+<!-- ── LEVEL UP POPUP ──────────────────────────────────────────────────── -->
+<div id="lr-levelup-overlay">
+  <div id="lr-levelup-card">
+    <div class="lr-levelup-particles" id="lr-levelup-particles"></div>
+    <div class="lr-levelup-icon">🚀</div>
+    <div class="lr-levelup-title" id="lr-levelup-title">Level Up!</div>
+    <div class="lr-levelup-level" id="lr-levelup-level"></div>
+    <div class="lr-levelup-name" id="lr-levelup-name"></div>
+    <div class="lr-levelup-stars">⭐ ✨ ⭐</div>
+    <button id="lr-levelup-close" onclick="closeLevelUpPopup()">💪 Let's Go!</button>
   </div>
 </div>
 
@@ -4098,6 +4315,7 @@ function showMenu() {
   document.getElementById('learning-hud').classList.remove('active');
   document.getElementById('hud').style.display = '';
   document.getElementById('learning-results-panel').className = '';
+  document.getElementById('lr-levelup-overlay').classList.remove('show');
   clearLearningPins();
   document.getElementById('overlay').style.display = 'flex';
   document.getElementById('menu-card').style.display = 'flex';
@@ -4299,25 +4517,31 @@ async function showLearningResults() {
     ? `${mastered} / ${total} מיקומים נלמדו`
     : `${mastered} / ${total} Mastered`;
 
-  const tierForDisplay = prevTier ?? 4;
+  // Progress bar — show progress within the current (or just-completed) tier
+  const tierForDisplay = newTier ?? prevTier ?? 4;
   const tierKnown = TOWNS.filter(t => t.tier === tierForDisplay && knownLocations.includes(t.name)).length;
   const tierTotal = TOWNS.filter(t => t.tier === tierForDisplay).length;
-  document.getElementById('lr-subtitle').textContent = lang === 'he'
-    ? `שלב ${tierForDisplay}: ${tierKnown} / ${tierTotal} ידועים`
-    : `Level ${tierForDisplay}: ${tierKnown} / ${tierTotal} known`;
+  const pct = tierTotal > 0 ? Math.round((tierKnown / tierTotal) * 100) : 100;
+  const tierName = LEARNING_TIER_NAMES[tierForDisplay];
 
-  const levelUpEl = document.getElementById('lr-level-up-banner');
-  if (leveledUp && newTier !== null) {
-    const n = LEARNING_TIER_NAMES[newTier];
-    levelUpEl.style.display = 'block';
-    levelUpEl.textContent = lang === 'he'
-      ? `🎉 עלית שלב! שלב ${newTier}: ${n.he}`
-      : `🎉 Level Up! Level ${newTier}: ${n.en}`;
-  } else if (leveledUp && newTier === null) {
-    levelUpEl.style.display = 'block';
-    levelUpEl.textContent = lang === 'he' ? '🏆 שלטת בכל המיקומים!' : '🏆 All locations mastered!';
-  } else {
-    levelUpEl.style.display = 'none';
+  document.getElementById('lr-subtitle').textContent = lang === 'he'
+    ? `שלב ${tierForDisplay}: ${tierName.he}`
+    : `Level ${tierForDisplay}: ${tierName.en}`;
+
+  document.getElementById('lr-progress-label').textContent = lang === 'he'
+    ? `${tierKnown} / ${tierTotal} מיקומים לשלב הבא`
+    : `${tierKnown} / ${tierTotal} to next level`;
+  document.getElementById('lr-progress-text').textContent = `${pct}%`;
+  // Animate the bar from 0
+  const fillEl = document.getElementById('lr-progress-fill');
+  fillEl.style.width = '0%';
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => { fillEl.style.width = pct + '%'; });
+  });
+
+  // Level-up popup (replaces old banner)
+  if (leveledUp) {
+    setTimeout(() => showLevelUpPopup(newTier), 600);
   }
 
   document.getElementById('lr-list').innerHTML = learningSessionResults.map(r => {
@@ -4341,6 +4565,53 @@ async function showLearningResults() {
   document.getElementById('learning-results-panel').classList.add('show');
   document.getElementById('learning-hud').classList.remove('active');
   document.getElementById('hud').style.display = '';
+}
+
+function showLevelUpPopup(newTier) {
+  const overlay = document.getElementById('lr-levelup-overlay');
+  const isAllMastered = newTier === null;
+
+  if (isAllMastered) {
+    document.getElementById('lr-levelup-title').textContent = lang === 'he' ? '!שלטת בהכל' : 'All Mastered!';
+    document.querySelector('.lr-levelup-icon').textContent = '🏆';
+    document.getElementById('lr-levelup-level').textContent = lang === 'he' ? 'אלוף!' : 'Champion!';
+    document.getElementById('lr-levelup-name').textContent = '';
+    document.getElementById('lr-levelup-close').textContent = lang === 'he' ? '💪 יאללה!' : '💪 Let\'s Go!';
+  } else {
+    const tierName = LEARNING_TIER_NAMES[newTier];
+    const levelName = PLAYER_LEVEL_NAMES[newTier];
+    document.getElementById('lr-levelup-title').textContent = lang === 'he' ? '!עלית שלב' : 'Level Up!';
+    document.querySelector('.lr-levelup-icon').textContent = '🚀';
+    document.getElementById('lr-levelup-level').textContent = lang === 'he'
+      ? `שלב ${newTier}` : `Level ${newTier}`;
+    document.getElementById('lr-levelup-name').textContent = lang === 'he'
+      ? `${tierName.he} — ${levelName.he}` : `${tierName.en} — ${levelName.en}`;
+    document.getElementById('lr-levelup-close').textContent = lang === 'he' ? '💪 יאללה!' : '💪 Let\'s Go!';
+  }
+
+  // Spawn particles
+  const particleContainer = document.getElementById('lr-levelup-particles');
+  particleContainer.innerHTML = '';
+  const colors = ['#22c55e', '#4ade80', '#fbbf24', '#16a34a', '#a3e635', '#34d399'];
+  for (let i = 0; i < 24; i++) {
+    const p = document.createElement('div');
+    p.className = 'lr-levelup-particle';
+    p.style.left = '50%';
+    p.style.top = '50%';
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    p.style.setProperty('--px', (Math.random() - 0.5) * 280 + 'px');
+    p.style.setProperty('--py', (Math.random() - 0.5) * 280 + 'px');
+    p.style.animationDelay = (Math.random() * 0.5) + 's';
+    p.style.width = (4 + Math.random() * 6) + 'px';
+    p.style.height = p.style.width;
+    particleContainer.appendChild(p);
+  }
+
+  overlay.classList.add('show');
+}
+
+function closeLevelUpPopup() {
+  document.getElementById('lr-levelup-overlay').classList.remove('show');
 }
 
 async function continueLearning() {
