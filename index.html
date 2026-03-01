@@ -510,8 +510,13 @@
   .sb-summary-left, .sb-summary-right { display: flex; flex-direction: column; gap: 1px; }
   .sb-summary-right { align-items: flex-end; }
   .sb-summary-label { font-size: 0.68rem; color: var(--muted); font-weight: 500; }
-  .sb-summary-pts { font-size: 1.15rem; font-weight: 800; color: var(--text); }
-  .sb-summary-pts-unit { font-size: 0.75rem; font-weight: 600; color: var(--muted); }
+  .sb-summary-name { font-size: 0.95rem; font-weight: 800; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
+  .sb-summary-score {
+    font-size: 1.15rem; font-weight: 900;
+    background: linear-gradient(90deg, #f97316, #ef4444, #ec4899, #8b5cf6);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .sb-summary-pts-unit { font-size: 0.75rem; font-weight: 600; }
   .sb-top-pct {
     font-size: 1.05rem; font-weight: 800;
     background: linear-gradient(90deg, #1a6fd4, #7c3aed);
@@ -5087,6 +5092,10 @@ async function saveScore(scoreData) {
     const userSnap = await getDoc(userRef);
     const current  = userSnap.exists() ? (userSnap.data().highest_score || 0) : 0;
     const isNewRecord = scoreData.score > current;
+    // Ensure knownLocations is loaded so getLearningTier() returns the correct level
+    if (userSnap.exists() && userSnap.data().knownLocations) {
+      knownLocations = userSnap.data().knownLocations;
+    }
     const tier = getLearningTier() || 4;
     if (isNewRecord) {
       await setDoc(userRef, { highest_score: scoreData.score, level: tier }, { merge: true });
@@ -5222,8 +5231,12 @@ async function loadScoreboard(myScore) {
     ));
 
     const players = [];
+    let myNickname = null;
     snap.forEach(doc => {
       const d = doc.data();
+      if (doc.id === window._fbUser.uid) {
+        myNickname = d.nickname || d.displayName || null;
+      }
       if (d.highest_score > 0) {
         players.push({
           uid:      doc.id,
@@ -5258,17 +5271,24 @@ async function loadScoreboard(myScore) {
     const myLvl   = PLAYER_LEVEL_NAMES[myLevel] || PLAYER_LEVEL_NAMES[1];
     const myLvlText = lang === 'he' ? myLvl.he : myLvl.en;
 
+    // Player's nickname
+    const myName = myNickname || window._fbUser?.displayName?.split(' ')[0] || (lang === 'he' ? 'שחקן אנונימי' : 'Anonymous');
+
+    // Place label: percentage if enough players, otherwise M/N
+    const placeLabel = showTopPct
+      ? `Top ${topPct}%`
+      : (lang === 'he' ? `<span dir="rtl">${currentScoreRank}/${totalForRank}</span>` : `${currentScoreRank}/${totalForRank}`);
+
     // "This Game" banner (placed inline at its correct rank)
     const summaryHtml = `
       <div class="sb-summary">
         <div class="sb-summary-left">
-          <div class="sb-summary-label">${lang === 'he' ? 'המשחק הנוכחי' : 'This game'}</div>
+          <div class="sb-summary-name">${myName}</div>
           <div class="sb-level-badge" dir="${lang === 'he' ? 'rtl' : 'ltr'}">${myLvlText}</div>
-          <div class="sb-summary-pts">${myScore} <span class="sb-summary-pts-unit">pts</span></div>
         </div>
         <div class="sb-summary-right">
-          ${showTopPct ? `<div class="sb-top-pct">Top ${topPct}%</div>` : ''}
-          <div class="sb-summary-label">${rankLabel}</div>
+          <div class="sb-summary-label">${placeLabel}</div>
+          <div class="sb-summary-score">${myScore} <span class="sb-summary-pts-unit">pts</span></div>
         </div>
       </div>`;
 
