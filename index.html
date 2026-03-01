@@ -2124,12 +2124,6 @@
     text-shadow: 0 1px 4px rgba(0,0,0,0.5);
     pointer-events: none;
   }
-  #lr-progress-label {
-    font-size: 0.72rem;
-    color: var(--muted);
-    margin-top: 4px;
-    text-align: center;
-  }
   @keyframes lrBarShimmer {
     0%   { background-position: 0% 50%; }
     100% { background-position: 300% 50%; }
@@ -2591,7 +2585,6 @@
           <div id="lr-progress-fill" style="width:0%"></div>
           <div id="lr-progress-text"></div>
         </div>
-        <div id="lr-progress-label"></div>
       </div>
     </div>
     <div id="lr-list"></div>
@@ -4577,11 +4570,6 @@ async function showLearningResults() {
     ? (lang === 'he' ? levelNameForDisplay.he : levelNameForDisplay.en)
     : '';
 
-  const lrProgLabel = document.getElementById('lr-progress-label');
-  lrProgLabel.dir = heDir;
-  lrProgLabel.textContent = lang === 'he'
-    ? `${tierKnown} / ${tierTotal} מיקומים לרמה הבאה`
-    : `${tierKnown} / ${tierTotal} to next level`;
   document.getElementById('lr-progress-text').textContent = `${tierKnown} / ${tierTotal}`;
   // Animate the bar from 0
   const fillEl = document.getElementById('lr-progress-fill');
