@@ -4289,7 +4289,6 @@ async function showLearningResults() {
     } catch (e) { console.error('Failed to save known locations:', e); }
   }
 
-  showKnownPins();
   const newTier = getLearningTier();
   const leveledUp = prevTier !== null && newTier !== prevTier;
   const mastered = learningSessionResults.filter(r => r.mastered).length;
@@ -4394,7 +4393,6 @@ async function startLearning() {
   const v = REGION_VIEWS['all'];
   map.setView(v.center, v.zoom);
 
-  showKnownPins();
   document.getElementById('hud').style.display = 'none';
   document.getElementById('learning-hud').classList.add('active');
   ['btn-hint', 'btn-layer'].forEach(id => {
