@@ -5284,7 +5284,7 @@ async function loadScoreboard(myScore) {
       <div class="sb-summary">
         <div class="sb-summary-left">
           <div class="sb-summary-name">${myName}</div>
-          <div class="sb-level-badge" dir="${lang === 'he' ? 'rtl' : 'ltr'}">${myLvlText}</div>
+          <div class="sb-level-badge">${myLvlText}</div>
         </div>
         <div class="sb-summary-right">
           <div class="sb-summary-label">${placeLabel}</div>
@@ -5330,7 +5330,7 @@ async function loadScoreboard(myScore) {
           ${rankHtml}
           <span class="sb-name">
             <span class="sb-name-text">${p.isMe ? `<strong>${p.name}</strong>` : p.name}</span>
-            <span class="sb-level-badge" dir="${lang === 'he' ? 'rtl' : 'ltr'}">${lvlText}</span>
+            <span class="sb-level-badge">${lvlText}</span>
           </span>
           <span class="sb-score">${p.score}</span>
         </div>`;
