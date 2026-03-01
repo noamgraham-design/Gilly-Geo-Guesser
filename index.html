@@ -3989,8 +3989,7 @@ function useHint() {
     color: palette[0].stroke,
     weight: 3,
     dashArray: '10, 6',
-    fillColor: palette[0].fill,
-    fillOpacity: 0.25,
+    fill: false,
   }).addTo(map);
 
   // Animate color cycling every 600ms
@@ -4000,7 +3999,6 @@ function useHint() {
     colorIdx = (colorIdx + 1) % palette.length;
     hintCircle.setStyle({
       color: palette[colorIdx].stroke,
-      fillColor: palette[colorIdx].fill,
     });
   }, 600);
 
