@@ -1592,6 +1592,9 @@
       position: relative;
       flex-shrink: 0;
     }
+    #mobile-tools-wrap.learning-hidden {
+      display: none !important;
+    }
     #mobile-tools-btn {
       display: flex;
       align-items: center;
@@ -2088,20 +2091,7 @@
   }
   #learning-big-countdown {
     display: none;
-    position: fixed;
-    top: 72px;
-    right: 16px;
-    z-index: 860;
-    font-family: 'Playfair Display', 'Alef', serif;
-    font-size: 5rem;
-    font-weight: 900;
-    color: #fff;
-    text-shadow: 0 0 24px rgba(220,50,50,0.9), 0 2px 6px rgba(0,0,0,0.6);
-    line-height: 1;
-    pointer-events: none;
-    animation: lrPulse 1s ease-in-out infinite;
   }
-  #learning-big-countdown.active { display: block; }
   @media (max-width: 768px) {
     #learning-results-panel { width: 100% !important; }
     #learning-hud { position: static !important; transform: none !important; display: none; gap: 10px; }
@@ -2156,10 +2146,6 @@
     <div class="hud-block">
       <span class="hud-label" id="lr-prog-label">Location</span>
       <span class="hud-value" id="lr-prog-val">—</span>
-    </div>
-    <div class="hud-block">
-      <span class="hud-label" id="lr-att-label">Tries</span>
-      <div class="lr-att-wrap" id="lr-att-dots"></div>
     </div>
   </div>
   <div id="mobile-topbar-town" style="display:none"><span class="mob-find-label">📍 Find</span><span class="mob-town-text">—</span></div>
@@ -4123,6 +4109,8 @@ function showMenu() {
   ['btn-hint', 'btn-layer'].forEach(id => {
     document.getElementById(id).style.display = '';
   });
+  // Restore mobile assistance button when leaving learning mode
+  document.getElementById('mobile-tools-wrap').classList.remove('learning-hidden');
 }
 
 // ── Learning Mode ─────────────────────────────────────────────────────────────
@@ -4154,13 +4142,7 @@ function clearLearningPins() {
 }
 
 function updateLearningDots(used) {
-  const dotsEl = document.getElementById('lr-att-dots');
-  dotsEl.innerHTML = '';
-  for (let i = 0; i < LEARNING_MAX_ATTEMPTS; i++) {
-    const d = document.createElement('div');
-    d.className = 'lr-dot' + (i < used ? ' used' : '');
-    dotsEl.appendChild(d);
-  }
+  // Attempts dots removed from UI
 }
 
 function startLearningPreview(town) {
@@ -4176,16 +4158,9 @@ function startLearningPreview(town) {
   countEl.textContent = secondsLeft;
   bar.classList.add('active');
 
-  const bigEl = document.getElementById('learning-big-countdown');
   learningPreviewInterval = setInterval(() => {
     secondsLeft--;
     countEl.textContent = secondsLeft;
-    if (secondsLeft <= 5 && secondsLeft > 0) {
-      bigEl.textContent = secondsLeft;
-      bigEl.classList.add('active');
-    } else {
-      bigEl.classList.remove('active');
-    }
     if (secondsLeft <= 0) endLearningPreview();
   }, 1000);
   learningPreviewTimer = setTimeout(endLearningPreview, 15000);
@@ -4225,8 +4200,6 @@ function loadLearningTown() {
   // Update learning HUD
   document.getElementById('lr-prog-label').textContent = lang === 'he' ? 'מיקום' : 'Location';
   document.getElementById('lr-prog-val').textContent = (learningIdx + 1) + ' / ' + learningSequence.length;
-  document.getElementById('lr-att-label').textContent = lang === 'he' ? 'נסיונות' : 'Tries';
-  updateLearningDots(0);
 
   hintUsed = false;
   streetUsedThisRound = false;
@@ -4427,6 +4400,8 @@ async function startLearning() {
   ['btn-hint', 'btn-layer'].forEach(id => {
     document.getElementById(id).style.display = 'none';
   });
+  // Hide mobile assistance button in learning mode
+  document.getElementById('mobile-tools-wrap').classList.add('learning-hidden');
 
   loadLearningTown();
 }
