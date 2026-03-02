@@ -466,6 +466,19 @@
     -webkit-text-fill-color: transparent;
     letter-spacing: 0.5px;
   }
+  #sb-header-actions { display: flex; align-items: center; gap: 6px; }
+  #sb-top5-btn {
+    display: none; background: var(--bg); border: 1px solid var(--border);
+    color: var(--muted); font-size: 0.72rem; font-weight: 700; cursor: pointer;
+    padding: 4px 10px; border-radius: 8px; line-height: 1;
+    letter-spacing: 0.3px; transition: all 0.18s;
+  }
+  #sb-top5-btn:hover { background: rgba(26,111,212,0.08); border-color: rgba(26,111,212,0.3); color: #1a6fd4; }
+  #sb-top5-btn.active {
+    background: linear-gradient(135deg, #1a6fd4, #7c3aed);
+    color: #fff; border-color: transparent;
+  }
+  #sb-top5-btn.active:hover { opacity: 0.9; }
   #sb-close-btn {
     display: none; background: transparent; border: none;
     color: var(--muted); font-size: 1rem; cursor: pointer;
@@ -2549,7 +2562,10 @@
   <div id="scoreboard-card">
     <div id="sb-header">
       <h3 id="scoreboard-title">🏆 Leaderboard</h3>
-      <button id="sb-close-btn" onclick="document.getElementById('scoreboard-panel').classList.remove('show')">✕</button>
+      <div id="sb-header-actions">
+        <button id="sb-top5-btn" onclick="toggleTop5View()">Top 5</button>
+        <button id="sb-close-btn" onclick="document.getElementById('scoreboard-panel').classList.remove('show')">✕</button>
+      </div>
     </div>
     <div id="scoreboard-list"></div>
     <div id="scoreboard-guest" style="display:none">
@@ -5240,12 +5256,93 @@ function launchConfetti() {
 }
 
 // ── SCOREBOARD ────────────────────────────────────────────────────────────
+let _sbData = null;   // cached scoreboard state for view toggling
+let _sbTop5  = false; // true when Top 5 view is active
+
+function renderPlayerRow(p, globalRank) {
+  let rankHtml;
+  if      (globalRank === 1) rankHtml = `<span class="sb-rank gold">🥇</span>`;
+  else if (globalRank === 2) rankHtml = `<span class="sb-rank silver">🥈</span>`;
+  else if (globalRank === 3) rankHtml = `<span class="sb-rank bronze">🥉</span>`;
+  else                       rankHtml = `<span class="sb-rank">#${globalRank}</span>`;
+
+  const lvl = PLAYER_LEVEL_NAMES[p.level] || PLAYER_LEVEL_NAMES[1];
+  const lvlText = lang === 'he' ? lvl.he : lvl.en;
+  return `
+    <div class="sb-row ${p.isMe ? 'sb-me' : ''}">
+      ${rankHtml}
+      <span class="sb-name">
+        <span class="sb-name-text">${p.isMe ? `<strong>${p.name}</strong>` : p.name}</span>
+        <span class="sb-level-badge">${lvlText}</span>
+      </span>
+      <span class="sb-score">${p.score}</span>
+    </div>`;
+}
+
+function renderContextView() {
+  if (!_sbData) return '';
+  const { players, summaryHtml, insertIdx } = _sbData;
+
+  let start = Math.max(0, insertIdx - 2);
+  let end   = Math.min(players.length - 1, start + 3);
+  start     = Math.max(0, end - 3);
+  const visible = players.slice(start, end + 1);
+
+  let html = '';
+  let gameInserted = false;
+
+  if (start > 0) html += `<div class="sb-divider">· · ·</div>`;
+
+  visible.forEach((p, i) => {
+    const globalIdx  = start + i;
+    const globalRank = globalIdx + 1;
+
+    if (!gameInserted && globalIdx >= insertIdx) {
+      html += summaryHtml;
+      gameInserted = true;
+    }
+    html += renderPlayerRow(p, globalRank);
+  });
+
+  if (!gameInserted) html += summaryHtml;
+  if (end < players.length - 1) html += `<div class="sb-divider">· · ·</div>`;
+
+  return html;
+}
+
+function renderTop5View() {
+  if (!_sbData) return '';
+  const { players } = _sbData;
+  const top = players.slice(0, 5);
+  let html = '';
+  top.forEach((p, i) => { html += renderPlayerRow(p, i + 1); });
+  if (players.length > 5) html += `<div class="sb-divider">· · ·</div>`;
+  return html;
+}
+
+function toggleTop5View() {
+  if (!_sbData) return;
+  const btn  = document.getElementById('sb-top5-btn');
+  const list = document.getElementById('scoreboard-list');
+  _sbTop5 = !_sbTop5;
+  btn.classList.toggle('active', _sbTop5);
+  btn.textContent = _sbTop5
+    ? (lang === 'he' ? 'המשחק שלי' : 'My Rank')
+    : 'Top 5';
+  list.innerHTML = _sbTop5 ? renderTop5View() : renderContextView();
+}
+
 async function loadScoreboard(myScore) {
   const section = document.getElementById('scoreboard-panel');
   const list    = document.getElementById('scoreboard-list');
   const guest   = document.getElementById('scoreboard-guest');
+  const top5Btn = document.getElementById('sb-top5-btn');
   section.classList.add('show');
   list.innerHTML = '';
+  _sbData  = null;
+  _sbTop5  = false;
+  top5Btn.classList.remove('active');
+  top5Btn.textContent = 'Top 5';
 
   // Update lang labels
   document.getElementById('scoreboard-title').textContent    = lang === 'he' ? '🏆 לוח תוצאות' : '🏆 Leaderboard';
@@ -5255,10 +5352,12 @@ async function loadScoreboard(myScore) {
   if (!window._fbUser) {
     list.style.display  = 'none';
     guest.style.display = 'block';
+    top5Btn.style.display = 'none';
     return;
   }
   guest.style.display = 'none';
   list.style.display  = 'block';
+  top5Btn.style.display = 'none';
   list.innerHTML = `<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:8px 0">${lang === 'he' ? 'טוען…' : 'Loading…'}</div>`;
 
   try {
@@ -5302,9 +5401,6 @@ async function loadScoreboard(myScore) {
     const totalForRank     = myIdx === -1 ? players.length + 1 : players.length;
     const showTopPct       = totalForRank >= 10;
     const topPct           = showTopPct ? Math.max(1, Math.ceil((currentScoreRank / totalForRank) * 100)) : null;
-    const rankLabel        = lang === 'he'
-      ? `<span dir="rtl">מקום ${currentScoreRank} מתוך ${totalForRank}</span>`
-      : `#${currentScoreRank} of ${totalForRank}`;
 
     // Player's current level
     const myLevel = myIdx !== -1 ? players[myIdx].level : (getLearningTier() || 4);
@@ -5335,55 +5431,14 @@ async function loadScoreboard(myScore) {
     // Insertion index: where "This Game" ranks among players (0-based)
     const insertIdx = currentScoreRank - 1;
 
-    // Pick 4 player rows around the insertion point (+ the banner = 5 visible items)
-    let start = Math.max(0, insertIdx - 2);
-    let end   = Math.min(players.length - 1, start + 3);
-    start     = Math.max(0, end - 3);
-    const visible = players.slice(start, end + 1);
+    // Store data for view toggling
+    _sbData = { players, summaryHtml, insertIdx };
 
-    let html = '';
-    let gameInserted = false;
+    // Show Top 5 button now that data is loaded
+    top5Btn.style.display = 'inline-block';
 
-    // Show "..." if not starting from rank 1
-    if (start > 0) html += `<div class="sb-divider">· · ·</div>`;
-
-    visible.forEach((p, i) => {
-      const globalIdx  = start + i;
-      const globalRank = globalIdx + 1;
-
-      // Insert "This Game" at its correct ranked position
-      if (!gameInserted && globalIdx >= insertIdx) {
-        html += summaryHtml;
-        gameInserted = true;
-      }
-
-      let rankHtml;
-      if      (globalRank === 1) rankHtml = `<span class="sb-rank gold">🥇</span>`;
-      else if (globalRank === 2) rankHtml = `<span class="sb-rank silver">🥈</span>`;
-      else if (globalRank === 3) rankHtml = `<span class="sb-rank bronze">🥉</span>`;
-      else                       rankHtml = `<span class="sb-rank">#${globalRank}</span>`;
-
-      const lvl = PLAYER_LEVEL_NAMES[p.level] || PLAYER_LEVEL_NAMES[1];
-      const lvlText = lang === 'he' ? lvl.he : lvl.en;
-      html += `
-        <div class="sb-row ${p.isMe ? 'sb-me' : ''}">
-          ${rankHtml}
-          <span class="sb-name">
-            <span class="sb-name-text">${p.isMe ? `<strong>${p.name}</strong>` : p.name}</span>
-            <span class="sb-level-badge">${lvlText}</span>
-          </span>
-          <span class="sb-score">${p.score}</span>
-        </div>`;
-    });
-
-    // If "This Game" goes after all visible players (lowest score)
-    if (!gameInserted) {
-      html += summaryHtml;
-    }
-
-    if (end < players.length - 1) html += `<div class="sb-divider">· · ·</div>`;
-
-    list.innerHTML = html;
+    // Render default context view
+    list.innerHTML = renderContextView();
   } catch(e) {
     console.error('Scoreboard failed:', e);
     list.innerHTML = `<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:8px 0">${lang === 'he' ? 'שגיאה בטעינה' : 'Could not load'}</div>`;
@@ -5395,6 +5450,8 @@ showResults = async function() {
   // Reset scoreboard
   document.getElementById('scoreboard-panel').classList.remove('show');
   document.getElementById('scoreboard-list').innerHTML = '';
+  _sbData = null;
+  _sbTop5 = false;
 
   const hits = results.filter(r => r.pts >= 90).length;
   const recPopup  = document.getElementById('new-record-popup');
