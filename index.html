@@ -469,9 +469,9 @@
   #sb-header-actions { display: flex; align-items: center; gap: 6px; }
   #sb-top5-btn {
     display: none; background: var(--bg); border: 1px solid var(--border);
-    color: var(--muted); font-size: 0.72rem; font-weight: 700; cursor: pointer;
-    padding: 4px 10px; border-radius: 8px; line-height: 1;
-    letter-spacing: 0.3px; transition: all 0.18s;
+    color: var(--muted); font-size: 0.75rem; font-weight: 700; cursor: pointer;
+    padding: 4px 8px; border-radius: 8px; line-height: 1;
+    transition: all 0.18s;
   }
   #sb-top5-btn:hover { background: rgba(26,111,212,0.08); border-color: rgba(26,111,212,0.3); color: #1a6fd4; }
   #sb-top5-btn.active {
@@ -2563,7 +2563,7 @@
     <div id="sb-header">
       <h3 id="scoreboard-title">🏆 Leaderboard</h3>
       <div id="sb-header-actions">
-        <button id="sb-top5-btn" onclick="toggleTop5View()">Top 5</button>
+        <button id="sb-top5-btn" onclick="toggleTop5View()">▲</button>
         <button id="sb-close-btn" onclick="document.getElementById('scoreboard-panel').classList.remove('show')">✕</button>
       </div>
     </div>
@@ -5326,9 +5326,7 @@ function toggleTop5View() {
   const list = document.getElementById('scoreboard-list');
   _sbTop5 = !_sbTop5;
   btn.classList.toggle('active', _sbTop5);
-  btn.textContent = _sbTop5
-    ? (lang === 'he' ? 'המשחק שלי' : 'My Rank')
-    : 'Top 5';
+  btn.textContent = _sbTop5 ? '▼' : '▲';
   list.innerHTML = _sbTop5 ? renderTop5View() : renderContextView();
 }
 
@@ -5342,7 +5340,7 @@ async function loadScoreboard(myScore) {
   _sbData  = null;
   _sbTop5  = false;
   top5Btn.classList.remove('active');
-  top5Btn.textContent = 'Top 5';
+  top5Btn.textContent = '▲';
 
   // Update lang labels
   document.getElementById('scoreboard-title').textContent    = lang === 'he' ? '🏆 לוח תוצאות' : '🏆 Leaderboard';
