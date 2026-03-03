@@ -1830,7 +1830,8 @@
       position: relative;
       flex-shrink: 0;
     }
-    #mobile-tools-wrap.learning-hidden {
+    #mobile-tools-wrap.learning-hidden,
+    #mobile-tools-wrap.challenge-hidden {
       display: none !important;
     }
     #mobile-tools-btn {
@@ -6140,7 +6141,7 @@ function startChallengeGame() {
   document.getElementById('hud').style.display = 'none';
   document.getElementById('btn-back').style.display = 'none';
   document.getElementById('btn-hint').style.display = 'none';
-  document.getElementById('mobile-tools-wrap').style.display = 'none';
+  document.getElementById('mobile-tools-wrap').classList.add('challenge-hidden');
 
   if (currentLayer === 'street') toggleMapLayer(true);
   document.getElementById('results-panel').className = '';
@@ -6243,7 +6244,7 @@ function exitChallengeMode() {
   // Restore HUD + controls
   document.getElementById('hud').style.display = '';
   document.getElementById('btn-hint').style.display = '';
-  document.getElementById('mobile-tools-wrap').style.display = '';
+  document.getElementById('mobile-tools-wrap').classList.remove('challenge-hidden');
   // Clean challenge param from URL without reload
   const url = new URL(window.location.href);
   url.searchParams.delete('challenge');
