@@ -1,0 +1,1068 @@
+[
+  {
+    "location_name": "תל אביב",
+    "fun_fact_he": "תל אביב מחזיקה במספר הגדול ביותר של מבנים בסגנון הבאוהאוס בעולם, מה שהעניק לה את הכינוי 'העיר הלבנה' והכרה כאתר מורשת עולמית של אונסק\"ו.",
+    "fun_fact_en": "Tel Aviv has the largest number of Bauhaus-style buildings in the world, earning it the nickname 'The White City' and status as a UNESCO World Heritage site."
+  },
+  {
+    "location_name": "ירושלים",
+    "fun_fact_he": "בירושלים יש יותר מ-2,000 אתרים ארכיאולוגיים רשומים, והיא אחת הערים העתיקות בעולם שעדיין מיושבות ברציפות.",
+    "fun_fact_en": "Jerusalem has more than 2,000 registered archaeological sites and is one of the oldest continuously inhabited cities in the world."
+  },
+  {
+    "location_name": "חיפה",
+    "fun_fact_he": "חיפה היא העיר היחידה בישראל שיש בה רכבת תחתית – הכרמלית, שהיא גם אחת ממערכות הרכבת התחתית הקצרות בעולם.",
+    "fun_fact_en": "Haifa is the only city in Israel with a subway system—the Carmelit, which is also one of the shortest subway systems in the world."
+  },
+  {
+    "location_name": "באר שבע",
+    "fun_fact_he": "באר שבע נחשבת ל'בירת הסייבר של ישראל' ומארחת מרכז פיתוח טכנולוגי ענק המרכז חברות הייטק בינלאומיות רבות.",
+    "fun_fact_en": "Beersheba is considered the 'Cyber Capital of Israel' and hosts a massive technology park home to many international high-tech companies."
+  },
+  {
+    "location_name": "ראשון לציון",
+    "fun_fact_he": "בראשון לציון הוקמו בית הספר העברי הראשון וגן הילדים העברי הראשון בעולם.",
+    "fun_fact_en": "The world's first Hebrew-speaking school and the first Hebrew kindergarten were established in Rishon LeZion."
+  },
+  {
+    "location_name": "פתח תקווה",
+    "fun_fact_he": "פתח תקווה מכונה 'אם המושבות' מכיוון שהייתה המושבה החקלאית הראשונה שהוקמה בעת החדשה (בשנת 1878).",
+    "fun_fact_en": "Petah Tikva is known as the 'Mother of the Moshavot' because it was the first modern Jewish agricultural settlement, founded in 1878."
+  },
+  {
+    "location_name": "אשדוד",
+    "fun_fact_he": "נמל אשדוד הוא הנמל הגדול ביותר בישראל, דרכו עוברים כ-60% מכלל הסחורות המיובאות למדינה.",
+    "fun_fact_en": "The Port of Ashdod is the largest in Israel, handling about 60% of all goods imported into the country."
+  },
+  {
+    "location_name": "נתניה",
+    "fun_fact_he": "העיר נקראה על שמו של הנדבן היהודי-אמריקאי נתן שטראוס, שתרם רבות לפיתוח היישוב בארץ ישראל.",
+    "fun_fact_en": "The city was named after Jewish-American philanthropist Nathan Straus, who contributed greatly to the development of Israel."
+  },
+  {
+    "location_name": "בני ברק",
+    "fun_fact_he": "בני ברק היא העיר בעלת צפיפות האוכלוסין הגבוהה ביותר בישראל.",
+    "fun_fact_en": "Bnei Brak is the most densely populated city in Israel."
+  },
+  {
+    "location_name": "בת ים",
+    "fun_fact_he": "בת ים מארחת מדי שנתיים את הפסטיבל הבינלאומי לתיאטרון ואמנות רחוב, מהגדולים והוותיקים מסוגו בישראל.",
+    "fun_fact_en": "Bat Yam hosts a biennial International Festival of Street Theater and Art, one of the largest and oldest of its kind in Israel."
+  },
+  {
+    "location_name": "חולון",
+    "fun_fact_he": "חולון ידועה כ'עיר הילדים' של ישראל, בזכות מוזיאון הילדים המפורסם שלה וגני הסיפור הפזורים ברחבי העיר.",
+    "fun_fact_en": "Holon is known as Israel's 'Children's City,' thanks to its famous Children's Museum and 'Story Gardens' located throughout the city."
+  },
+  {
+    "location_name": "רמת גן",
+    "fun_fact_he": "הספארי ברמת גן מחזיק באוסף הגדול ביותר של בעלי חיים במזרח התיכון והוא ייחודי בשל שטחי המרעה הפתוחים שלו.",
+    "fun_fact_en": "The Ramat Gan Safari houses the largest collection of animals in the Middle East and is unique for its large open-air drive-through enclosures."
+  },
+  {
+    "location_name": "אשקלון",
+    "fun_fact_he": "בתחומי הגן הלאומי באשקלון נמצא השער המקושת העתיק ביותר בעולם שנבנה מלבני בוץ, המתוארך לתקופת הברונזה התיכונה.",
+    "fun_fact_en": "Inside Ashkelon National Park is the oldest mud-brick arched gate in the world, dating back to the Middle Bronze Age."
+  },
+  {
+    "location_name": "רחובות",
+    "fun_fact_he": "רחובות ידועה כ'עיר המדע והתרבות' בזכות מכון ויצמן למדע והפקולטה לחקלאות של האוניברסיטה העברית הנמצאים בה.",
+    "fun_fact_en": "Rehovot is known as the 'City of Science and Culture' because it is home to the Weizmann Institute of Science and the Hebrew University's Faculty of Agriculture."
+  },
+  {
+    "location_name": "הרצליה",
+    "fun_fact_he": "העיר קרויה על שמו של בנימין זאב הרצל, חוזה המדינה, והיא נחשבת לאחד ממוקדי ההייטק המובילים בישראל.",
+    "fun_fact_en": "The city is named after Theodor Herzl, the visionary of the Jewish State, and is a major hub for Israel's high-tech industry."
+  },
+  {
+    "location_name": "חדרה",
+    "fun_fact_he": "בתחנת הכוח 'אורות רבין' בחדרה נמצאות הארובות הגבוהות ביותר בישראל, המתנשאות לגובה של כ-300 מטרים.",
+    "fun_fact_en": "The Orot Rabin power station in Hadera features the tallest chimneys in Israel, reaching heights of approximately 300 meters."
+  },
+  {
+    "location_name": "לוד",
+    "fun_fact_he": "לוד היא אחת הערים העתיקות בעולם, ולפי המסורת הנוצרית, זהו מקום קבורתו של סנט ג'ורג' (הקדוש המגן של אנגליה).",
+    "fun_fact_en": "Lod is one of the oldest cities in the world and, according to Christian tradition, is the burial place of Saint George (the patron saint of England)."
+  },
+  {
+    "location_name": "רמלה",
+    "fun_fact_he": "רמלה היא העיר היחידה בארץ ישראל שהוקמה על ידי המוסלמים בתקופת שלטונם (במאה ה-8), והיא שימשה כעיר בירה מחוזית.",
+    "fun_fact_en": "Ramle is the only city in the land of Israel founded by Muslims during their rule (in the 8th century), and it served as a provincial capital."
+  },
+  {
+    "location_name": "נס ציונה",
+    "fun_fact_he": "נס ציונה החלה כמושבה לגידול דבורים והפקת דבש, ועד היום סמל העיר כולל דבורה וכוורת.",
+    "fun_fact_en": "Ness Ziona began as a settlement focused on beekeeping and honey production; to this day, the city's emblem includes a bee and a hive."
+  },
+  {
+    "location_name": "גבעתיים",
+    "fun_fact_he": "העיר בנויה על שתי גבעות (גבעת קוזלובסקי וגבעת בורוכוב), וגבעת קוזלובסקי היא הנקודה הגבוהה ביותר בגוש דן.",
+    "fun_fact_en": "The city is built on two hills (Kozlovsky and Borochov), and Kozlovsky Hill is the highest point in the Gush Dan region."
+  },
+  {
+    "location_name": "הוד השרון",
+    "fun_fact_he": "הוד השרון נוצרה מאיחוד של ארבע מושבות חקלאיות: מגדיאל, רמתיים, כפר הדר ורמת הדר.",
+    "fun_fact_en": "Hod HaSharon was formed by the merger of four agricultural colonies: Magdiel, Ramatayim, Kfar Hadar, and Ramat Hadar."
+  },
+  {
+    "location_name": "כפר סבא",
+    "fun_fact_he": "כפר סבא הייתה העיר הראשונה בישראל שנטעה אלפי עצים כדי להפוך ל'עיר ירוקה', ומסורת זו נמשכת עד היום.",
+    "fun_fact_en": "Kfar Saba was the first city in Israel to plant thousands of trees to become a 'Green City,' a tradition that continues today."
+  },
+  {
+    "location_name": "רעננה",
+    "fun_fact_he": "רעננה ידועה בכינוי 'אמריקה הקטנה' בשל המספר הגדול של עולים ממדינות דוברות אנגלית המתגוררים בה.",
+    "fun_fact_en": "Ra'anana is often nicknamed 'Little America' due to the large number of English-speaking immigrants living there."
+  },
+  {
+    "location_name": "עפולה",
+    "fun_fact_he": "עפולה מכונה 'בירת העמק' והיא מפורסמת במיוחד בתעשיית הגרעינים השחורים שלה ('גרעיני עפולה').",
+    "fun_fact_en": "Afula is known as the 'Capital of the Valley' and is particularly famous for its sunflower seed industry ('Garinei Afula')."
+  },
+  {
+    "location_name": "אילת",
+    "fun_fact_he": "אילת היא העיר הדרומית ביותר בישראל והיא הוכרזה כאזור סחר חופשי, מה שאומר שאין בה מע\"מ על מרבית המוצרים והשירותים.",
+    "fun_fact_en": "Eilat is the southernmost city in Israel and is a designated Free Trade Zone, meaning there is no VAT (Value Added Tax) on most goods and services."
+  }
+]
+[
+  {
+    "location_name": "נהריה",
+    [cite_start]"fun_fact_he": "נהריה היא העיר היחידה בישראל שבה נחל (נחל הגעתון) זורם ממש במרכז הרחוב הראשי של העיר. [cite: 1]",
+    [cite_start]"fun_fact_en": "Nahariya is the only city in Israel where a river (the Ga'aton River) flows directly through the center of its main street. [cite: 1]"
+  },
+  {
+    "location_name": "עכו",
+    [cite_start]"fun_fact_he": "עכו היא אחת הערים המיושבות ברציפות העתיקות בעולם, והיא הצליחה לעמוד במצור של נפוליאון בונפרטה בשנת 1799. [cite: 1]",
+    [cite_start]"fun_fact_en": "Acre is one of the world's oldest continuously inhabited cities and famously withstood a siege by Napoleon Bonaparte in 1799. [cite: 1]"
+  },
+  {
+    "location_name": "כרמיאל",
+    [cite_start]"fun_fact_he": "מדי שנה מארחת העיר את 'פסטיבל מחול כרמיאל', פסטיבל הריקודים הגדול ביותר בישראל המושך אלפי רקדנים מכל העולם. [cite: 1]",
+    [cite_start]"fun_fact_en": "Every year, the city hosts the 'Karmiel Dance Festival,' the largest dance festival in Israel, attracting thousands of dancers from around the world. [cite: 1]"
+  },
+  {
+    "location_name": "טבריה",
+    [cite_start]"fun_fact_he": "טבריה היא העיר הנמוכה ביותר בישראל, והיא שוכנת בגובה של כ-200 מטרים מתחת לפני הים. [cite: 1]",
+    [cite_start]"fun_fact_en": "Tiberias is the lowest city in Israel, situated at approximately 200 meters below sea level. [cite: 1]"
+  },
+  {
+    "location_name": "נצרת",
+    [cite_start]"fun_fact_he": "נצרת היא העיר הערבית הגדולה ביותר בישראל ונחשבת לאחד ממוקדי התיירות הצליינית החשובים בעולם. [cite: 1]",
+    [cite_start]"fun_fact_en": "Nazareth is the largest Arab city in Israel and is considered one of the most important pilgrimage sites in the world. [cite: 1]"
+  },
+  {
+    "location_name": "נוף הגליל",
+    [cite_start]"fun_fact_he": "בעיר נמצא מפעל השוקולד הגדול של חברת 'שטראוס-עלית', המפיץ ממתקים לכל רחבי הארץ. [cite: 1]",
+    [cite_start]"fun_fact_en": "The city is home to the large 'Strauss-Elite' chocolate factory, which distributes sweets throughout the country. [cite: 1]"
+  },
+  {
+    "location_name": "קריית שמונה",
+    [cite_start]"fun_fact_he": "העיר נקראה על שמם של שמונת הנופלים בהגנה על תל חי בשנת 1920, ובראשם יוסף טרומפלדור. [cite: 1]",
+    [cite_start]"fun_fact_en": "The city was named after the eight people who fell defending Tel Hai in 1920, led by Joseph Trumpeldor. [cite: 1]"
+  },
+  {
+    "location_name": "צפת",
+    [cite_start]"fun_fact_he": "צפת היא העיר הגבוהה ביותר בישראל, והיא נחשבת למרכז העולמי של תורת הקבלה מאז המאה ה-16. [cite: 1]",
+    [cite_start]"fun_fact_en": "Safed is the highest city in Israel and has been considered the world center of Kabbalah (Jewish mysticism) since the 16th century. [cite: 1]"
+  },
+  {
+    "location_name": "ערד",
+    [cite_start]"fun_fact_he": "בשל האוויר הנקי והיבש שלה, נחשבת ערד לאחד המקומות הטובים בעולם עבור אנשים הסובלים מקשיים בנשימה או אסתמה. [cite: 1]",
+    [cite_start]"fun_fact_en": "Due to its clean and dry air, Arad is considered one of the best places in the world for people suffering from respiratory issues or asthma. [cite: 1]"
+  },
+  {
+    "location_name": "דימונה",
+    [cite_start]"fun_fact_he": "דימונה היא מרכז הקהילה של 'העבריים מדימונה' (הכושים העבריים), קהילה ייחודית שהגיעה מארה\"ב בשנות ה-60. [cite: 1]",
+    [cite_start]"fun_fact_en": "Dimona is the center of the 'African Hebrew Israelites' community, a unique group that arrived from the U.S. in the 1960s. [cite: 1]"
+  },
+  {
+    "location_name": "שדרות",
+    [cite_start]"fun_fact_he": "שדרות ידועה כ'בירת הרוק של ישראל' בשל מספרן הרב של להקות וזמרים מפורסמים שהחלו את דרכם בעיר. [cite: 1]",
+    [cite_start]"fun_fact_en": "Sderot is known as the 'Rock Capital of Israel' because of the many famous bands and singers who started their careers in the city. [cite: 1]"
+  },
+  {
+    "location_name": "נתיבות",
+    [cite_start]"fun_fact_he": "נתיבות היא מוקד עלייה לרגל למאות אלפי אנשים מדי שנה המגיעים לבקר בקברו של ה'באבא סאלי'. [cite: 1]",
+    [cite_start]"fun_fact_en": "Netivot is a pilgrimage site for hundreds of thousands of people every year who come to visit the tomb of the 'Baba Sali.' [cite: 1]"
+  },
+  {
+    "location_name": "אופקים",
+    [cite_start]"fun_fact_he": "שום דבר מעניין עדיין לא קרה פה... [cite: 1]",
+    [cite_start]"fun_fact_en": "Nothing interesting happened here YET.. [cite: 1]"
+  },
+  {
+    "location_name": "קריית גת",
+    [cite_start]"fun_fact_he": "העיר מארחת את אחד ממפעלי הייצור המתקדמים ביותר בעולם של חברת 'אינטל'. [cite: 1]",
+    [cite_start]"fun_fact_en": "The city hosts one of Intel's most advanced manufacturing plants in the world. [cite: 1]"
+  },
+  {
+    "location_name": "קריית מלאכי",
+    [cite_start]"fun_fact_he": "העיר נקראה על שם קהילת יהודי לוס אנג'לס ('עיר המלאכים'), שתרמו רבות להקמתה. [cite: 1]",
+    [cite_start]"fun_fact_en": "The city was named after the Jewish community of Los Angeles ('City of Angels'), who contributed significantly to its founding. [cite: 1]"
+  },
+  {
+    "location_name": "מודיעין",
+    [cite_start]"fun_fact_he": "מודיעין ידועה כעיר המכבים, והיא נחשבת לאחת הערים המתוכננות והמודרניות ביותר בישראל. [cite: 1]",
+    [cite_start]"fun_fact_en": "Modi'in is known as the City of the Maccabees and is considered one of the most modern and well-planned cities in Israel. [cite: 1]"
+  },
+  {
+    "location_name": "בית שמש",
+    [cite_start]"fun_fact_he": "סמוך לעיר נמצאת מערת אבשלום (מערת הנטיפים), הנחשבת לאחת היפות והמרשימות בישראל. [cite: 1]",
+    [cite_start]"fun_fact_en": "Located near the city is the Avshalom Cave (Stalactite Cave), considered one of the most beautiful and impressive in Israel. [cite: 1]"
+  },
+  {
+    "location_name": "מבשרת ציון",
+    [cite_start]"fun_fact_he": "בתחומי המועצה נמצא הגן הלאומי קסטל, אתר היסטורי המשקיף על הדרך לירושלים. [cite: 1]",
+    [cite_start]"fun_fact_en": "Within the council limits is the Castel National Park, a historical site overlooking the main road to Jerusalem. [cite: 1]"
+  },
+  {
+    "location_name": "גבעת שמואל",
+    [cite_start]"fun_fact_he": "גבעת שמואל ידועה בשיעור האקדמאים הגבוה שבה ביחס לאוכלוסייה, מה שהופך אותה לאחת הערים המשכילות בישראל. [cite: 1]",
+    [cite_start]"fun_fact_en": "Givat Shmuel is known for having a very high ratio of university graduates per capita, making it one of the most educated cities in Israel. [cite: 1]"
+  },
+  {
+    "location_name": "אור יהודה",
+    [cite_start]"fun_fact_he": "באור יהודה נמצא 'מרכז מורשת יהדות בבל', המוזיאון הגדול ביותר בעולם המוקדש להיסטוריה של יהודי עיראק. [cite: 1]",
+    [cite_start]"fun_fact_en": "Or Yehuda is home to the 'Babylonian Jewry Heritage Center,' the world's largest museum dedicated to the history of Iraqi Jews. [cite: 1]"
+  },
+  {
+    "location_name": "יהוד",
+    [cite_start]"fun_fact_he": "מרכז הבקרה של חללית 'בראשית' (החללית הישראלית הראשונה לירח) נמצא ביהוד, במטה חברת SpaceIL. [cite: 1]",
+    [cite_start]"fun_fact_en": "The control center for the 'Beresheet' spacecraft (Israel's first mission to the Moon) is located in Yehud, at the SpaceIL headquarters. [cite: 1]"
+  },
+  {
+    "location_name": "גני תקווה",
+    [cite_start]"fun_fact_he": "העיר מתגאה ב'שדרת הפסלים', גלריית אמנות פתוחה המציגה עשרות פסלים של אמנים ישראלים לאורך רחובותיה. [cite: 1]",
+    [cite_start]"fun_fact_en": "The city boasts 'The Statues Trail,' an open-air art gallery featuring dozens of sculptures by Israeli artists along its streets. [cite: 1]"
+  },
+  {
+    "location_name": "קריית אונו",
+    [cite_start]"fun_fact_he": "אחד מסימני ההיכר של העיר הוא עץ השקמה העתיק והענק שנמצא במרכז העיר, שגילו מוערך במאות שנים. [cite: 1]",
+    [cite_start]"fun_fact_en": "One of the city's landmarks is a giant ancient sycamore tree in the city center, estimated to be hundreds of years old. [cite: 1]"
+  },
+  {
+    "location_name": "אלעד",
+    [cite_start]"fun_fact_he": "אלעד תוכננה ונבנתה מלכתחילה כעיר המיועדת לאוכלוסייה דתית וחרדית, עם דגש על מוסדות חינוך רבים. [cite: 1]",
+    [cite_start]"fun_fact_en": "Elad was originally planned and built as a city specifically for the religious and Haredi population, with a focus on numerous educational institutions. [cite: 1]"
+  },
+  {
+    "location_name": "שוהם",
+    [cite_start]"fun_fact_he": "שוהם ידועה כיישוב ירוק במיוחד, שבו מספר העצים הנטועים גבוה משמעותית ממספר התושבים. [cite: 1]",
+    [cite_start]"fun_fact_en": "Shoham is known as an exceptionally green town, where the number of planted trees is significantly higher than the number of residents. [cite: 1]"
+  }
+]
+[
+  {
+    "location_name": "גדרה",
+    "fun_fact_he": "גדרה מכונה לעיתים 'עיר הילדים' בשל הדגש הרב שהיא שמה על צרכי הילדים והנוער, והיא הוקמה ב-1884 על ידי חברי תנועת הבילו\"ים.",
+    "fun_fact_en": "Gedera is sometimes called the 'City of Children' due to its emphasis on the needs of children and youth; it was founded in 1884 by members of the Bilu movement."
+  },
+  {
+    "location_name": "גן יבנה",
+    "fun_fact_he": "גן יבנה הוקמה בשנת 1931 על ידי קבוצת 'אחוזה' מניו יורק, ששאפה להקים מושבה חקלאית המבוססת על פרדסי הדרים.",
+    "fun_fact_en": "Gan Yavne was established in 1931 by the 'Ahuzah' group from New York, who aimed to create an agricultural colony based on citrus orchards."
+  },
+  {
+    "location_name": "יבנה",
+    "fun_fact_he": "לאחר חורבן בית המקדש השני, הפכה יבנה למרכז הרוחני והתורני של עם ישראל, שם הוקמה הסנהדרין מחדש על ידי רבן יוחנן בן זכאי.",
+    "fun_fact_en": "After the destruction of the Second Temple, Yavne became the spiritual and Torah center of the Jewish people, where the Sanhedrin was re-established by Rabban Yochanan ben Zakkai."
+  },
+  {
+    "location_name": "קריית עקרון",
+    "fun_fact_he": "בקריית עקרון נמצא אחד ממרכזי הקניות הפתוחים הגדולים בישראל, 'בילו סנטר', המושך אליו קונים מכל אזור המרכז.",
+    "fun_fact_en": "Kiryat Ekron is home to one of Israel's largest open-air shopping centers, 'Bilu Centre,' which attracts shoppers from all over the central region."
+  },
+  {
+    "location_name": "מזכרת בתיה",
+    "fun_fact_he": "המושבה הוקמה על ידי הברון רוטשילד ב-1883 ונקראה על שם אמו, בטי (בתיה), והיא משמרת עד היום את המראה ההיסטורי של ראשית ההתיישבות.",
+    "fun_fact_en": "The colony was established by Baron Rothschild in 1883 and named after his mother, Betty (Batya); it still preserves the historic look of the early settlement era today."
+  },
+  {
+    "location_name": "נשר",
+    "fun_fact_he": "העיר קרויה על שם מפעל המלט 'נשר', שהיה מפעל המלט הראשון שהוקם בארץ ישראל (בשנת 1923) וסיפק חומרים לבניית המדינה.",
+    "fun_fact_en": "The city is named after the 'Nesher' cement factory, which was the first cement factory established in Israel (in 1923) and provided materials for building the country."
+  },
+  {
+    "location_name": "קריית אתא",
+    "fun_fact_he": "ישנן עדויות ארכיאולוגיות לכך שהאזור של קריית אתא היה מיושב ברציפות במשך למעלה מ-3,000 שנה.",
+    "fun_fact_en": "There is archaeological evidence suggesting that the area of Kiryat Ata has been continuously inhabited for over 3,000 years."
+  },
+  {
+    "location_name": "קריית ביאליק",
+    "fun_fact_he": "העיר קרויה על שמו של חיים נחמן ביאליק, המשורר הלאומי של ישראל, שהלך לעולמו זמן קצר לפני הקמתה.",
+    "fun_fact_en": "The city is named after Hayim Nahman Bialik, Israel's national poet, who passed away shortly before its founding."
+  },
+  {
+    "location_name": "קריית מוצקין",
+    "fun_fact_he": "בקריית מוצקין נמצא 'חי-פארק', גן חיות ופארק רחב ידיים הכולל מאות בעלי חיים ואמפיתיאטרון להופעות ענק.",
+    "fun_fact_en": "Kiryat Motzkin is home to 'Hai-Park,' a large zoo and park that features hundreds of animals and an amphitheater for major performances."
+  },
+  {
+    "location_name": "קריית ים",
+    "fun_fact_he": "העיר עלתה לכותרות בעולם בשנת 2009 לאחר שתושבים דיווחו על צפייה ב'בת ים' (Mermaid) בחופיה, מה שהוביל את העירייה להציע פרס של מיליון דולר למי שיביא הוכחה לקיומה.",
+    "fun_fact_en": "The city made global headlines in 2009 after residents reported seeing a 'mermaid' off its shores, leading the municipality to offer a $1 million reward for proof of its existence."
+  },
+  {
+    "location_name": "קריית טבעון",
+    "fun_fact_he": "ביערות סביב קריית טבעון צומח עץ אלון עתיק שגילו מוערך בכ-800 שנה, והוא נחשב לאחד העצים המרשימים בישראל.",
+    "fun_fact_en": "In the forests surrounding Kiryat Tiv'on grows an ancient oak tree estimated to be about 800 years old, considered one of the most impressive trees in Israel."
+  },
+  {
+    "location_name": "טירת כרמל",
+    "fun_fact_he": "העיר שוכנת למרגלות הר הכרמל ומשלבת נוף הררי מרהיב עם קרבה לים התיכון.",
+    "fun_fact_en": "The city is situated at the foot of Mount Carmel, combining spectacular mountain views with proximity to the Mediterranean Sea."
+  },
+  {
+    "location_name": "אבן יהודה",
+    "fun_fact_he": "המושבה קרויה על שמו של אליעזר בן-יהודה, מחיה השפה העברית, והיא ידועה באווירה הכפרית השקטה שלה בלב השרון.",
+    "fun_fact_en": "The colony is named after Eliezer Ben-Yehuda, the reviver of the Hebrew language, and is known for its quiet rural atmosphere in the heart of the Sharon region."
+  },
+  {
+    "location_name": "קדימה-צורן",
+    "fun_fact_he": "היישוב נוצר מאיחוד של שתי מועצות והוא מפורסם בפרדסים שלו ובשדות התותים הרבים המקיפים אותו.",
+    "fun_fact_en": "The community was formed by the merger of two local councils and is famous for its citrus orchards and the many strawberry fields surrounding it."
+  },
+  {
+    "location_name": "פרדסיה",
+    "fun_fact_he": "פרדסיה הוקמה על אדמות שהיו בעבר פרדסים, ומכאן שמה, והיא נחשבה במשך שנים לאחת המועצות המקומיות הקטנות והמטופחות בישראל.",
+    "fun_fact_en": "Pardesiya was built on lands that were formerly orchards (Pardesim), hence its name, and was considered for years to be one of Israel's smallest and best-maintained local councils."
+  },
+  {
+    "location_name": "כפר יונה",
+    "fun_fact_he": "העיר קרויה על שמו של יונה בוגאץ', ציוני בלגי שתרם רבות לרכישת הקרקעות שעליהן הוקם היישוב ב-1932.",
+    "fun_fact_en": "The city is named after Yona Bogacz, a Belgian Zionist who contributed significantly to the purchase of the land where the settlement was established in 1932."
+  },
+  {
+    "location_name": "בנימינה",
+    "fun_fact_he": "בנימינה היא מקום הולדתם של אישים מפורסמים כמו הפזמונאי אהוד מנור וראש הממשלה לשעבר אהוד אולמרט.",
+    "fun_fact_en": "Binyamina is the birthplace of famous figures such as songwriter Ehud Manor and former Prime Minister Ehud Olmert."
+  },
+  {
+    "location_name": "פרדס חנה",
+    "fun_fact_he": "היישוב ידוע בקהילה האמנותית והאלטרנטיבית הגדולה שבו, והוא מארח מדי שנה את אירועי 'אמנים במושבה' שמושכים מבקרים מכל הארץ.",
+    "fun_fact_en": "The town is known for its large artistic and alternative community and hosts the annual 'Artists in the Colony' events, which attract visitors from all over the country."
+  },
+  {
+    "location_name": "זכרון יעקב",
+    "fun_fact_he": "זכרון יעקב היא אחת המושבות הראשונות בארץ (הוקמה ב-1882) והיא מפורסמת ביקב 'כרמל' ההיסטורי שהוקם בה בסיוע הברון רוטשילד.",
+    "fun_fact_en": "Zichron Ya'akov is one of the first pioneer colonies in Israel (founded in 1882) and is famous for its historic 'Carmel' winery established with the help of Baron Rothschild."
+  },
+  {
+    "location_name": "עתלית",
+    "fun_fact_he": "מול חופי עתלית נמצא אתר 'עתלית-ים', כפר פרהיסטורי טבוע בן כ-9,000 שנה שנחשב לאחד האתרים התת-ימיים השמורים והחשובים בעולם.",
+    "fun_fact_en": "Off the coast of Atlit lies 'Atlit-Yam,' a 9,000-year-old submerged prehistoric village considered one of the world's most important and well-preserved underwater sites."
+  },
+  {
+    "location_name": "אור עקיבא",
+    "fun_fact_he": "העיר קרויה על שמו של התנא רבי עקיבא, שהוצא להורג על ידי הרומאים בקיסריה הסמוכה.",
+    "fun_fact_en": "The city is named after Rabbi Akiva, the Talmudic sage who was executed by the Romans in nearby Caesarea."
+  },
+  {
+    "location_name": "חריש",
+    "fun_fact_he": "חריש היא אחת הערים החדשות והצומחות ביותר בישראל, והיא תוכננה להפוך למרכז עירוני מודרני בלב אזור ירוק.",
+    "fun_fact_en": "Harish is one of the newest and fastest-growing cities in Israel, designed to become a modern urban center in the heart of a green region."
+  },
+  {
+    "location_name": "כפר שמריהו",
+    "fun_fact_he": "כפר שמריהו הוקם במקור כמושבה חקלאית עבור עולים מגרמניה בשנת 1937, וכיום הוא נחשב לאחד היישובים היוקרתיים והאמידים בישראל.",
+    "fun_fact_en": "Kfar Shmaryahu was originally founded in 1937 as an agricultural settlement for German immigrants and is now considered one of the most prestigious and affluent communities in Israel."
+  },
+  {
+    "location_name": "סביון",
+    "fun_fact_he": "היישוב קרוי על שם פרח הסביון הנפוץ באזור, והוא ידוע כאחד המקומות בעלי איכות החיים הגבוהה ביותר בארץ.",
+    "fun_fact_en": "The community is named after the Groundsel (Savyon) flower common in the area and is known for having one of the highest qualities of life in the country."
+  },
+  {
+    "location_name": "רמת השרון",
+    "fun_fact_he": "רמת השרון נחשבת ל'בירת התותים' של ישראל, ומדי שנה נערך בה פסטיבל תותים המוקדש לפרי האהוב המגודל בשדותיה.",
+    "fun_fact_en": "Ramat HaSharon is considered the 'Strawberry Capital' of Israel, and it hosts an annual strawberry festival dedicated to the popular fruit grown in its fields."
+  }
+]
+[
+  {
+    "location_name": "כוכב יאיר",
+    "fun_fact_he": "היישוב קרוי על שמו של אברהם שטרן, מייסד הלח\"י, שכינויו היה 'יאיר'. השם 'כוכב' הוא תרגום של שם משפחתו 'שטרן' מגרמנית.",
+    "fun_fact_en": "The town is named after Abraham Stern, the founder of the Lehi underground group, whose alias was 'Ya'ir.' The name 'Kokhav' (Star) is a translation of his last name 'Stern' from German."
+  },
+  {
+    "location_name": "מודיעין עילית",
+    "fun_fact_he": "מודיעין עילית ידועה כעיר עם שיעור הילודה הגבוה ביותר בישראל, עם ממוצע של למעלה מ-7 ילדים למשפחה.",
+    "fun_fact_en": "Modi'in Illit is known for having the highest birth rate in Israel, with an average of over 7 children per family."
+  },
+  {
+    "location_name": "ביתר עילית",
+    "fun_fact_he": "העיר קרויה על שם העיר הקדומה ביתר, שהייתה המעוז האחרון של מרד בר כוכבא נגד הרומאים.",
+    "fun_fact_en": "The city is named after the ancient city of Betar, which was the last stronghold of the Bar Kokhba revolt against the Romans."
+  },
+  {
+    "location_name": "אפרת",
+    "fun_fact_he": "אפרת בנויה על שבע גבעות, בדומה לערים מפורסמות בעולם כמו רומא וסן פרנסיסקו.",
+    "fun_fact_en": "Efrat is built on seven hills, similar to famous world cities like Rome and San Francisco."
+  },
+  {
+    "location_name": "מעלה אדומים",
+    "fun_fact_he": "העיר קרויה על שם סלעי הגיר האדמדמים המצויים באזור, המופיעים בתיאור הגבול בין נחלת יהודה לבנימין בספר יהושע.",
+    "fun_fact_en": "The city is named after the reddish limestone rocks found in the area, which are mentioned in the biblical description of the border between the tribes of Judah and Benjamin."
+  },
+  {
+    "location_name": "גבעת זאב",
+    "fun_fact_he": "היישוב קרוי על שמו של זאב (ולדימיר) ז'בוטינסקי, מייסד התנועה הרוויזיוניסטית ומפקד האצ\"ל.",
+    "fun_fact_en": "The settlement is named after Ze'ev (Vladimir) Jabotinsky, the founder of the Revisionist movement and leader of the Irgun."
+  },
+  {
+    "location_name": "קריית ארבע",
+    "fun_fact_he": "שם העיר לקוח מהשם המקראי של חברון, 'קריית ארבע', הנקראת כך על שם ארבעת הענקים שחיו בה או ארבעת הזוגות הקבורים במערת המכפלה.",
+    "fun_fact_en": "The city's name is taken from the biblical name for Hebron, 'Kiryat Arba,' named either after the four giants who lived there or the four couples buried in the Cave of the Patriarchs."
+  },
+  {
+    "location_name": "אריאל",
+    "fun_fact_he": "אריאל מכונה 'בירת השומרון', והיא הוקמה בשנת 1978 על גבעה שנבחרה בשל מיקומה האסטרטגי על הדרך לירושלים.",
+    "fun_fact_en": "Ariel is known as the 'Capital of Samaria' and was established in 1978 on a hill chosen for its strategic location on the road to Jerusalem."
+  },
+  {
+    "location_name": "אורנית",
+    "fun_fact_he": "משמעות השם 'אורנית' היא 'אורן קטן', והיישוב ידוע באיכות החיים הגבוהה שלו ובקרבתו ליער חורשים.",
+    "fun_fact_en": "The name 'Oranit' means 'Little Pine,' and the settlement is known for its high quality of life and proximity to the Horshim Forest."
+  },
+  {
+    "location_name": "מגדל העמק",
+    "fun_fact_he": "העיר ממוקמת על גבעה המשקיפה על עמק יזרעאל, ומכאן שמה - 'המגדל של העמק'.",
+    "fun_fact_en": "The city is located on a hill overlooking the Jezreel Valley, hence its name - 'The Tower of the Valley.'"
+  },
+  {
+    "location_name": "יקנעם עילית",
+    "fun_fact_he": "יקנעם עילית זכתה לכינוי 'עמק הסיליקון של הצפון' בשל הריכוז הגבוה של חברות הייטק וסטארט-אפ הפועלות בתחומה.",
+    "fun_fact_en": "Yokneam Illit is nicknamed the 'Silicon Valley of the North' due to the high concentration of high-tech and startup companies operating there."
+  },
+  {
+    "location_name": "יקנעם",
+    "fun_fact_he": "בתל יקנעם נמצאו שרידים של לא פחות מ-25 שכבות יישוב שונות, החל מהתקופה הכנענית ועד התקופה העות'מאנית.",
+    "fun_fact_en": "At Tel Yokneam, remains of no fewer than 25 different settlement layers have been found, spanning from the Canaanite period to the Ottoman era."
+  },
+  {
+    "location_name": "נוף הגליל",
+    "fun_fact_he": "העיר נקראה בעבר 'נצרת עילית', אך בשנת 2019 שונה שמה ל'נוף הגליל' כדי להעניק לה זהות נפרדת מהעיר נצרת השכנה.",
+    "fun_fact_en": "The city was formerly called 'Nazareth Illit,' but in 2019 its name was changed to 'Nof HaGalil' to give it a distinct identity from the neighboring city of Nazareth."
+  },
+  {
+    "location_name": "טמרה",
+    "fun_fact_he": "פירוש השם 'טמרה' בערבית הוא 'תמר', והעיר ידועה במיקומה ההררי המעניק תצפית מרהיבה על כל אזור הגליל התחתון.",
+    "fun_fact_en": "The name 'Tamra' means 'Date' (the fruit) in Arabic, and the city is known for its mountainous location providing a spectacular view of the Lower Galilee."
+  },
+  {
+    "location_name": "שפרעם",
+    "fun_fact_he": "שפרעם הייתה אחת התחנות שבהן ישבה הסנהדרין (המוסד היהודי העליון) לאחר חורבן בית המקדש השני.",
+    "fun_fact_en": "Shefa-'Amr was one of the locations where the Sanhedrin (the supreme Jewish council) sat following the destruction of the Second Temple."
+  },
+  {
+    "location_name": "סח'נין",
+    "fun_fact_he": "קבוצת הכדורגל של העיר, בני סח'נין, עשתה היסטוריה בשנת 2004 כשהייתה לקבוצה הערבית הראשונה שזכתה בגביע המדינה.",
+    "fun_fact_en": "The city's football team, Bnei Sakhnin, made history in 2004 by becoming the first Arab team to win the State Cup."
+  },
+  {
+    "location_name": "עראבה",
+    "fun_fact_he": "סמל העיר עראבה כולל בצל, אבטיח ומלון, המסמלים את הגידולים החקלאיים שבהם התפרסמה העיר לאורך ההיסטוריה.",
+    "fun_fact_en": "The symbol of the city of Arraba includes an onion, a watermelon, and a cantaloupe, representing the agricultural crops for which the city has been famous throughout history."
+  },
+  {
+    "location_name": "דיר חנא",
+    "fun_fact_he": "בעיר נמצא אחד המבצרים השמורים ביותר מהמאה ה-18, שנבנה על ידי משפחתו של שליט הגליל דאהר אל-עומר.",
+    "fun_fact_en": "The city is home to one of the best-preserved 18th-century fortresses, built by the family of the Galilee ruler Daher al-Umar."
+  },
+  {
+    "location_name": "מג'ד אל-כרום",
+    "fun_fact_he": "פירוש שם העיר הוא 'תהילת הכרמים', עדות למוניטין ההיסטורי שלה בגידול ענבי יין וזיתים איכותיים.",
+    "fun_fact_en": "The city's name translates to 'Glory of the Vineyards,' reflecting its historical reputation for growing high-quality wine grapes and olives."
+  },
+  {
+    "location_name": "כפר כנא",
+    "fun_fact_he": "לפי המסורת הנוצרית, זהו האתר שבו ביצע ישו את נס החתונה בקנה, שבו הפך מים ליין.",
+    "fun_fact_en": "According to Christian tradition, this is the site where Jesus performed the miracle of the Wedding at Cana, turning water into wine."
+  },
+  {
+    "location_name": "כפר מנדא",
+    "fun_fact_he": "על פי מסורות מקומיות, בכפר מנדא נמצאים קבריהם של אשר ונפתלי, שניים מבניו של יעקב אבינו.",
+    "fun_fact_en": "According to local traditions, Kafr Manda is the site of the tombs of Asher and Naphtali, two of the sons of the biblical patriarch Jacob."
+  },
+  {
+    "location_name": "עיבלין",
+    "fun_fact_he": "עיבלין היא מקום הולדתה של מרים באוארדי, הנזירה שהוכרזה כקדושה הפלסטינית הראשונה בעת החדשה על ידי האפיפיור פרנציסקוס.",
+    "fun_fact_en": "Ibillin is the birthplace of Mariam Baouardy, the nun who was canonized as the first Palestinian saint of the modern era by Pope Francis."
+  },
+  {
+    "location_name": "טורען",
+    "fun_fact_he": "היישוב שוכן למרגלות הר טורען, המציע את אחת התצפיות הפנורמיות היפות ביותר על הגליל והעמקים הסובבים אותו.",
+    "fun_fact_en": "The community is located at the foot of Mount Tur'an, which offers one of the most beautiful panoramic views of the Galilee and its surrounding valleys."
+  },
+  {
+    "location_name": "ריינה",
+    "fun_fact_he": "בריינה התגלה בית מלאכה נדיר לכלי אבן מהתקופה הרומית (לפני כ-2,000 שנה), המעיד על שמירה קפדנית על חוקי הטהרה בקרב יהודי הגליל בעת העתיקה.",
+    "fun_fact_en": "A rare workshop for stone vessels from the Roman period (about 2,000 years ago) was discovered in Reineh, indicating strict adherence to purity laws among Galilean Jews in antiquity."
+  },
+  {
+    "location_name": "אכסאל",
+    "fun_fact_he": "אכסאל מזוהה עם העיר המקראית 'כסלות תבור' המוזכרת בספר יהושע כנקודת גבול בנחלת שבט יששכר.",
+    "fun_fact_en": "Iksal is identified with the biblical city of 'Chisloth-Tabor,' mentioned in the Book of Joshua as a border point in the territory of the tribe of Issachar."
+  }
+]
+[
+  {
+    "location_name": "יפיע",
+    "fun_fact_he": "העיר מזוהה עם היישוב המקראי 'יפיע', שהיה יישוב גבול בנחלת שבט זבולון ומוזכר בספר יהושע.",
+    "fun_fact_en": "The town is identified with the biblical 'Japhia,' which was a border settlement in the territory of the Tribe of Zebulun and is mentioned in the Book of Joshua."
+  },
+  {
+    "location_name": "עילוט",
+    "fun_fact_he": "בשנת 2020 התגלתה בעילוט חווה חקלאית נדירה מהתקופה החשמונאית, המעידה על התיישבות יהודית באזור לפני כ-2,100 שנה.",
+    "fun_fact_en": "In 2020, a rare agricultural farm from the Hasmonean period was discovered in I'llut, providing evidence of Jewish settlement in the area about 2,100 years ago."
+  },
+  {
+    "location_name": "דבוריה",
+    "fun_fact_he": "הכפר שוכן למרגלות הר תבור ושמו משמר את שם היישוב המקראי 'דברת'. הוא מזוהה במסורת גם עם דבורה הנביאה שפעלה באזור.",
+    "fun_fact_en": "The village lies at the foot of Mount Tabor, and its name preserves the biblical 'Daberath.' Tradition also associates it with the prophetess Deborah, who was active in the region."
+  },
+  {
+    "location_name": "כאבול",
+    "fun_fact_he": "בספר מלכים מסופר ששלמה המלך נתן לחירם מלך צור 20 ערים באזור זה, אך חירם לא אהב אותן וקרא לאזור 'ארץ כבול', שפירושו כנראה 'אדמה לא פורייה'.",
+    "fun_fact_en": "The Book of Kings tells that King Solomon gave Hiram, King of Tyre, 20 cities in this area, but Hiram did not like them and called the region 'The Land of Cabul,' likely meaning 'unfruitful land.'"
+  },
+  {
+    "location_name": "ג'לג'וליה",
+    "fun_fact_he": "בג'לג'וליה נמצא חאן עות'מאני מרשים ושמור היטב, ששימש כתחנה חשובה בדרך השיירות העתיקה בין קהיר לדמשק.",
+    "fun_fact_en": "In Jaljulia, there is an impressive and well-preserved Ottoman caravanserai (Khan) that served as an important stop on the ancient caravan route between Cairo and Damascus."
+  },
+  {
+    "location_name": "קלנסווה",
+    "fun_fact_he": "פירוש השם 'קלנסווה' בערבית הוא 'כובע' או 'תרבוש', והעיר נבנתה סביב שרידי מבצר צלבני עתיק שחלק מקירותיו נראים עד היום.",
+    "fun_fact_en": "The name 'Qalansawe' means 'hat' or 'turban' in Arabic, and the city was built around the remains of an ancient Crusader fortress, parts of whose walls are still visible today."
+  },
+  {
+    "location_name": "טייבה",
+    "fun_fact_he": "משמעות השם 'טייבה' היא 'הטובה' או 'הנעימה'. זוהי הגדולה מבין מספר יישובים באזור (ובמזרח התיכון בכלל) הנושאים שם זה.",
+    "fun_fact_en": "The name 'Tayibe' means 'The Good' or 'The Pleasant.' It is the largest of several settlements in the region (and the Middle East in general) that bear this name."
+  },
+  {
+    "location_name": "טירה",
+    "fun_fact_he": "טירה מפורסמת ב'שוק שבת' הססגוני שלה, המושך אליו מדי שבוע אלפי מבקרים מכל אזור המרכז והשרון.",
+    "fun_fact_en": "Tira is famous for its colorful 'Saturday Market,' which attracts thousands of visitors from across the Central and Sharon regions every week."
+  },
+  {
+    "location_name": "כפר קאסם",
+    "fun_fact_he": "בקרבת העיר נמצאת 'מערת קסם', אתר ארכיאולוגי פרהיסטורי שבו נמצאו שיני אדם המעידות על נוכחות אנושית לפני כ-400,000 שנה.",
+    "fun_fact_en": "Near the city lies the 'Qesem Cave,' a prehistoric archaeological site where human teeth were found, indicating human presence about 400,000 years ago."
+  },
+  {
+    "location_name": "כפר קרע",
+    "fun_fact_he": "כפר קרע ידוע באחוז הגבוה של רופאים ואקדמאים ביחס לאוכלוסייה, והוא נחשב לאחד היישובים המשכילים ביותר במגזר הערבי בישראל.",
+    "fun_fact_en": "Kafr Qara is known for its high percentage of doctors and academics relative to its population and is considered one of the most educated communities in Israel's Arab sector."
+  },
+  {
+    "location_name": "באקה אל-ע'רביה",
+    "fun_fact_he": "פירוש שם העיר הוא 'זר פרחים מערבי', והיא מהווה מרכז מסחרי ותרבותי חשוב באזור 'המשולש'.",
+    "fun_fact_en": "The city's name translates to 'Western Bouquet,' and it serves as an important commercial and cultural center in the 'Triangle' region."
+  },
+  {
+    "location_name": "אום אל-פחם",
+    "fun_fact_he": "שם העיר פירושו 'אם הפחם', לזכר תעשיית ייצור הפחם מעצי היערות הסמוכים שהייתה נפוצה בה בעבר.",
+    "fun_fact_en": "The city's name means 'Mother of Charcoal,' referring to the charcoal production industry from nearby forest trees that once thrived there."
+  },
+  {
+    "location_name": "ג'סר א-זרקא",
+    "fun_fact_he": "זהו היישוב הערבי היחיד בישראל השוכן לחוף הים התיכון, ושמו פירושו 'הגשר על הנהר הכחול' (נחל תנינים).",
+    "fun_fact_en": "This is the only Arab community in Israel located on the Mediterranean coast; its name means 'The Bridge over the Blue River' (Nahal Taninim)."
+  },
+  {
+    "location_name": "פוריידיס",
+    "fun_fact_he": "שם היישוב נגזר מהמילה הערבית 'פירדוס', שפירושה 'גן עדן', כנראה בזכות הקרקע הפורייה ומטעי הפירות המקיפים אותו.",
+    "fun_fact_en": "The community's name is derived from the Arabic word 'Firdous,' meaning 'Paradise,' likely due to the fertile soil and fruit orchards surrounding it."
+  },
+  {
+    "location_name": "דלית אל-כרמל",
+    "fun_fact_he": "זהו היישוב הדרוזי הגדול ביותר בישראל, והוא מפורסם בשוק התיירותי התוסס שלו המציע מאכלים מסורתיים ועבודות יד.",
+    "fun_fact_en": "This is the largest Druze settlement in Israel, and it is famous for its vibrant tourist market offering traditional foods and handicrafts."
+  },
+  {
+    "location_name": "עיספיה",
+    "fun_fact_he": "בשטח היישוב התגלו שרידי בית כנסת עתיק מהתקופה הביזנטית ובו רצפת פסיפס יפהפייה הכוללת את גלגל המזלות וכתובות בעברית.",
+    "fun_fact_en": "Remains of an ancient synagogue from the Byzantine period were discovered within the town, featuring a beautiful mosaic floor that includes a Zodiac wheel and Hebrew inscriptions."
+  },
+  {
+    "location_name": "חורפיש",
+    "fun_fact_he": "בחורפיש נמצא קבר 'נבי סבלאן', אתר קדוש לדרוזים המזוהה עם זבולון, אחד משבטי ישראל.",
+    "fun_fact_en": "In Hurfeish lies the tomb of 'Nabi Sabalan,' a holy site for the Druze identified with Zebulun, one of the tribes of Israel."
+  },
+  {
+    "location_name": "ירכא",
+    "fun_fact_he": "ירכא נחשבת לאחד היישובים העתיקים ביותר של העדה הדרוזית בארץ, וכיום היא מהווה מוקד קניות מרכזי בצפון בזכות מרכזי הקניות הענקיים שבה.",
+    "fun_fact_en": "Yarka is considered one of the oldest Druze settlements in Israel, and today it is a major shopping hub in the north due to its massive commercial centers."
+  },
+  {
+    "location_name": "ג'וליס",
+    "fun_fact_he": "בג'וליס נמצא 'גני אל-מונא', גן פרטי מרהיב ביופיו שצמח והפך לאתר תיירותי המשלב צמחייה עשירה, מפלי מים ופסלים.",
+    "fun_fact_en": "Julis is home to 'El-Mona Gardens,' a spectacularly beautiful private garden that grew into a tourist site combining lush vegetation, waterfalls, and sculptures."
+  },
+  {
+    "location_name": "כסרא-סמיע",
+    "fun_fact_he": "היישוב מפורסם ב'פארק הסלעים', אתר גיאולוגי ייחודי עם תצורות סלע גיר מרשימות שנוצרו על ידי הטבע ונראות כפסלים.",
+    "fun_fact_en": "The community is famous for 'Rock Park,' a unique geological site with impressive limestone formations created by nature that look like sculptures."
+  },
+  {
+    "location_name": "פקיעין",
+    "fun_fact_he": "פקיעין ידועה במערה שבה, לפי המסורת, הסתתרו רבי שמעון בר יוחאי ובנו מהרומאים במשך 13 שנה ובה נכתב ספר הזוהר.",
+    "fun_fact_en": "Peki'in is known for the cave where, according to tradition, Rabbi Shimon Bar Yochai and his son hid from the Romans for 13 years and where the Zohar was written."
+  },
+  {
+    "location_name": "מעיליא",
+    "fun_fact_he": "זהו כפר שכל תושביו נוצרים-קתולים, והוא בנוי כולו על חורבות מבצר צלבני עתיק שנקרא 'מבצר המלך' (Castellum Regis).",
+    "fun_fact_en": "This is a village where all residents are Catholic Christians, and it is built entirely on the ruins of an ancient Crusader fortress called 'The King's Castle' (Castellum Regis)."
+  },
+  {
+    "location_name": "ראמה",
+    "fun_fact_he": "ראמה מפורסמת בשמן הזית האיכותי שלה, המופק מעצי זית עתיקים בני מאות שנים הגדלים בעמק הסובב את הכפר.",
+    "fun_fact_en": "Rameh is famous for its high-quality olive oil, produced from ancient olive trees hundreds of years old that grow in the valley surrounding the village."
+  },
+  {
+    "location_name": "סאג'ור",
+    "fun_fact_he": "בפאתי הכפר נמצאים קבריהם המסורתיים של התנאים רבי ישמעאל כהן גדול ורבי שמעון שזורי, המהווים מוקד עלייה לרגל.",
+    "fun_fact_en": "On the outskirts of the village are the traditional tombs of the Talmudic sages Rabbi Ishmael the High Priest and Rabbi Shimon Shezuri, which serve as pilgrimage sites."
+  },
+  {
+    "location_name": "מע'אר",
+    "fun_fact_he": "בשנת 2021 הפכה מע'אר לעיר הדרוזית הראשונה בישראל; שמה פירושו 'המערות' בערבית.",
+    "fun_fact_en": "In 2021, Maghar became the first Druze city in Israel; its name means 'The Caves' in Arabic."
+  }
+]
+[
+  {
+    "location_name": "שעב",
+    "fun_fact_he": "שעב שוכנת בלב הגליל המערבי והיא מזוהה עם היישוב היהודי העתיק 'שאב', שהיה פעיל בתקופת המשנה והתלמוד.",
+    "fun_fact_en": "Sha'ab is located in the heart of the Western Galilee and is identified with the ancient Jewish settlement of 'Sha'ab,' which was active during the Mishnaic and Talmudic periods."
+  },
+  {
+    "location_name": "מזרעה",
+    "fun_fact_he": "במזרעה נמצא 'בית המזרעה', מבנה היסטורי ששימש כמקום מגוריו של בהא-אללה, מייסד הדת הבהאית, במהלך גלותו בארץ ישראל.",
+    "fun_fact_en": "Mazra'a is home to 'Mansion of Mazra'ih,' a historic building that served as the residence of Bahá'u'lláh, the founder of the Bahá'í Faith, during his exile in the Holy Land."
+  },
+  {
+    "location_name": "נחף",
+    "fun_fact_he": "הכפר נחף ממוקם בבקעת בית כרם וידוע בתעשיית השיש והאבן האיכותית שלו, המשמשת לבנייה בכל רחבי הארץ.",
+    "fun_fact_en": "The village of Nahf is located in the Beit Kerem Valley and is known for its high-quality marble and stone industry, used in construction throughout the country."
+  },
+  {
+    "location_name": "עילבון",
+    "fun_fact_he": "עילבון היה הכפר הראשון בצפון שחובר למוביל הארצי בשנות ה-60, בשל קרבתו לאחת המנהרות המרכזיות של הפרויקט.",
+    "fun_fact_en": "Eilabun was the first village in the north to be connected to the National Water Carrier in the 1960s, due to its proximity to one of the project's main tunnels."
+  },
+  {
+    "location_name": "מזרעה",
+    "fun_fact_he": "המזרעה מארחת מדי שנה פסטיבל פולקלור דרוזי מסורתי המציג את המנהגים והתרבות הייחודית של הכפר והאזור.",
+    "fun_fact_en": "Mazra'a hosts an annual traditional Druze folklore festival showcasing the unique customs and culture of the village and the region."
+  },
+  {
+    "location_name": "ראג'ר",
+    "fun_fact_he": "ראג'ר הוא הכפר העלווי היחיד בישראל, והוא ייחודי בכך שקו הגבול הבינלאומי בין ישראל ללבנון עובר בדיוק במרכזו.",
+    "fun_fact_en": "Ghajar is the only Alawite village in Israel, and it is unique in that the international border between Israel and Lebanon runs directly through its center."
+  },
+  {
+    "location_name": "בוקעאתא",
+    "fun_fact_he": "בוקעאתא הוא אחד מארבעת הכפרים הדרוזיים ברמת הגולן, והוא מוקף במטעי תפוחים ודובדבנים הנחשבים מהטובים בישראל.",
+    "fun_fact_en": "Buq'ata is one of the four Druze villages in the Golan Heights, surrounded by apple and cherry orchards considered among the best in Israel."
+  },
+  {
+    "location_name": "מג'דל שמס",
+    "fun_fact_he": "זהו היישוב הגבוה ביותר בישראל (למרגלות החרמון), ושמו פירושו 'מגדל השמש' בשל היותו המקום הראשון שבו זורחת השמש באזור.",
+    "fun_fact_en": "This is the highest settlement in Israel (at the foot of Mt. Hermon), and its name means 'Tower of the Sun' because it is the first place where the sun rises in the region."
+  },
+  {
+    "location_name": "מסעדה",
+    "fun_fact_he": "בסמוך לכפר מסעדה נמצאת 'בריכת רם', אגם טבעי בתוך לוע של הר געש כבוי, המהווה מוקד תיירותי פופולרי.",
+    "fun_fact_en": "Near the village of Mas'ade lies 'Birket Ram,' a natural lake inside the crater of an extinct volcano, which is a popular tourist destination."
+  },
+  {
+    "location_name": "אבו גוש",
+    "fun_fact_he": "אבו גוש מפורסמת בעולם ב'פסטיבל אבו גוש' למוזיקה ווקאלית וכן בחומוס שלה, שזכה בעבר להיכנס לספר השיאים של גינס.",
+    "fun_fact_en": "Abu Ghosh is globally famous for its Vocal Music Festival and its hummus, which once earned a spot in the Guinness World Records."
+  },
+  {
+    "location_name": "אבו סנאן",
+    "fun_fact_he": "אבו סנאן הוא אחד היישובים הרב-תרבותיים ביותר בישראל, שבו חיים יחד בשכנות דרוזים, מוסלמים ונוצרים.",
+    "fun_fact_en": "Abu Snan is one of the most multicultural communities in Israel, where Druze, Muslims, and Christians live together as neighbors."
+  },
+  {
+    "location_name": "כפר יסיף",
+    "fun_fact_he": "כפר יסיף הוא מרכז תרבותי וחינוכי חשוב בגליל המערבי, והוא מארח מדי שנה את פסטיבל 'מסרחיר' לתיאטרון ערבי.",
+    "fun_fact_en": "Kafr Yasif is an important cultural and educational center in the Western Galilee and hosts the annual 'Masrahid' festival for Arabic theater."
+  },
+  {
+    "location_name": "ינוח-ג'ת",
+    "fun_fact_he": "המועצה מורכבת משני כפרים עתיקים; בינוח נמצאו שרידים המזוהים עם העיר המקראית 'ינוח' שנכבשה על ידי מלך אשור.",
+    "fun_fact_en": "The council consists of two ancient villages; in Yanuh, remains identified with the biblical city of 'Janoah,' conquered by the King of Assyria, were found."
+  },
+  {
+    "location_name": "טובא-זנגריה",
+    "fun_fact_he": "היישוב הוקם מאיחוד של שני שבטים בדואים, והוא שוכן במיקום אסטרטגי המשקיף על נהר הירדן ההררי.",
+    "fun_fact_en": "The community was formed by the merger of two Bedouin tribes and is located in a strategic position overlooking the mountainous Jordan River."
+  },
+  {
+    "location_name": "רהט",
+    "fun_fact_he": "רהט היא העיר הבדואית הגדולה ביותר בעולם, והיא משמשת כמרכז מסחרי ותרבותי ראשי לאוכלוסייה הבדואית בנגב.",
+    "fun_fact_en": "Rahat is the largest Bedouin city in the world and serves as a major commercial and cultural center for the Bedouin population in the Negev."
+  },
+  {
+    "location_name": "לקיה",
+    "fun_fact_he": "לקיה מפורסמת בפרויקט 'רקמת המדבר' שלה, יוזמה חברתית שבה נשים בדואיות משמרות את אומנות הרקמה המסורתית ומייצרות מוצרים הנמכרים בעולם.",
+    "fun_fact_en": "Lakiya is famous for its 'Desert Embroidery' project, a social initiative where Bedouin women preserve traditional embroidery arts and create products sold worldwide."
+  },
+  {
+    "location_name": "חורה",
+    "fun_fact_he": "חורה נחשבת ליישוב בדואי פורץ דרך בתחום הקיימות, עם יוזמות של אנרגיה סולארית ומערכות למיחזור מים המשמשות מודל ליישובים אחרים.",
+    "fun_fact_en": "Hura is considered a pioneering Bedouin community in sustainability, with solar energy initiatives and water recycling systems serving as a model for other towns."
+  },
+  {
+    "location_name": "תל שבע",
+    "fun_fact_he": "תל שבע היה היישוב הבדואי הראשון שהוקם בנגב כחלק מתוכנית הקבע של המדינה עבור האוכלוסייה הבדואית בשנת 1967.",
+    "fun_fact_en": "Tel Sheva was the first Bedouin permanent settlement established in the Negev by the state in 1967."
+  },
+  {
+    "location_name": "להבים",
+    "fun_fact_he": "להבים הוא אחד היישובים היוקרתיים בדרום, ותחנת הרכבת שלו היא אחת היחידות בארץ שנמצאת ממש בתוך היישוב עצמו.",
+    "fun_fact_en": "Lehavim is one of the most prestigious communities in the south, and its train station is one of the few in Israel located directly within the residential area."
+  },
+  {
+    "location_name": "עומר",
+    "fun_fact_he": "היישוב עומר מדורג בעקביות באשכול החברתי-כלכלי הגבוה ביותר בישראל (10 מתוך 10), והוא ידוע בפארק התעשייה המתקדם שלו.",
+    "fun_fact_en": "Omer is consistently ranked in Israel's highest socio-economic cluster (10 out of 10) and is known for its advanced industrial park."
+  },
+  {
+    "location_name": "כפר כמא",
+    "fun_fact_he": "זהו אחד משני הכפרים הצ'רקסים היחידים בישראל, והוא נבחר על ידי ארגון התיירות של האו\"ם כאחד מ'כפרי התיירות הטובים בעולם'.",
+    "fun_fact_en": "This is one of only two Circassian villages in Israel, and it was selected by the UN World Tourism Organization as one of the 'Best Tourism Villages in the World.'"
+  },
+  {
+    "location_name": "רכסים",
+    "fun_fact_he": "רכסים היא מועצה מקומית חרדית השוכנת על גבעות המשקיפות על עמק זבולון, והיא משמשת כמרכז רוחני חשוב בצפון הארץ.",
+    "fun_fact_en": "Rekhasim is a Haredi local council located on hills overlooking the Zebulun Valley, serving as an important spiritual center in northern Israel."
+  },
+  {
+    "location_name": "כפר תבור",
+    "fun_fact_he": "כפר תבור (או 'מסחה') הייתה אחד ממוקדי הפעילות המרכזיים של ארגון 'השומר', ארגון השמירה היהודי הראשון בארץ ישראל.",
+    "fun_fact_en": "Kfar Tavor (or 'Mesha') was one of the primary activity hubs for 'HaShomer,' the first Jewish defense organization in the Land of Israel."
+  },
+  {
+    "location_name": "יבנאל",
+    "fun_fact_he": "יבנאל היא אחת המושבות הוותיקות בגליל (הוקמה ב-1901) והיא ידועה ביופייה הכפרי ובקהילת חסידי ברסלב הגדולה המתגוררת בה.",
+    "fun_fact_en": "Yavne'el is one of the oldest colonies in the Galilee (founded in 1901) and is known for its rural beauty and the large Breslov Hasidic community living there."
+  },
+  {
+    "location_name": "מגדל",
+    "fun_fact_he": "היישוב מגדל שוכן לחופי הכנרת והוא מזוהה עם 'מגדלא' העתיקה, מקום הולדתה של מרים המגדלית.",
+    "fun_fact_en": "The settlement of Migdal is located on the shores of the Sea of Galilee and is identified with ancient 'Magdala,' the birthplace of Mary Magdalene."
+  }
+]
+[
+  {
+    "location_name": "מצפה נטופה",
+    "fun_fact_he": "מצפה נטופה הוא יישוב קהילתי דתי המשקיף על בקעת בית נטופה, והוא ידוע באווירה הפסטורלית ובתצפיות הנוף המרהיבות שלו לגליל התחתון.",
+    "fun_fact_en": "Mitzpe Netofa is a religious community settlement overlooking the Beit Netofa Valley, known for its pastoral atmosphere and spectacular scenic views of the Lower Galilee."
+  },
+  {
+    "location_name": "כפר ורדים",
+    "fun_fact_he": "כפר ורדים הוקם על ידי התעשיין סטף ורטהיימר במטרה ליצור יישוב המשלב איכות חיים גבוהה עם קרבה למרכז תעסוקה טכנולוגי (תפן).",
+    "fun_fact_en": "Kfar Vradim was established by industrialist Stef Wertheimer with the aim of creating a community that combines high quality of life with proximity to a technological employment center (Tefen)."
+  },
+  {
+    "location_name": "מעלות-תרשיחא",
+    "fun_fact_he": "העיר היא איחוד של מעלות היהודית ותרשיחא הערבית, והיא מארחת מדי שנה את פסטיבל 'פיסול באבן' הבינלאומי באגם מונפורט.",
+    "fun_fact_en": "The city is a union of Jewish Ma'alot and Arab Tarshiha, and it hosts the international 'Stone Sculpture' festival annually at Lake Monfort."
+  },
+  {
+    "location_name": "שלומי",
+    "fun_fact_he": "שלומי שוכנת סמוך לגבול לבנון ונקראת על שם דמות מקראית משבט אשר; בסמוך לה נמצאים שרידי העיר העתיקה 'בצת'.",
+    "fun_fact_en": "Shlomi is located near the Lebanese border and is named after a biblical figure from the tribe of Asher; nearby are the remains of the ancient city of 'Betzet'."
+  },
+  {
+    "location_name": "אילון",
+    "fun_fact_he": "קיבוץ אילון מפורסם ב'קשת אילון', פרויקט מוזיקלי בינלאומי המושך כנרים צעירים ומצטיינים מכל העולם לסדנאות אמן בגליל.",
+    "fun_fact_en": "Kibbutz Eilon is famous for 'Keshet Eilon,' an international musical project that attracts outstanding young violinists from around the world for masterclasses in the Galilee."
+  },
+  {
+    "location_name": "חצור הגלילית",
+    "fun_fact_he": "חצור הגלילית שוכנת למרגלות תל חצור, שהיה אחד הערים החשובות והגדולות בכנען ומוזכר במקרא כ'ראש כל הממלכות האלה'.",
+    "fun_fact_en": "Hatzor HaGlilit lies at the foot of Tel Hazor, which was one of the largest and most important cities in Canaan, mentioned in the Bible as 'the head of all those kingdoms'."
+  },
+  {
+    "location_name": "ראש פינה",
+    "fun_fact_he": "ראש פינה, שהוקמה ב-1882, נחשבת ל'אם המושבות' בגליל והיא מפורסמת ברחובותיה המרוצפים באבן ובמבנים ההיסטוריים המשומרים שלה.",
+    "fun_fact_en": "Founded in 1882, Rosh Pinna is considered the 'Mother of Colonies' in the Galilee and is famous for its cobblestone streets and preserved historical buildings."
+  },
+  {
+    "location_name": "יסוד המעלה",
+    "fun_fact_he": "המושבה הוקמה על גדות אגם החולה ההיסטורי, ובמרכזה נמצאת 'אחוזת דוברובין', מוזיאון המשחזר את חיי המתיישבים הראשונים.",
+    "fun_fact_en": "The colony was established on the shores of the historic Hula Lake, and at its center is the 'Dubrovin Farm,' a museum reconstructing the lives of the early settlers."
+  },
+  {
+    "location_name": "מטולה",
+    "fun_fact_he": "מטולה היא היישוב הצפוני ביותר בישראל, והיא מוקפת משלושה עברים בגבול עם לבנון.",
+    "fun_fact_en": "Metula is the northernmost town in Israel and is surrounded on three sides by the border with Lebanon."
+  },
+  {
+    "location_name": "ביריה",
+    "fun_fact_he": "מצודת ביריה הפכה לסמל למאבק על ההתיישבות לאחר שאלפי בני נוער עלו אליה ב-1946 למרות ניסיונות הבריטים לפנותה.",
+    "fun_fact_en": "The Birya Fortress became a symbol of the struggle for settlement after thousands of youth marched to it in 1946 despite British attempts to evacuate it."
+  },
+  {
+    "location_name": "קיבוץ סאסא",
+    "fun_fact_he": "הקיבוץ ממוקם באחד המקומות הגבוהים בארץ והוא ביתה של חברת 'פלסן', מהמובילות בעולם במיגון כלי רכב צבאיים.",
+    "fun_fact_en": "The kibbutz is located at one of the highest points in Israel and is home to 'Plasan,' a world leader in armor protection for military vehicles."
+  },
+  {
+    "location_name": "רמות נפתלי",
+    "fun_fact_he": "המושב ממוקם על רכס נפתלי ומשקיף על נוף עוצר נשימה של עמק החולה והחרמון.",
+    "fun_fact_en": "The moshav is located on the Naftali Ridge and overlooks a breathtaking view of the Hula Valley and Mount Hermon."
+  },
+  {
+    "location_name": "קצרין",
+    "fun_fact_he": "קצרין מכונה 'בירת הגולן' ובשטחה נמצא פארק ארכיאולוגי המשחזר כפר יהודי מתקופת התלמוד עם בית כנסת עתיק מרשים.",
+    "fun_fact_en": "Katzrin is known as the 'Capital of the Golan' and contains an archaeological park reconstructing a Jewish village from the Talmudic period with an impressive ancient synagogue."
+  },
+  {
+    "location_name": "דגניה א'",
+    "fun_fact_he": "דגניה א' היא הקיבוץ הראשון שהוקם בעולם (בשנת 1910) ולכן היא מכונה 'אם הקבוצות והקיבוצים'.",
+    "fun_fact_en": "Degania Alef is the first kibbutz ever established (in 1910), earning it the nickname 'Mother of the Kibbutzim'."
+  },
+  {
+    "location_name": "שער הגולן",
+    "fun_fact_he": "בקיבוץ נמצא מוזיאון לתרבות הירמוכית המציג ממצאים פרהיסטוריים נדירים, בהם פסלוני פולחן בני כ-8,000 שנה.",
+    "fun_fact_en": "The kibbutz houses the Museum of Yarmukian Culture, showcasing rare prehistoric findings, including 8,000-year-old ritual figurines."
+  },
+  {
+    "location_name": "ניר דוד",
+    "fun_fact_he": "ניר דוד (תל עמל) היה היישוב הראשון שהוקם בשיטת 'חומה ומגדל' בשנת 1936, והוא ידוע בנחל האסי שזורם בתוכו.",
+    "fun_fact_en": "Nir David (Tel Amal) was the first settlement established using the 'Tower and Stockade' method in 1936, and is known for the Amal River (Asi) flowing through it."
+  },
+  {
+    "location_name": "בית שאן",
+    "fun_fact_he": "בבית שאן נמצא אחד האתרים הארכיאולוגיים המרשימים בעולם, הכולל תיאטרון רומי שלם ושרידי עיר מפוארת שנחרבה ברעידת אדמה.",
+    "fun_fact_en": "Beit She'an is home to one of the world's most impressive archaeological sites, featuring a complete Roman theater and the remains of a magnificent city destroyed by an earthquake."
+  },
+  {
+    "location_name": "משמר הנגב",
+    "fun_fact_he": "הקיבוץ הוקם במוצאי יום כיפור 1946 כאחד מ-11 הנקודות שנועדו להבטיח את הנגב בתחומי המדינה היהודית.",
+    "fun_fact_en": "The kibbutz was established on the night after Yom Kippur 1946 as one of the '11 Points' intended to secure the Negev within the borders of the Jewish state."
+  },
+  {
+    "location_name": "רביבים",
+    "fun_fact_he": "בקיבוץ נמצא 'מצפה רביבים', אתר משוחזר המציג את תנאי החיים הקשים של החלוצים בנגב בשנות ה-40.",
+    "fun_fact_en": "The kibbutz features 'Mitzpe Revivim,' a reconstructed site showing the harsh living conditions of the Negev pioneers in the 1940s."
+  },
+  {
+    "location_name": "שדה בוקר",
+    "fun_fact_he": "הקיבוץ מפורסם בזכות דוד בן-גוריון, ראש הממשלה הראשון של ישראל, שבחר להתגורר בו לאחר פרישתו ונקבר במדרשה הסמוכה.",
+    "fun_fact_en": "The kibbutz is famous for being the home of David Ben-Gurion, Israel's first Prime Minister, who chose to live there after retiring and is buried in the nearby Midrasha."
+  },
+  {
+    "location_name": "מצפה רמון",
+    "fun_fact_he": "היישוב שוכן על שפת מכתש רמון, המכתש האירוזי הגדול בעולם, והוא נחשב לאחד המקומות הטובים ביותר בישראל לצפייה בכוכבים.",
+    "fun_fact_en": "The town sits on the edge of the Ramon Crater, the world's largest erosion crater, and is considered one of the best places in Israel for stargazing."
+  },
+  {
+    "location_name": "עין בוקק",
+    "fun_fact_he": "עין בוקק הוא מרכז התיירות המרכזי של ים המלח, המקום הנמוך ביותר בעולם, וידוע בסגולות המרפא של מימיו.",
+    "fun_fact_en": "Ein Bokek is the main tourism hub of the Dead Sea, the lowest point on Earth, and is famous for the medicinal properties of its waters."
+  },
+  {
+    "location_name": "עין גדי",
+    "fun_fact_he": "עין גדי הוא נווה מדבר מקראי המשלב שמורת טבע מרהיבה עם מפלי מים בלב המדבר, שם הסתתר דוד המלך מפני שאול.",
+    "fun_fact_en": "Ein Gedi is a biblical oasis combining a spectacular nature reserve with waterfalls in the heart of the desert, where King David hid from King Saul."
+  },
+  {
+    "location_name": "ירוחם",
+    "fun_fact_he": "בירוחם נמצא אגם מלאכותי גדול בלב המדבר המהווה מוקד משיכה לציפורים נודדות ולמטיילים.",
+    "fun_fact_en": "Yeruham features a large artificial lake in the heart of the desert that serves as a magnet for migratory birds and hikers."
+  },
+  {
+    "location_name": "לטרון",
+    "fun_fact_he": "בלטרון נמצא מנזר השתקנים המפורסם וכן 'יד לשריון', מוזיאון השריון הרשמי של צה\"ל המציג את אחד מאוספי הטנקים הגדולים בעולם.",
+    "fun_fact_en": "Latrun is home to the famous Trappist Monastery and 'Yad La-Shiryon,' the official Armored Corps museum of the IDF, featuring one of the largest tank collections in the world."
+  }
+]
+[
+  {
+    "location_name": "נווה שלום",
+    "fun_fact_he": "נווה שלום (ואחאת אל-סלאם) הוא יישוב שיתופי שהוקם במשותף על ידי יהודים וערבים במטרה לקדם דו-קיום ושלום, ושמו לקוח מספר ישעיהו.",
+    "fun_fact_en": "Neve Shalom (Wahat al-Salam) is a cooperative village founded jointly by Jews and Arabs to promote coexistence and peace; its name is derived from the Book of Isaiah."
+  },
+  {
+    "location_name": "בית דגן",
+    "fun_fact_he": "בבית דגן נמצא המרכז המטאורולוגי לישראל, האחראי על תחזיות מזג האוויר וניטור אקלימי בכל רחבי המדינה.",
+    "fun_fact_en": "Beit Dagan is home to the Israel Meteorological Service, responsible for weather forecasting and climate monitoring throughout the country."
+  },
+  {
+    "location_name": "יריחו",
+    "fun_fact_he": "יריחו נחשבת לאחת הערים העתיקות בעולם המיושבות ברציפות, והיא העיר הנמוכה ביותר בעולם (כ-250 מטר מתחת לפני הים).",
+    "fun_fact_en": "Jericho is considered one of the oldest continuously inhabited cities in the world and is the lowest city on Earth (approximately 250 meters below sea level)."
+  },
+  {
+    "location_name": "מחלף עפולה",
+    "fun_fact_he": "מחלף זה מהווה צומת דרכים מרכזי בעמק יזרעאל, המחבר בין כביש 65 לכביש 60 ומהווה שער כניסה לעיר עפולה.",
+    "fun_fact_en": "This interchange is a major junction in the Jezreel Valley, connecting Highway 65 and Highway 60, and serves as a gateway to the city of Afula."
+  },
+  {
+    "location_name": "צומת מגידו",
+    "fun_fact_he": "הצומת שוכנת סמוך לתל מגידו המקראי, אתר מורשת עולמית של אונסק\"ו המזוהה במסורת הנוצרית עם ה'ארמגדון'.",
+    "fun_fact_en": "The junction is located near biblical Tel Megiddo, a UNESCO World Heritage site identified in Christian tradition with 'Armageddon.'"
+  },
+  {
+    "location_name": "מחלף עין תות",
+    "fun_fact_he": "מחלף עין תות הוא נקודת החיבור הצפונית ביותר של כביש 6 (כביש חוצה ישראל) עם כביש 70, סמוך לאזור רמות מנשה.",
+    "fun_fact_en": "Ein Tut Interchange is the northernmost connection point of Highway 6 (Trans-Israel Highway) with Highway 70, near the Ramot Menashe area."
+  },
+  {
+    "location_name": "מחלף גולני",
+    "fun_fact_he": "המחלף קרוי על שם חטיבת גולני, ובסמוך לו נמצא אתר ההנצחה הרשמי של החטיבה ומוזיאון המורשת שלה.",
+    "fun_fact_en": "The interchange is named after the Golani Brigade; nearby is the brigade's official memorial site and heritage museum."
+  },
+  {
+    "location_name": "צומת מחניים",
+    "fun_fact_he": "צומת מחניים היא צומת אסטרטגית באצבע הגליל, המובילה ליישובי עמק החולה, רמת הגולן ושדה התעופה ראש פינה.",
+    "fun_fact_en": "Mahanaim Junction is a strategic junction in the Galilee Panhandle, leading to the settlements of the Hula Valley, the Golan Heights, and Rosh Pinna Airport."
+  },
+  {
+    "location_name": "מחלף קישון",
+    "fun_fact_he": "המחלף ממוקם באזור חיפה והוא קרוי על שם נחל הקישון הזורם תחתיו, אחד הנחלים החשובים והגדולים בישראל.",
+    "fun_fact_en": "The interchange is located in the Haifa area and is named after the Kishon River flowing beneath it, one of Israel's most important and largest rivers."
+  },
+  {
+    "location_name": "מחלף גהה",
+    "fun_fact_he": "זהו אחד המחלפים העמוסים בישראל, ושמו 'גהה' (מרפא) נגזר משמו ההיסטורי של בית החולים לבריאות הנפש שהיה סמוך אליו.",
+    "fun_fact_en": "This is one of Israel's busiest interchanges; its name 'Geha' (healing) is derived from the historic name of the psychiatric hospital that was located nearby."
+  },
+  {
+    "location_name": "מחלף מורשה",
+    "fun_fact_he": "המחלף מחבר בין כביש 4 לכביש 5, והוא קרוי על שם שכונת מורשה ברמת השרון הסמוכה.",
+    "fun_fact_en": "The interchange connects Highway 4 and Highway 5 and is named after the Morasha neighborhood in nearby Ramat HaSharon."
+  },
+  {
+    "location_name": "מחלף גלילות",
+    "fun_fact_he": "בסמוך למחלף גלילות נמצאים מטה המוסד ויחידה 8200, וכן מערות אפקה - אתר טבע עירוני המכיל מערות קבורה עתיקות.",
+    "fun_fact_en": "Near Glilot Interchange are the headquarters of the Mossad and Unit 8200, as well as the Afeka Caves—an urban nature site containing ancient burial caves."
+  },
+  {
+    "location_name": "מחלף גשר הירקון",
+    "fun_fact_he": "המחלף עובר מעל נחל הירקון ומהווה עורק תחבורה ראשי המחבר בין צפון תל אביב לבני ברק ופתח תקווה.",
+    "fun_fact_en": "The interchange passes over the Yarkon River and serves as a major transportation artery connecting northern Tel Aviv to Bnei Brak and Petah Tikva."
+  },
+  {
+    "location_name": "מחלף דרור",
+    "fun_fact_he": "המחלף שוכן בלב השרון ומהווה את הכניסה המרכזית לאזור תל מונד ויישובי המועצה האזורית לב השרון.",
+    "fun_fact_en": "Dror Interchange is located in the heart of the Sharon region and serves as the main entrance to the Tel Mond area and the Lev HaSharon Regional Council settlements."
+  },
+  {
+    "location_name": "מחלף נחשונים",
+    "fun_fact_he": "המחלף מחבר את כביש 6 לכביש 471 ומאפשר גישה מהירה לאזור התעשייה של ראש העין ולפארק המים נחשונית.",
+    "fun_fact_en": "The interchange connects Highway 6 to Highway 471, providing quick access to the Rosh Ha'ayin industrial zone and the Nachshonit water park."
+  },
+  {
+    "location_name": "מחלף בן שמן",
+    "fun_fact_he": "זהו אחד המחלפים הגדולים והמורכבים בישראל, המחבר בין כביש 1, כביש 6 וכביש 443, ומוקף ביער בן שמן רחב הידיים.",
+    "fun_fact_en": "This is one of Israel's largest and most complex interchanges, connecting Highway 1, Highway 6, and Highway 443, and is surrounded by the vast Ben Shemen Forest."
+  },
+  {
+    "location_name": "מחלף לטרון",
+    "fun_fact_he": "המחלף מהווה נקודת מפגש היסטורית בדרך לירושלים, סמוך למנזר השתקנים ולאתר 'מיני ישראל' המציג דגמים מיניאטוריים של אתרי הארץ.",
+    "fun_fact_en": "The interchange is a historic meeting point on the road to Jerusalem, near the Trappist Monastery and 'Mini Israel,' which displays miniature models of Israeli sites."
+  },
+  {
+    "location_name": "מחלף שער הגיא",
+    "fun_fact_he": "המחלף, הידוע גם בשם 'באב אל-וואד', הוא סמל למצור על ירושלים במלחמת העצמאות; לצד הדרך ניתן לראות עד היום שרידי משוריינים מאותה תקופה.",
+    "fun_fact_en": "The interchange, also known as 'Bab al-Wad,' is a symbol of the siege of Jerusalem during the War of Independence; remains of armored vehicles from that era can still be seen along the road today."
+  },
+  {
+    "location_name": "מחלף חמד",
+    "fun_fact_he": "המחלף שוכן על הדרך לירושלים וקרוי על שם המושב הסמוך 'חמד', ששמו הוא ראשי תיבות של 'חיילים משוחררים דתיים'.",
+    "fun_fact_en": "Located on the road to Jerusalem, the interchange is named after the nearby moshav 'Hemed,' which is a Hebrew acronym for 'Religious Discharged Soldiers.'"
+  },
+  {
+    "location_name": "צומת בילו",
+    "fun_fact_he": "צומת בילו היא צומת מסחרית תוססת הקרויה על שם תנועת ביל\"ו, והיא מהווה מוקד קניות מרכזי עבור תושבי רחובות והסביבה.",
+    "fun_fact_en": "Bilu Junction is a vibrant commercial junction named after the Bilu movement and serves as a major shopping hub for residents of Rehovot and the surrounding area."
+  },
+  {
+    "location_name": "מחלף ישי",
+    "fun_fact_he": "המחלף מקשר בין עמק יזרעאל לגליל התחתון, והוא קרוי על שם רמת ישי הסמוכה, המפורסמת במבני התעשייה ההיסטוריים שלה.",
+    "fun_fact_en": "The interchange links the Jezreel Valley and the Lower Galilee and is named after nearby Ramat Yishai, famous for its historic industrial buildings."
+  },
+  {
+    "location_name": "מחלף פלוגות",
+    "fun_fact_he": "המחלף ממוקם בנגב הצפוני וקרוי על שם פלוגות השדה (פו\"ש) של ארגון ההגנה שפעלו באזור זה.",
+    "fun_fact_en": "Located in the northern Negev, the interchange is named after the Field Companies (Fosh) of the Haganah organization that operated in this area."
+  },
+  {
+    "location_name": "צומת גורל",
+    "fun_fact_he": "צומת גורל היא צומת כניסה ראשית לבאר שבע מכיוון צפון, והיא מהווה נקודת מעבר חשובה למטיילים היורדים דרומה.",
+    "fun_fact_en": "Goral Junction is a main entrance to Beer Sheva from the north and serves as an important transit point for travelers heading south."
+  },
+  {
+    "location_name": "מחלף להבים",
+    "fun_fact_he": "המחלף מחבר את כביש 40 וכביש 31, ומספק גישה ליישוב להבים ולתחנת הרכבת המשרתת את תושבי צפון הנגב.",
+    "fun_fact_en": "The interchange connects Highway 40 and Highway 31, providing access to the town of Lehavim and the train station serving northern Negev residents."
+  },
+  {
+    "location_name": "מחלף זוהר",
+    "fun_fact_he": "מחלף זה שוכן באזור קריית גת ומהווה חיבור חשוב בין כביש 6 לכביש 35, המוביל מזרחה לכיוון חברון ומערבה לאשקלון.",
+    "fun_fact_en": "This interchange is located in the Kiryat Gat area and forms an important connection between Highway 6 and Highway 35, leading east toward Hebron and west to Ashkelon."
+  }
+]
+[
+  {
+    "location_name": "מחלף אייל",
+    "fun_fact_he": "המחלף מקשר בין כביש 6 לכביש 551 ומשמש כניסה מרכזית ליישובים כוכב יאיר-צור יגאל וקיבוץ אייל הסמוך.",
+    "fun_fact_en": "The interchange connects Highway 6 with Highway 551 and serves as a major entrance to the communities of Kokhav Ya'ir-Tzur Yigal and the nearby Kibbutz Eyal."
+  },
+  {
+    "location_name": "מחלף קסם",
+    "fun_fact_he": "זהו אחד המחלפים העמוסים והגדולים בישראל, המהווה צומת מפגש קריטי בין כביש 6, כביש 5 וכביש 444.",
+    "fun_fact_en": "This is one of Israel's largest and busiest interchanges, serving as a critical junction between Highway 6, Highway 5, and Highway 444."
+  },
+  {
+    "location_name": "מחלף ניצני עוז",
+    "fun_fact_he": "המחלף מחבר את כביש 6 עם כביש 57, ומהווה עורק תחבורה ראשי המקשר בין אזור נתניה לטול כרם ויישובי עמק חפר.",
+    "fun_fact_en": "The interchange connects Highway 6 with Highway 57, serving as a major transportation artery linking the Netanya area to Tulkarm and the Emek Hefer communities."
+  },
+  {
+    "location_name": "צומת גרנות",
+    "fun_fact_he": "הצומת שוכנת סמוך למפעל 'גרנות', אחד הארגונים הכלכליים הקיבוציים הגדולים בישראל, המרכז פעילות חקלאית ותעשייתית רחבה.",
+    "fun_fact_en": "The junction is located near the 'Granot' factory, one of Israel's largest kibbutz economic organizations, which centralizes extensive agricultural and industrial activities."
+  },
+  {
+    "location_name": "מחלף אור עקיבה",
+    "fun_fact_he": "המחלף על כביש 2 (כביש החוף) מספק את הגישה המרכזית לעיר אור עקיבא וליישוב היוקרתי קיסריה הסמוך לו.",
+    "fun_fact_en": "The interchange on Highway 2 (Coastal Highway) provides the primary access to the city of Or Akiva and the adjacent prestigious community of Caesarea."
+  },
+  {
+    "location_name": "מחלף יקנעם",
+    "fun_fact_he": "המחלף מהווה את נקודת החיבור המרכזית בין כביש 6 לצפון הארץ, ומשמש כשער כניסה לעיר יקנעם עילית ולפארקי ההייטק שלה.",
+    "fun_fact_en": "The interchange is the central connection point between Highway 6 and northern Israel, serving as a gateway to the city of Yokneam Illit and its high-tech parks."
+  },
+  {
+    "location_name": "מחלף תצומת הגדר",
+    "fun_fact_he": "מחלף זה שוכן באזור התפר ומשמש כנקודת מעבר ותשתית חשובה המחברת בין יישובי קו התפר למערכת הכבישים הארצית.",
+    "fun_fact_en": "This interchange is located in the seam zone area and serves as an important transit point and infrastructure connecting seam line communities to the national road network."
+  },
+  {
+    "location_name": "מחלף עפולה",
+    "fun_fact_he": "בנוסף להיותו צומת דרכים מרכזי, המחלף תוכנן כדי להקל על עומסי התנועה בכניסה לבירת העמק ולאפשר גישה מהירה לבתי החולים והמרכזים המסחריים באזור.",
+    "fun_fact_en": "In addition to being a major road junction, the interchange was designed to ease traffic congestion at the entrance to Afula and provide quick access to local hospitals and commercial centers."
+  },
+  {
+    "location_name": "בית דגן",
+    "fun_fact_he": "צומת בית דגן היא אחת הצמתים הוותיקות והמוכרות בישראל, המקשרת בין השפלה לגוש דן ושוכנת סמוך למכון הוולקני למחקר חקלאי.",
+    "fun_fact_en": "The Beit Dagan junction is one of Israel's oldest and most well-known junctions, linking the Shephelah region to Gush Dan and located near the Volcani Institute for agricultural research."
+  },
+  {
+    "location_name": "זמר",
+    "fun_fact_he": "המועצה המקומית זמר הוקמה מאיחוד של ארבעה כפרים ערביים (ימה, ביר אל-סיכה, איבתאן ומרג'ה) השוכנים בלב אזור השרון.",
+    "fun_fact_en": "The local council of Zemer was formed by the merger of four Arab villages (Yama, Bir al-Sika, Ibtan, and Marja) located in the heart of the Sharon region."
+  }
+]
