@@ -22,6 +22,7 @@
            GoogleAuthProvider, signInWithPopup,
            createUserWithEmailAndPassword,
            signInWithEmailAndPassword,
+           signInAnonymously,
            updateProfile }                          from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import { getFirestore, collection, addDoc,
            query, where, orderBy, limit,
@@ -48,6 +49,7 @@
   window._fbFns  = {
     signOut, GoogleAuthProvider, signInWithPopup,
     createUserWithEmailAndPassword, signInWithEmailAndPassword,
+    signInAnonymously,
     updateProfile, collection, addDoc, query, where,
     orderBy, limit, getDocs, serverTimestamp,
     setDoc, getDoc, doc
@@ -301,6 +303,58 @@
     from { opacity: 0; transform: translateY(-100%); }
     to   { opacity: 1; transform: translateY(0); }
   }
+
+  /* ── DAILY PERCENTILE POPUP ─────────────────────────────────────────── */
+  #daily-percentile-popup {
+    display: none; position: fixed; inset: 0; z-index: 10000;
+    background: rgba(0,0,0,0.65); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center;
+  }
+  #daily-percentile-popup.show { display: flex; }
+  #daily-percentile-card {
+    background: var(--surface); border-radius: 24px;
+    padding: 32px 28px 24px; width: min(340px, 90vw);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    text-align: center;
+    animation: recordCardEntry 0.45s cubic-bezier(.34,1.3,.64,1);
+  }
+  #dp-title {
+    font-size: 1rem; font-weight: 700; color: var(--muted);
+    letter-spacing: 0.4px; margin-bottom: 4px;
+  }
+  #dp-score {
+    font-size: 2.2rem; font-weight: 900; color: var(--text);
+    margin-bottom: 20px;
+  }
+  #dp-ring-wrap {
+    width: 120px; height: 120px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    margin: 0 auto 16px; position: relative;
+    background: conic-gradient(#e8eaed 360deg, #e8eaed 360deg);
+    transition: background 0.6s ease;
+  }
+  #dp-ring-wrap::after {
+    content: ''; position: absolute; inset: 16px;
+    background: var(--surface); border-radius: 50%;
+  }
+  #dp-pct-value {
+    position: relative; z-index: 1;
+    font-size: 1.6rem; font-weight: 900; color: var(--text);
+  }
+  #dp-pct-label {
+    position: relative; z-index: 1;
+    font-size: 0.72rem; font-weight: 600; color: var(--muted);
+    margin-top: -2px;
+  }
+  #dp-message { font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  #dp-count   { font-size: 0.82rem; color: var(--muted); margin-bottom: 22px; }
+  #dp-close-btn {
+    background: var(--green); color: #fff;
+    border: none; border-radius: 999px; padding: 11px 32px;
+    font-size: 1rem; font-weight: 700; cursor: pointer; font-family: inherit;
+  }
+  #dp-close-btn:hover { opacity: 0.88; }
 
   /* ── NEW RECORD POPUP ─────────────────────────────────────────────────── */
   #new-record-popup {
@@ -1427,48 +1481,44 @@
   }
   #challenge-intro-btn:hover { opacity: 0.9; transform: translateY(-1px); }
 
-  /* ── DAILY CHALLENGE INTRO MODAL ──────────────────────────────────────── */
-  #daily-modal {
+  /* ── DAILY CHALLENGE INTRO POPUP ──────────────────────────────────────── */
+  #daily-challenge-intro {
     display: none; position: fixed; inset: 0; z-index: 9800;
-    background: rgba(0,0,0,0.55); backdrop-filter: blur(4px);
-    align-items: center; justify-content: center; padding: 24px;
+    background: rgba(0,0,0,0.62); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center;
   }
-  #daily-modal.open { display: flex; }
-  #daily-modal-card {
-    background: var(--surface); border-radius: 20px;
-    padding: 28px 32px 24px; max-width: 400px; width: 100%;
-    box-shadow: 0 12px 48px rgba(0,0,0,0.25);
-    display: flex; flex-direction: column; gap: 14px;
-    animation: factCardPop 0.25s cubic-bezier(.34,1.56,.64,1);
+  #daily-challenge-intro.open { display: flex; }
+  #daily-challenge-intro-card {
+    background: var(--surface); border-radius: 24px; padding: 32px 28px 28px;
+    width: min(380px, 92vw); box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+    display: flex; flex-direction: column; align-items: center;
+    gap: 10px; text-align: center; position: relative;
   }
-  #daily-modal-title {
-    font-family: 'Playfair Display', 'Alef', serif;
-    font-size: 1.35rem; font-weight: 900;
-    background: linear-gradient(90deg, #7c3aed, #1a6fd4);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  #dci-close-btn {
+    position: absolute; top: 14px; right: 16px;
+    background: none; border: none; cursor: pointer;
+    font-size: 1.1rem; color: var(--muted); padding: 4px 8px;
   }
-  #daily-modal-body {
-    font-size: 0.95rem; color: var(--text); line-height: 1.65;
+  #dci-icon { font-size: 2.8rem; line-height: 1; }
+  #dci-title {
+    font-family: 'Alef',sans-serif; font-size: 1.5rem; font-weight: 900;
+    color: var(--text); margin-top: 2px;
   }
-  #daily-modal-actions {
-    display: flex; gap: 10px; justify-content: flex-end; margin-top: 4px;
+  #dci-desc-box {
+    font-family: 'Alef',sans-serif; font-size: 1rem; font-weight: 500;
+    color: var(--text); line-height: 1.55; direction: rtl;
+    background: rgba(229,124,26,0.09); border-radius: 12px;
+    padding: 12px 16px; margin: 4px 0; width: 100%; box-sizing: border-box;
   }
-  #daily-modal-cancel {
-    padding: 7px 20px; border-radius: 50px; border: 1px solid var(--border);
-    background: transparent; color: var(--muted);
-    font-family: 'Source Serif 4', 'Alef', serif; font-size: 0.9rem;
-    cursor: pointer; transition: background 0.15s;
+  #dci-start-btn {
+    margin-top: 4px; padding: 13px 24px; border-radius: 50px; border: none;
+    background: linear-gradient(90deg, #e57c1a, #f4c430); color: #fff;
+    font-family: 'Alef',sans-serif; font-size: 1.1rem; font-weight: 800;
+    cursor: pointer; width: 100%;
+    box-shadow: 0 4px 16px rgba(229,124,26,0.3);
+    transition: opacity 0.15s, transform 0.15s;
   }
-  #daily-modal-cancel:hover { background: var(--bg); }
-  #daily-modal-start {
-    padding: 8px 22px; border-radius: 50px; border: none;
-    background: linear-gradient(135deg, #7c3aed, #1a6fd4);
-    color: #fff; font-family: 'Source Serif 4', 'Alef', serif;
-    font-size: 0.9rem; font-weight: 700;
-    cursor: pointer; transition: opacity 0.15s, transform 0.15s;
-    box-shadow: 0 4px 14px rgba(124,58,237,0.3);
-  }
-  #daily-modal-start:hover { opacity: 0.9; transform: translateY(-1px); }
+  #dci-start-btn:hover { opacity: 0.9; transform: translateY(-1px); }
 
   /* ── CHALLENGE RESULT POPUP ───────────────────────────────────────────── */
   #challenge-result {
@@ -2770,6 +2820,19 @@
   </div>
 </div>
 
+<!-- DAILY CHALLENGE INTRO POPUP -->
+<div id="daily-challenge-intro">
+  <div id="daily-challenge-intro-card">
+    <button id="dci-close-btn" onclick="closeDailyChallengeIntro()">✕</button>
+    <div id="dci-icon">⚡</div>
+    <div id="dci-title">אתגר יומי</div>
+    <div id="dci-desc-box">
+      <span id="dci-desc-text">למד את האיזור המוצג במפה במשך 15 שניות, לאחר מכן מצא את המיקום</span>
+    </div>
+    <button id="dci-start-btn" onclick="startDailyChallengeGame()">בואו נתחיל! →</button>
+  </div>
+</div>
+
 <!-- CHALLENGE RESULT POPUP -->
 <div id="challenge-result">
   <div id="challenge-result-card">
@@ -2795,18 +2858,6 @@
       <div id="cr-copied-toast"></div>
     </div>
     <button id="cr-play-btn" dir="rtl" onclick="exitChallengeMode()">Play the full game →</button>
-  </div>
-</div>
-
-<!-- DAILY CHALLENGE INTRO MODAL -->
-<div id="daily-modal">
-  <div id="daily-modal-card">
-    <div id="daily-modal-title"></div>
-    <div id="daily-modal-body"></div>
-    <div id="daily-modal-actions">
-      <button id="daily-modal-cancel" onclick="closeDailyModal()"></button>
-      <button id="daily-modal-start" onclick="beginDailyChallenge()"></button>
-    </div>
   </div>
 </div>
 
@@ -2944,6 +2995,21 @@
       <a style="cursor:pointer;color:#1a6fd4;text-decoration:underline" onclick="openLoginModal()" id="sb-signin-link">Sign in</a>
       <span id="sb-signin-text"> to see the leaderboard</span>
     </div>
+  </div>
+</div>
+
+<!-- ── DAILY CHALLENGE PERCENTILE POPUP ──────────────────────────────── -->
+<div id="daily-percentile-popup">
+  <div id="daily-percentile-card">
+    <div id="dp-title">📅 Daily Challenge</div>
+    <div id="dp-score"></div>
+    <div id="dp-ring-wrap">
+      <span id="dp-pct-value"></span>
+      <span id="dp-pct-label"></span>
+    </div>
+    <div id="dp-message"></div>
+    <div id="dp-count"></div>
+    <button id="dp-close-btn" onclick="document.getElementById('daily-percentile-popup').classList.remove('show')">Got it!</button>
   </div>
 </div>
 
@@ -3509,10 +3575,6 @@ const STRINGS = {
     start_btn:        "Start Game →",
     learn_btn:        "🗺️ Learning Mode",
     daily_btn:        "⚡ Daily Challenge",
-    daily_modal_title:  "⚡ Daily Challenge",
-    daily_modal_body:   "Learn the area shown in the street map, then pin the location",
-    daily_modal_start:  "Let's go →",
-    daily_modal_cancel: "Cancel",
     region_all_short: "All",
     region_north_short: "North",
     region_center_short: "Center",
@@ -3551,10 +3613,6 @@ const STRINGS = {
     start_btn:        "← התחל משחק",
     learn_btn:        "🗺️ מצב למידה",
     daily_btn:        "⚡ אתגר יומי",
-    daily_modal_title:  "⚡ אתגר יומי",
-    daily_modal_body:   "למד את האיזור המוצג במפה במשך 15 שניות, לאחר מכן מצא את המיקום",
-    daily_modal_start:  "← בואו נתחיל",
-    daily_modal_cancel: "ביטול",
     region_all_short: "הכל",
     region_north_short: "צפון",
     region_center_short: "מרכז",
@@ -3600,12 +3658,6 @@ function applyLang() {
   document.getElementById('start-btn').textContent    = t('start_btn');
   document.getElementById('learn-btn').textContent    = t('learn_btn');
   document.getElementById('daily-btn').textContent    = t('daily_btn');
-  document.getElementById('daily-modal-title').textContent  = t('daily_modal_title');
-  document.getElementById('daily-modal-body').textContent   = t('daily_modal_body');
-  document.getElementById('daily-modal-body').dir           = lang === 'he' ? 'rtl' : 'ltr';
-  document.getElementById('daily-modal-start').textContent  = t('daily_modal_start');
-  document.getElementById('daily-modal-cancel').textContent = t('daily_modal_cancel');
-  document.getElementById('daily-modal-card').dir           = lang === 'he' ? 'rtl' : 'ltr';
   document.getElementById('btn-play-again').textContent = t('play_again');
   document.getElementById('btn-menu').textContent      = t('menu_btn');
   document.getElementById('btn-back').textContent      = t('back_btn');
@@ -3708,6 +3760,11 @@ let isLearningMode = false;
 let learningSequence = [], learningIdx = 0, learningAttempt = 0;
 let knownLocations = [], learningSessionResults = [], learningPins = [];
 let learningPreviewActive = false, learningPreviewTimer = null, learningPreviewInterval = null;
+
+// ── Daily Challenge State ─────────────────────────────────────────────────────
+let isDailyChallenge = false;
+let dailyChallengePreviewActive = false;
+let dailyChallengePreviewTimer = null, dailyChallengePreviewInterval = null;
 
 // ── MAP — ESRI World Physical: free, no API key, no city labels ──────────────
 const ISRAEL_BOUNDS = L.latLngBounds(
@@ -4352,9 +4409,6 @@ function closeFactModal() {
 document.getElementById('fact-modal').addEventListener('click', (e) => {
   if (e.target === document.getElementById('fact-modal')) closeFactModal();
 });
-document.getElementById('daily-modal').addEventListener('click', (e) => {
-  if (e.target === document.getElementById('daily-modal')) closeDailyModal();
-});
 
 // Use Leaflet's DOM event system to intercept clicks on .fact-btn BEFORE
 // they reach the map — this prevents the ghost map-click.
@@ -4823,7 +4877,9 @@ function useHint() {
 
 function showMenu() {
   isLearningMode = false;
+  isDailyChallenge = false;
   clearLearningPreview();
+  clearDailyChallengePreview();
   document.getElementById('learning-hud').classList.remove('active');
   document.getElementById('hud').style.display = '';
   document.getElementById('learning-results-panel').className = '';
@@ -5160,28 +5216,186 @@ async function continueLearning() {
   await startLearning();
 }
 
+// ── Daily Challenge ───────────────────────────────────────────────────────────
+
+// Mulberry32 seeded PRNG — fast, good distribution, no deps
+function _seededRand(seed) {
+  let s = seed >>> 0;
+  return function () {
+    s += 0x6d2b79f5;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
+    return ((t ^ (t >>> 14)) >>> 0) / 0x100000000;
+  };
+}
+
+// Returns { dayNumber, dateStr } for the current challenge "day".
+// A new challenge day starts at 04:00 Israel time (Asia/Jerusalem, DST-aware).
+// Strategy: shift "now" back 4 hours, then read the Israel calendar date —
+// so 00:00–03:59 Israel time still belongs to the previous challenge day.
+function _getDailyChallengeDay() {
+  const shifted = new Date(Date.now() - 4 * 3600 * 1000);
+  const dateStr = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Jerusalem',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+  }).format(shifted);                         // "YYYY-MM-DD"
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const dayNumber = Math.floor(Date.UTC(y, m - 1, d) / 86400000);
+  return { dayNumber, dateStr };
+}
+
+function getDailyLocation() {
+  // Deterministic global schedule: same town for every user on the same challenge day.
+  // Cycles through all TOWNS in a shuffled order with no repeats.
+  // Each full cycle (TOWNS.length days) uses a fresh shuffle seeded by the cycle number.
+  const { dayNumber } = _getDailyChallengeDay();
+  const n = TOWNS.length;
+  const cycleNumber = Math.floor(dayNumber / n);
+  const posInCycle = dayNumber % n;
+
+  // Fisher-Yates shuffle using the cycle number as the PRNG seed
+  const rand = _seededRand(cycleNumber + 1); // +1 so seed=0 is never used
+  const indices = Array.from({ length: n }, (_, i) => i);
+  for (let i = n - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [indices[i], indices[j]] = [indices[j], indices[i]];
+  }
+
+  return TOWNS[indices[posInCycle]];
+}
+
+function getRandomPointNearby(lat, lng, radiusKm) {
+  // Returns a random point between 0.5–1× radiusKm from the target
+  const angle = Math.random() * 2 * Math.PI;
+  const distance = (0.5 + Math.random() * 0.5) * radiusKm;
+  const dLat = distance / 111.32;
+  const dLng = distance / (111.32 * Math.cos(lat * Math.PI / 180));
+  return {
+    lat: lat + dLat * Math.cos(angle),
+    lng: lng + dLng * Math.sin(angle),
+  };
+}
+
 function startDailyChallenge() {
-  openDailyModal();
+  // Step 2: Show intro popup with explanation
+  const descEl = document.getElementById('dci-desc-text');
+  descEl.textContent = lang === 'he'
+    ? 'למד את האיזור המוצג במפה במשך 15 שניות, לאחר מכן מצא את המיקום'
+    : 'Learn the area shown in the street map, then pin the location';
+  document.getElementById('dci-title').textContent = lang === 'he' ? 'אתגר יומי' : 'Daily Challenge';
+  document.getElementById('dci-start-btn').textContent = lang === 'he' ? '!בואו נתחיל ←' : "Let's go! →";
+  document.getElementById('daily-challenge-intro').classList.add('open');
 }
 
-function openDailyModal() {
-  document.getElementById('daily-modal-title').textContent  = t('daily_modal_title');
-  document.getElementById('daily-modal-body').textContent   = t('daily_modal_body');
-  document.getElementById('daily-modal-body').dir           = lang === 'he' ? 'rtl' : 'ltr';
-  document.getElementById('daily-modal-start').textContent  = t('daily_modal_start');
-  document.getElementById('daily-modal-cancel').textContent = t('daily_modal_cancel');
-  document.getElementById('daily-modal-card').dir           = lang === 'he' ? 'rtl' : 'ltr';
-  document.getElementById('daily-modal').classList.add('open');
+function closeDailyChallengeIntro() {
+  document.getElementById('daily-challenge-intro').classList.remove('open');
 }
 
-function closeDailyModal() {
-  document.getElementById('daily-modal').classList.remove('open');
+function startDailyChallengeGame() {
+  closeDailyChallengeIntro();
+
+  const town = getDailyLocation();
+  isDailyChallenge = true;
+  isLearningMode = false;
+
+  // One round only, uses the regular guess flow
+  sequence = [town];
+  roundCount = 1;
+  currentIdx = 0;
+  score = 0;
+  streak = 0;
+  results = [];
+  waiting = false;
+  hintsLeft = 0; // no hints in daily challenge
+  hintUsed = false;
+  streetUsedThisRound = false;
+  clearAllMarkers();
+
+  // Ensure we start in street view for the preview phase
+  if (currentLayer !== 'street') toggleMapLayer(true);
+
+  // Hide overlay and results panels
+  document.getElementById('overlay').style.display = 'none';
+  document.getElementById('results-panel').className = '';
+  document.getElementById('scoreboard-panel').className = '';
+  document.getElementById('btn-back').style.display = 'inline-block';
+
+  // Hide round/score HUD — no LOCATION counter either (step 3e)
+  document.getElementById('hud').style.display = 'none';
+  document.getElementById('learning-hud').classList.remove('active');
+
+  // Hide hint and layer toggle buttons
+  ['btn-hint', 'btn-layer'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
+  document.getElementById('mobile-tools-wrap').classList.add('learning-hidden');
+
+  // Hide location name during preview (step 3c)
+  document.getElementById('town-name').textContent = '—';
+  document.getElementById('town-desc').textContent = '';
+  document.querySelector('#mobile-topbar-town .mob-town-text').textContent = '—';
+
+  // Prefetch polygon for scoring
+  fetchCityPolygon(town.name);
+
+  // Zoom to random point 1km from target in street view (step 3b)
+  const nearbyPoint = getRandomPointNearby(town.lat, town.lng, 1);
+  map.setView([nearbyPoint.lat, nearbyPoint.lng], 16, { animate: false });
+
+  // Start the 15-second street-view preview
+  startDailyChallengePreview(town);
 }
 
-function beginDailyChallenge() {
-  closeDailyModal();
-  // Steps 3–4 will be implemented in subsequent steps
-  showFeedback(lang === 'he' ? '🚧 בקרוב...' : '🚧 Coming soon...', '#d97706');
+function startDailyChallengePreview(town) {
+  dailyChallengePreviewActive = true;
+  let secondsLeft = 15;
+  const bar = document.getElementById('learning-preview-bar');
+  const msgEl = document.getElementById('learning-preview-msg');
+  const countEl = document.getElementById('learning-preview-count');
+  msgEl.textContent = lang === 'he' ? '🗺️ למד/י את האיזור...' : '🗺️ Learn the area...';
+  countEl.textContent = secondsLeft;
+  bar.classList.add('active');
+
+  dailyChallengePreviewInterval = setInterval(() => {
+    secondsLeft--;
+    countEl.textContent = secondsLeft;
+    if (secondsLeft <= 0) endDailyChallengePreview(town);
+  }, 1000);
+  dailyChallengePreviewTimer = setTimeout(() => endDailyChallengePreview(town), 15000);
+}
+
+function endDailyChallengePreview(town) {
+  if (!dailyChallengePreviewActive) return;
+  dailyChallengePreviewActive = false;
+  clearTimeout(dailyChallengePreviewTimer);
+  clearInterval(dailyChallengePreviewInterval);
+  dailyChallengePreviewTimer = dailyChallengePreviewInterval = null;
+  document.getElementById('learning-preview-bar').classList.remove('active');
+
+  // Switch to satellite view (step 3d)
+  if (currentLayer === 'street') toggleMapLayer(true);
+
+  // Zoom back to full-Israel view so user can click the correct spot
+  const v = REGION_VIEWS['all'];
+  map.setView(v.center, v.zoom);
+
+  // Now reveal the location name in the top bar (step 3d)
+  const townName = lang === 'he' ? town.nameHe : town.name;
+  const townDesc = lang === 'he' ? town.descHe : town.desc;
+  document.getElementById('town-name').textContent = townName;
+  document.getElementById('town-desc').textContent = townDesc;
+  document.querySelector('#mobile-topbar-town .mob-town-text').textContent = townName;
+  adjustMobileTownFontSize(townName);
+
+  roundStartTime = Date.now();
+}
+
+function clearDailyChallengePreview() {
+  dailyChallengePreviewActive = false;
+  clearTimeout(dailyChallengePreviewTimer);
+  clearInterval(dailyChallengePreviewInterval);
+  dailyChallengePreviewTimer = dailyChallengePreviewInterval = null;
+  document.getElementById('learning-preview-bar').classList.remove('active');
 }
 
 async function startLearning() {
@@ -5270,6 +5484,7 @@ function startGame() {
 function onMapClick(e) {
   if (factModalOpen || document.getElementById('overlay').style.display !== 'none') return;
   if (isLearningMode && learningPreviewActive) { endLearningPreview(); return; }
+  if (isDailyChallenge && dailyChallengePreviewActive) { endDailyChallengePreview(sequence[0]); return; }
   if (waiting) return;
   if (isLearningMode) { handleLearningClick(e); return; }
 
@@ -5785,6 +6000,83 @@ function toggleTop5View() {
   list.innerHTML = _sbTop5 ? renderTop5View() : renderContextView();
 }
 
+// ── Daily Challenge score saving & percentile display ─────────────────────
+
+async function saveDailyScore(myScore) {
+  const { collection, addDoc, serverTimestamp, signInAnonymously } = window._fbFns;
+  // Ensure an auth session exists (anonymous if not signed in) so Firestore rules pass
+  if (!window._fbUser) {
+    try { await signInAnonymously(window._fbAuth); } catch (_) {}
+  }
+  const today = _getDailyChallengeDay().dateStr; // Israel date, resets at 04:00 IST
+  try {
+    await addDoc(collection(window._fbDb, 'daily_scores'), {
+      date:      today,
+      score:     myScore,
+      timestamp: serverTimestamp(),
+    });
+  } catch (e) { console.error('saveDailyScore failed:', e); }
+}
+
+async function showDailyPercentile(myScore) {
+  const popup   = document.getElementById('daily-percentile-popup');
+  const scoreEl = document.getElementById('dp-score');
+  const ring    = document.getElementById('dp-ring-wrap');
+  const pctVal  = document.getElementById('dp-pct-value');
+  const pctLbl  = document.getElementById('dp-pct-label');
+  const msgEl   = document.getElementById('dp-message');
+  const countEl = document.getElementById('dp-count');
+
+  // Show popup immediately with score; fill percentile once data arrives
+  scoreEl.textContent = `${myScore} ${lang === 'he' ? 'נקודות' : 'pts'}`;
+  pctVal.textContent  = '…';
+  pctLbl.textContent  = '';
+  msgEl.textContent   = '';
+  countEl.textContent = '';
+  ring.style.background = 'conic-gradient(#e8eaed 360deg, #e8eaed 360deg)';
+  popup.classList.add('show');
+
+  // Save this score anonymously, then read today's full distribution
+  await saveDailyScore(myScore);
+
+  const { collection, query, where, getDocs } = window._fbFns;
+  const today = _getDailyChallengeDay().dateStr;
+  let allScores = [];
+  try {
+    const snap = await getDocs(query(
+      collection(window._fbDb, 'daily_scores'),
+      where('date', '==', today)
+    ));
+    snap.forEach(d => allScores.push(d.data().score));
+  } catch (e) { console.error('fetch daily_scores failed:', e); }
+
+  const total = allScores.length;
+  const below = allScores.filter(s => s < myScore).length;
+
+  if (total <= 1) {
+    // First (or only) player of the day
+    pctVal.textContent = '🥇';
+    pctLbl.textContent = '';
+    msgEl.textContent  = lang === 'he' ? 'אתה הראשון לשחק היום!' : "You're the first to play today!";
+    countEl.textContent = '';
+    ring.style.background = 'conic-gradient(#f4c430 360deg, #e8eaed 0deg)';
+  } else {
+    // Percentile: fraction of other players you beat
+    const pct   = Math.round((below / (total - 1)) * 100);
+    const deg   = Math.round(pct * 3.6); // map 0-100 → 0-360 degrees
+    const color = pct >= 80 ? '#1a7f37' : pct >= 50 ? '#1a6fd4' : '#f0883e';
+    ring.style.background = `conic-gradient(${color} ${deg}deg, #e8eaed ${deg}deg)`;
+    pctVal.textContent  = `${pct}%`;
+    pctLbl.textContent  = lang === 'he' ? 'אחוזון' : 'percentile';
+    msgEl.textContent   = lang === 'he'
+      ? `עקפת ${pct}% מהשחקנים היום`
+      : `You scored better than ${pct}% of today's players`;
+    countEl.textContent = lang === 'he'
+      ? `${total} שחקנים שיחקו היום`
+      : `${total} players played today`;
+  }
+}
+
 async function loadScoreboard(myScore) {
   const section = document.getElementById('scoreboard-panel');
   const list    = document.getElementById('scoreboard-list');
@@ -5905,6 +6197,13 @@ showResults = async function() {
   document.getElementById('scoreboard-list').innerHTML = '';
   _sbData = null;
   _sbTop5 = false;
+
+  // ── Daily Challenge: save score anonymously and show percentile popup ──
+  if (isDailyChallenge) {
+    document.getElementById('history-section').classList.remove('show');
+    showDailyPercentile(score);
+    return;
+  }
 
   const hits = results.filter(r => r.pts >= 90).length;
   const recPopup  = document.getElementById('new-record-popup');
