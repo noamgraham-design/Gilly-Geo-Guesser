@@ -5229,12 +5229,26 @@ function _seededRand(seed) {
   };
 }
 
+// Returns { dayNumber, dateStr } for the current challenge "day".
+// A new challenge day starts at 04:00 Israel time (Asia/Jerusalem, DST-aware).
+// Strategy: shift "now" back 4 hours, then read the Israel calendar date —
+// so 00:00–03:59 Israel time still belongs to the previous challenge day.
+function _getDailyChallengeDay() {
+  const shifted = new Date(Date.now() - 4 * 3600 * 1000);
+  const dateStr = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Jerusalem',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+  }).format(shifted);                         // "YYYY-MM-DD"
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const dayNumber = Math.floor(Date.UTC(y, m - 1, d) / 86400000);
+  return { dayNumber, dateStr };
+}
+
 function getDailyLocation() {
-  // Deterministic global schedule: same town for every user on the same UTC day.
+  // Deterministic global schedule: same town for every user on the same challenge day.
   // Cycles through all TOWNS in a shuffled order with no repeats.
   // Each full cycle (TOWNS.length days) uses a fresh shuffle seeded by the cycle number.
-  const now = new Date();
-  const dayNumber = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000);
+  const { dayNumber } = _getDailyChallengeDay();
   const n = TOWNS.length;
   const cycleNumber = Math.floor(dayNumber / n);
   const posInCycle = dayNumber % n;
@@ -5994,7 +6008,7 @@ async function saveDailyScore(myScore) {
   if (!window._fbUser) {
     try { await signInAnonymously(window._fbAuth); } catch (_) {}
   }
-  const today = new Date().toISOString().slice(0, 10); // UTC "YYYY-MM-DD"
+  const today = _getDailyChallengeDay().dateStr; // Israel date, resets at 04:00 IST
   try {
     await addDoc(collection(window._fbDb, 'daily_scores'), {
       date:      today,
@@ -6026,7 +6040,7 @@ async function showDailyPercentile(myScore) {
   await saveDailyScore(myScore);
 
   const { collection, query, where, getDocs } = window._fbFns;
-  const today = new Date().toISOString().slice(0, 10);
+  const today = _getDailyChallengeDay().dateStr;
   let allScores = [];
   try {
     const snap = await getDocs(query(
