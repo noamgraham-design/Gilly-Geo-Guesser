@@ -5272,7 +5272,7 @@ function onMapClick(e) {
 
 function showResults() {
   const pct = (score / (roundCount * DIFF[difficulty].maxPts)) * 100;
-  const hits = results.filter(r => r.pts >= 90).length;
+  const hits = results.filter(r => r.hit).length;
   document.getElementById('result-emoji').textContent = pct >= 80 ? '🏆' : pct >= 50 ? '🌟' : '📚';
   document.getElementById('result-title').textContent =
     pct >= 80 ? t('result_excellent') : pct >= 50 ? t('result_good') : t('result_practice');
