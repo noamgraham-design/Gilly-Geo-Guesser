@@ -2819,6 +2819,7 @@
       <img src="logo_nb.png" alt="Gilly Israel Quiz" class="menu-logo" id="menu-logo">
       <div class="menu-mode-title" id="menu-mode-title">מצב משחק</div>
     </div>
+    <button id="daily-btn" class="btn btn-learn" onclick="startDailyChallenge()">📅 אתגר יומי</button>
     <p id="menu-desc" style="margin:0;font-size:0.88rem;line-height:1.35;text-align:center;">
       מצא/י את המיקום על המפה
     </p>
@@ -3452,6 +3453,7 @@ const STRINGS = {
     cities_towns:     "Cities & Towns",
     start_btn:        "Start Game →",
     learn_btn:        "🗺️ Learning Mode",
+    daily_btn:        "📅 Daily Challenge",
     region_all_short: "All",
     region_north_short: "North",
     region_center_short: "Center",
@@ -3489,6 +3491,7 @@ const STRINGS = {
     cities_towns:     "ערים ועיירות",
     start_btn:        "← התחל משחק",
     learn_btn:        "🗺️ מצב למידה",
+    daily_btn:        "📅 אתגר יומי",
     region_all_short: "הכל",
     region_north_short: "צפון",
     region_center_short: "מרכז",
@@ -3533,6 +3536,7 @@ function applyLang() {
   document.getElementById('r-south-label').textContent  = t('region_south_short');
   document.getElementById('start-btn').textContent    = t('start_btn');
   document.getElementById('learn-btn').textContent    = t('learn_btn');
+  document.getElementById('daily-btn').textContent    = t('daily_btn');
   document.getElementById('btn-play-again').textContent = t('play_again');
   document.getElementById('btn-menu').textContent      = t('menu_btn');
   document.getElementById('btn-back').textContent      = t('back_btn');
@@ -5082,6 +5086,11 @@ function closeLevelUpPopup() {
 async function continueLearning() {
   document.getElementById('learning-results-panel').className = '';
   await startLearning();
+}
+
+function startDailyChallenge() {
+  // Step 2–4 will be implemented in subsequent steps
+  showFeedback(lang === 'he' ? '🚧 בקרוב...' : '🚧 Coming soon...', '#d97706');
 }
 
 async function startLearning() {
