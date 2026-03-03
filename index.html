@@ -6042,18 +6042,27 @@ async function showDailyPercentile(myScore) {
   const { collection, query, where, getDocs } = window._fbFns;
   const today = _getDailyChallengeDay().dateStr;
   let allScores = [];
+  let fetchOk = false;
   try {
     const snap = await getDocs(query(
       collection(window._fbDb, 'daily_scores'),
       where('date', '==', today)
     ));
     snap.forEach(d => allScores.push(d.data().score));
+    fetchOk = true;
   } catch (e) { console.error('fetch daily_scores failed:', e); }
 
   const total = allScores.length;
   const below = allScores.filter(s => s < myScore).length;
 
-  if (total <= 1) {
+  if (!fetchOk) {
+    // Offline or auth error — don't mislead the user
+    pctVal.textContent = '—';
+    pctLbl.textContent = '';
+    msgEl.textContent  = lang === 'he' ? 'לא ניתן לטעון את לוח התוצאות' : 'Leaderboard unavailable';
+    countEl.textContent = '';
+    ring.style.background = 'conic-gradient(#e8eaed 360deg, #e8eaed 0deg)';
+  } else if (total <= 1) {
     // First (or only) player of the day
     pctVal.textContent = '🥇';
     pctLbl.textContent = '';
