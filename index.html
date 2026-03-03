@@ -1427,6 +1427,45 @@
   }
   #challenge-intro-btn:hover { opacity: 0.9; transform: translateY(-1px); }
 
+  /* ── DAILY CHALLENGE INTRO POPUP ──────────────────────────────────────── */
+  #daily-challenge-intro {
+    display: none; position: fixed; inset: 0; z-index: 9800;
+    background: rgba(0,0,0,0.62); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center;
+  }
+  #daily-challenge-intro.open { display: flex; }
+  #daily-challenge-intro-card {
+    background: var(--surface); border-radius: 24px; padding: 32px 28px 28px;
+    width: min(380px, 92vw); box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+    display: flex; flex-direction: column; align-items: center;
+    gap: 10px; text-align: center; position: relative;
+  }
+  #dci-close-btn {
+    position: absolute; top: 14px; right: 16px;
+    background: none; border: none; cursor: pointer;
+    font-size: 1.1rem; color: var(--muted); padding: 4px 8px;
+  }
+  #dci-icon { font-size: 2.8rem; line-height: 1; }
+  #dci-title {
+    font-family: 'Alef',sans-serif; font-size: 1.5rem; font-weight: 900;
+    color: var(--text); margin-top: 2px;
+  }
+  #dci-desc-box {
+    font-family: 'Alef',sans-serif; font-size: 1rem; font-weight: 500;
+    color: var(--text); line-height: 1.55; direction: rtl;
+    background: rgba(229,124,26,0.09); border-radius: 12px;
+    padding: 12px 16px; margin: 4px 0; width: 100%; box-sizing: border-box;
+  }
+  #dci-start-btn {
+    margin-top: 4px; padding: 13px 24px; border-radius: 50px; border: none;
+    background: linear-gradient(90deg, #e57c1a, #f4c430); color: #fff;
+    font-family: 'Alef',sans-serif; font-size: 1.1rem; font-weight: 800;
+    cursor: pointer; width: 100%;
+    box-shadow: 0 4px 16px rgba(229,124,26,0.3);
+    transition: opacity 0.15s, transform 0.15s;
+  }
+  #dci-start-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
   /* ── CHALLENGE RESULT POPUP ───────────────────────────────────────────── */
   #challenge-result {
     display: none; position: fixed; inset: 0; z-index: 9800;
@@ -2727,6 +2766,19 @@
   </div>
 </div>
 
+<!-- DAILY CHALLENGE INTRO POPUP -->
+<div id="daily-challenge-intro">
+  <div id="daily-challenge-intro-card">
+    <button id="dci-close-btn" onclick="closeDailyChallengeIntro()">✕</button>
+    <div id="dci-icon">⚡</div>
+    <div id="dci-title">אתגר יומי</div>
+    <div id="dci-desc-box">
+      <span id="dci-desc-text">למד את האיזור המוצג במפה במשך 15 שניות, לאחר מכן מצא את המיקום</span>
+    </div>
+    <button id="dci-start-btn" onclick="startDailyChallengeGame()">בואו נתחיל! →</button>
+  </div>
+</div>
+
 <!-- CHALLENGE RESULT POPUP -->
 <div id="challenge-result">
   <div id="challenge-result-card">
@@ -3639,6 +3691,11 @@ let isLearningMode = false;
 let learningSequence = [], learningIdx = 0, learningAttempt = 0;
 let knownLocations = [], learningSessionResults = [], learningPins = [];
 let learningPreviewActive = false, learningPreviewTimer = null, learningPreviewInterval = null;
+
+// ── Daily Challenge State ─────────────────────────────────────────────────────
+let isDailyChallenge = false;
+let dailyChallengePreviewActive = false;
+let dailyChallengePreviewTimer = null, dailyChallengePreviewInterval = null;
 
 // ── MAP — ESRI World Physical: free, no API key, no city labels ──────────────
 const ISRAEL_BOUNDS = L.latLngBounds(
@@ -4751,7 +4808,9 @@ function useHint() {
 
 function showMenu() {
   isLearningMode = false;
+  isDailyChallenge = false;
   clearLearningPreview();
+  clearDailyChallengePreview();
   document.getElementById('learning-hud').classList.remove('active');
   document.getElementById('hud').style.display = '';
   document.getElementById('learning-results-panel').className = '';
@@ -5088,9 +5147,149 @@ async function continueLearning() {
   await startLearning();
 }
 
+// ── Daily Challenge ───────────────────────────────────────────────────────────
+
+function getDailyLocation() {
+  // Deterministic: everyone sees the same town on the same UTC day.
+  // Uses dayNumber mod TOWNS.length so every day is different with no repeats
+  // until the full cycle resets (step 4 will add Firestore-backed tracking).
+  const now = new Date();
+  const dayNumber = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000);
+  return TOWNS[dayNumber % TOWNS.length];
+}
+
+function getRandomPointNearby(lat, lng, radiusKm) {
+  // Returns a random point between 0.5–1× radiusKm from the target
+  const angle = Math.random() * 2 * Math.PI;
+  const distance = (0.5 + Math.random() * 0.5) * radiusKm;
+  const dLat = distance / 111.32;
+  const dLng = distance / (111.32 * Math.cos(lat * Math.PI / 180));
+  return {
+    lat: lat + dLat * Math.cos(angle),
+    lng: lng + dLng * Math.sin(angle),
+  };
+}
+
 function startDailyChallenge() {
-  // Step 2–4 will be implemented in subsequent steps
-  showFeedback(lang === 'he' ? '🚧 בקרוב...' : '🚧 Coming soon...', '#d97706');
+  // Step 2: Show intro popup with explanation
+  const descEl = document.getElementById('dci-desc-text');
+  descEl.textContent = lang === 'he'
+    ? 'למד את האיזור המוצג במפה במשך 15 שניות, לאחר מכן מצא את המיקום'
+    : 'Learn the area shown in the street map, then pin the location';
+  document.getElementById('dci-title').textContent = lang === 'he' ? 'אתגר יומי' : 'Daily Challenge';
+  document.getElementById('dci-start-btn').textContent = lang === 'he' ? '!בואו נתחיל ←' : "Let's go! →";
+  document.getElementById('daily-challenge-intro').classList.add('open');
+}
+
+function closeDailyChallengeIntro() {
+  document.getElementById('daily-challenge-intro').classList.remove('open');
+}
+
+function startDailyChallengeGame() {
+  closeDailyChallengeIntro();
+
+  const town = getDailyLocation();
+  isDailyChallenge = true;
+  isLearningMode = false;
+
+  // One round only, uses the regular guess flow
+  sequence = [town];
+  roundCount = 1;
+  currentIdx = 0;
+  score = 0;
+  streak = 0;
+  results = [];
+  waiting = false;
+  hintsLeft = 0; // no hints in daily challenge
+  hintUsed = false;
+  streetUsedThisRound = false;
+  clearAllMarkers();
+
+  // Ensure we start in street view for the preview phase
+  if (currentLayer !== 'street') toggleMapLayer(true);
+
+  // Hide overlay and results panels
+  document.getElementById('overlay').style.display = 'none';
+  document.getElementById('results-panel').className = '';
+  document.getElementById('scoreboard-panel').className = '';
+  document.getElementById('btn-back').style.display = 'inline-block';
+
+  // Hide round/score HUD — no LOCATION counter either (step 3e)
+  document.getElementById('hud').style.display = 'none';
+  document.getElementById('learning-hud').classList.remove('active');
+
+  // Hide hint and layer toggle buttons
+  ['btn-hint', 'btn-layer'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
+  document.getElementById('mobile-tools-wrap').classList.add('learning-hidden');
+
+  // Hide location name during preview (step 3c)
+  document.getElementById('town-name').textContent = '—';
+  document.getElementById('town-desc').textContent = '';
+  document.querySelector('#mobile-topbar-town .mob-town-text').textContent = '—';
+
+  // Prefetch polygon for scoring
+  fetchCityPolygon(town.name);
+
+  // Zoom to random point 1km from target in street view (step 3b)
+  const nearbyPoint = getRandomPointNearby(town.lat, town.lng, 1);
+  map.setView([nearbyPoint.lat, nearbyPoint.lng], 16, { animate: false });
+
+  // Start the 15-second street-view preview
+  startDailyChallengePreview(town);
+}
+
+function startDailyChallengePreview(town) {
+  dailyChallengePreviewActive = true;
+  let secondsLeft = 15;
+  const bar = document.getElementById('learning-preview-bar');
+  const msgEl = document.getElementById('learning-preview-msg');
+  const countEl = document.getElementById('learning-preview-count');
+  msgEl.textContent = lang === 'he' ? '🗺️ למד/י את האיזור...' : '🗺️ Learn the area...';
+  countEl.textContent = secondsLeft;
+  bar.classList.add('active');
+
+  dailyChallengePreviewInterval = setInterval(() => {
+    secondsLeft--;
+    countEl.textContent = secondsLeft;
+    if (secondsLeft <= 0) endDailyChallengePreview(town);
+  }, 1000);
+  dailyChallengePreviewTimer = setTimeout(() => endDailyChallengePreview(town), 15000);
+}
+
+function endDailyChallengePreview(town) {
+  if (!dailyChallengePreviewActive) return;
+  dailyChallengePreviewActive = false;
+  clearTimeout(dailyChallengePreviewTimer);
+  clearInterval(dailyChallengePreviewInterval);
+  dailyChallengePreviewTimer = dailyChallengePreviewInterval = null;
+  document.getElementById('learning-preview-bar').classList.remove('active');
+
+  // Switch to satellite view (step 3d)
+  if (currentLayer === 'street') toggleMapLayer(true);
+
+  // Zoom back to full-Israel view so user can click the correct spot
+  const v = REGION_VIEWS['all'];
+  map.setView(v.center, v.zoom);
+
+  // Now reveal the location name in the top bar (step 3d)
+  const townName = lang === 'he' ? town.nameHe : town.name;
+  const townDesc = lang === 'he' ? town.descHe : town.desc;
+  document.getElementById('town-name').textContent = townName;
+  document.getElementById('town-desc').textContent = townDesc;
+  document.querySelector('#mobile-topbar-town .mob-town-text').textContent = townName;
+  adjustMobileTownFontSize(townName);
+
+  roundStartTime = Date.now();
+}
+
+function clearDailyChallengePreview() {
+  dailyChallengePreviewActive = false;
+  clearTimeout(dailyChallengePreviewTimer);
+  clearInterval(dailyChallengePreviewInterval);
+  dailyChallengePreviewTimer = dailyChallengePreviewInterval = null;
+  document.getElementById('learning-preview-bar').classList.remove('active');
 }
 
 async function startLearning() {
@@ -5179,6 +5378,7 @@ function startGame() {
 function onMapClick(e) {
   if (factModalOpen || document.getElementById('overlay').style.display !== 'none') return;
   if (isLearningMode && learningPreviewActive) { endLearningPreview(); return; }
+  if (isDailyChallenge && dailyChallengePreviewActive) { endDailyChallengePreview(sequence[0]); return; }
   if (waiting) return;
   if (isLearningMode) { handleLearningClick(e); return; }
 
