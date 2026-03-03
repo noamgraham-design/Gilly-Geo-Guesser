@@ -1499,7 +1499,17 @@
     background: none; border: none; cursor: pointer;
     font-size: 1.1rem; color: var(--muted); padding: 4px 8px;
   }
-  #dci-icon { font-size: 2.8rem; line-height: 1; }
+  #dci-icon {
+    font-size: 2.8rem; line-height: 1; display: inline-block;
+    animation: dciLightning 2.8s ease-in-out infinite;
+  }
+  @keyframes dciLightning {
+    0%, 55%, 100% { transform: scale(1) rotate(0deg);     filter: brightness(1); }
+    57%           { transform: scale(1.55) rotate(-13deg); filter: brightness(2.6) drop-shadow(0 0 14px #ffd700); }
+    59%           { transform: scale(0.8)  rotate(9deg);   filter: brightness(1); }
+    61%           { transform: scale(1.3)  rotate(-7deg);  filter: brightness(2.1) drop-shadow(0 0 8px #ffd700); }
+    63%           { transform: scale(1)    rotate(0deg);   filter: brightness(1); }
+  }
   #dci-title {
     font-family: 'Alef',sans-serif; font-size: 1.5rem; font-weight: 900;
     color: var(--text); margin-top: 2px;
@@ -1511,14 +1521,25 @@
     padding: 12px 16px; margin: 4px 0; width: 100%; box-sizing: border-box;
   }
   #dci-start-btn {
-    margin-top: 4px; padding: 13px 24px; border-radius: 50px; border: none;
-    background: linear-gradient(90deg, #e57c1a, #f4c430); color: #fff;
-    font-family: 'Alef',sans-serif; font-size: 1.1rem; font-weight: 800;
-    cursor: pointer; width: 100%;
-    box-shadow: 0 4px 16px rgba(229,124,26,0.3);
-    transition: opacity 0.15s, transform 0.15s;
+    margin-top: 8px; padding: 15px 24px; border-radius: 50px; border: none;
+    background: linear-gradient(110deg, #bf5810 0%, #e57c1a 22%, #f7d060 50%, #e57c1a 78%, #bf5810 100%);
+    background-size: 220% auto; color: #fff;
+    font-family: 'Alef',sans-serif; font-size: 1.15rem; font-weight: 800;
+    cursor: pointer; width: 100%; letter-spacing: 0.03em;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.25);
+    box-shadow: 0 5px 22px rgba(229,124,26,0.5), 0 1px 0 rgba(255,255,255,0.18) inset;
+    transition: transform 0.15s, box-shadow 0.15s;
+    animation: dciShimmer 2.4s linear infinite;
   }
-  #dci-start-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  @keyframes dciShimmer {
+    0%   { background-position: 100% center; }
+    100% { background-position: -100% center; }
+  }
+  #dci-start-btn:hover {
+    transform: translateY(-2px) scale(1.025);
+    box-shadow: 0 10px 32px rgba(229,124,26,0.65), 0 1px 0 rgba(255,255,255,0.18) inset;
+  }
+  #dci-start-btn:active { transform: translateY(1px) scale(0.98); box-shadow: 0 3px 12px rgba(229,124,26,0.4); }
 
   /* ── CHALLENGE RESULT POPUP ───────────────────────────────────────────── */
   #challenge-result {
