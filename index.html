@@ -6219,8 +6219,8 @@ function shareChallengeResult(method) {
   else resultStr = lang === 'he' ? `${distKm.toFixed(distKm<10?1:0)} ק"מ מהיעד` : `${distKm.toFixed(distKm<10?1:0)} km away`;
 
   const text = lang === 'he'
-    ? `${url}\n\u200Fמצאתי את ${townName}! ${resultStr} \u200E🇮🇱\u200E`
-    : `${url}\nI found ${townName}! ${resultStr} 🇮🇱`;
+    ? `${url}\n\u200Fמצאתי את ${townName}! ${resultStr} \u200E🇮🇱\u200E נסה/י גם`
+    : `${url}\nI found ${townName}! ${resultStr} 🇮🇱 Can you beat me?`;
 
   if (method === 'wa') {
     window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
