@@ -643,22 +643,6 @@
     transform: translateY(-1px);
     box-shadow: 0 4px 14px rgba(124,58,237,0.2);
   }
-  .btn-daily {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
-    color: #fff;
-    border: none;
-    box-shadow: 0 3px 12px rgba(245,158,11,0.32);
-    font-size: 0.9rem;
-    padding: 7px 22px;
-    min-width: 180px;
-    text-align: center;
-    transition: all 0.15s;
-  }
-  .btn-daily:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 5px 18px rgba(245,158,11,0.48);
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
-  }
   @keyframes gentlePulse {
     0%, 100% { box-shadow: 0 4px 14px rgba(26,111,212,0.35); }
     50%       { box-shadow: 0 4px 22px rgba(124,58,237,0.55); }
@@ -1709,11 +1693,6 @@
     .btn-learn {
       font-size: 0.92rem;
       padding: 6px 22px;
-    }
-    .btn-daily {
-      font-size: 0.95rem;
-      padding: 7px 24px;
-      min-width: 200px;
     }
     .menu-logo {
       max-width: 380px;
@@ -2840,7 +2819,7 @@
       <img src="logo_nb.png" alt="Gilly Israel Quiz" class="menu-logo" id="menu-logo">
       <div class="menu-mode-title" id="menu-mode-title">מצב משחק</div>
     </div>
-    <button id="daily-btn" class="btn btn-daily" onclick="startDailyChallenge()">📅 אתגר יומי &nbsp;·&nbsp; Daily Challenge</button>
+    <button id="daily-btn" class="btn btn-learn" onclick="startDailyChallenge()">📅 אתגר יומי</button>
     <p id="menu-desc" style="margin:0;font-size:0.88rem;line-height:1.35;text-align:center;">
       מצא/י את המיקום על המפה
     </p>
@@ -3474,6 +3453,7 @@ const STRINGS = {
     cities_towns:     "Cities & Towns",
     start_btn:        "Start Game →",
     learn_btn:        "🗺️ Learning Mode",
+    daily_btn:        "📅 Daily Challenge",
     region_all_short: "All",
     region_north_short: "North",
     region_center_short: "Center",
@@ -3511,6 +3491,7 @@ const STRINGS = {
     cities_towns:     "ערים ועיירות",
     start_btn:        "← התחל משחק",
     learn_btn:        "🗺️ מצב למידה",
+    daily_btn:        "📅 אתגר יומי",
     region_all_short: "הכל",
     region_north_short: "צפון",
     region_center_short: "מרכז",
@@ -3555,6 +3536,7 @@ function applyLang() {
   document.getElementById('r-south-label').textContent  = t('region_south_short');
   document.getElementById('start-btn').textContent    = t('start_btn');
   document.getElementById('learn-btn').textContent    = t('learn_btn');
+  document.getElementById('daily-btn').textContent    = t('daily_btn');
   document.getElementById('btn-play-again').textContent = t('play_again');
   document.getElementById('btn-menu').textContent      = t('menu_btn');
   document.getElementById('btn-back').textContent      = t('back_btn');
