@@ -3547,6 +3547,13 @@ function calcTimeBonus(elapsedMs) {
   return Math.round(TIME_BONUS_MAX * (1 - secs / TIME_BONUS_SECS));
 }
 
+// Ms-precision variant used for daily challenge leaderboard differentiation.
+// Returns a float so two players with the same base score can still be ranked.
+function calcTimeBonusMs(elapsedMs) {
+  if (elapsedMs >= TIME_BONUS_SECS * 1000) return 0;
+  return TIME_BONUS_MAX * (1 - elapsedMs / (TIME_BONUS_SECS * 1000));
+}
+
 
 const STRINGS = {
   en: {
@@ -5521,8 +5528,13 @@ function onMapClick(e) {
   // When a polygon is available, award full points for any click inside it
   const basePts = (polyFeature && perfect) ? Math.round(DIFF[difficulty].maxPts * (TIER_MULTIPLIER[town.tier] ?? 1)) : calcPts(distKm, d, hintUsed, town.tier);
   // Time bonus: only awarded when you score any points (no reward for a fast miss)
-  const timeBonus = basePts > 0 && !streetUsedThisRound ? calcTimeBonus(Date.now() - roundStartTime) : 0;
+  const elapsedMs = Date.now() - roundStartTime;
+  const timeBonus = basePts > 0 && !streetUsedThisRound ? calcTimeBonus(elapsedMs) : 0;
   const pts = basePts + timeBonus;
+  // Daily challenge: ms-precision time bonus for leaderboard differentiation
+  const scorePts = isDailyChallenge && basePts > 0 && !streetUsedThisRound
+    ? basePts + calcTimeBonusMs(elapsedMs)
+    : pts;
   const closeEnough = distKm < 10;
   const newStreak = perfect ? streak + 1 : 0;
 
@@ -5537,7 +5549,7 @@ function onMapClick(e) {
 
   waiting = true;
   streak = newStreak;
-  score += pts + (newStreak >= 3 && perfect ? 10 : 0);
+  score += scorePts + (newStreak >= 3 && perfect ? 10 : 0);
   results.push({ town, hit: perfect, distKm: distKm.toFixed(1), pts });
   if (newStreak >= 3 && perfect) {
     showStreakBanner(newStreak);
@@ -5611,7 +5623,7 @@ function showResults() {
   document.getElementById('result-title').textContent =
     pct >= 80 ? t('result_excellent') : pct >= 50 ? t('result_good') : t('result_practice');
   document.getElementById('score-display').textContent =
-    `${score} ${lang === 'he' ? 'נקודות' : 'pts'}`;
+    `${Math.floor(score)} ${lang === 'he' ? 'נקודות' : 'pts'}`;
   document.getElementById('score-display').style.color = DIFF[difficulty].color;
   document.getElementById('result-sub').textContent = lang === 'he'
     ? `${hits} / ${roundCount} ערים נמצאו נכון`
@@ -6045,7 +6057,7 @@ async function showDailyPercentile(myScore) {
   const countEl = document.getElementById('dp-count');
 
   // Show popup immediately with score; fill percentile once data arrives
-  scoreEl.textContent = `${myScore} ${lang === 'he' ? 'נקודות' : 'pts'}`;
+  scoreEl.textContent = `${Math.floor(myScore)} ${lang === 'he' ? 'נקודות' : 'pts'}`;
   pctVal.textContent  = '…';
   pctLbl.textContent  = '';
   msgEl.textContent   = '';
