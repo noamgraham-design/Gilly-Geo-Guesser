@@ -6003,7 +6003,7 @@ function toggleTop5View() {
 // ── Daily Challenge score saving & percentile display ─────────────────────
 
 async function saveDailyScore(myScore) {
-  if (!window._fbUser) return;   // don't create a ghost anonymous account
+  if (!window._fbUser || window._fbUser.isAnonymous) return;
   const { collection, addDoc, serverTimestamp } = window._fbFns;
   const today = _getDailyChallengeDay().dateStr; // Israel date, resets at 04:00 IST
   try {
@@ -6033,8 +6033,8 @@ async function showDailyPercentile(myScore) {
   ring.style.background = 'conic-gradient(#e8eaed 360deg, #e8eaed 360deg)';
   popup.classList.add('show');
 
-  // Guest: nothing to save or fetch — prompt them to log in
-  if (!window._fbUser) {
+  // Guest or leftover anonymous session: prompt them to log in
+  if (!window._fbUser || window._fbUser.isAnonymous) {
     pctVal.textContent  = '🔒';
     pctLbl.textContent  = '';
     msgEl.textContent   = lang === 'he' ? 'התחבר כדי לראות את הדירוג שלך' : 'Log in to see how you rank';
@@ -6057,7 +6057,7 @@ async function showDailyPercentile(myScore) {
     ));
     snap.forEach(d => allScores.push(d.data().score));
     fetchOk = true;
-  } catch (e) { console.error('fetch daily_scores failed:', e); }
+  } catch (e) { console.error('fetch daily_scores failed:', e.code, e.message); }
 
   const total = allScores.length;
   const below = allScores.filter(s => s < myScore).length;
