@@ -1380,28 +1380,23 @@
   }
   #challenge-intro.open { display: flex; }
   #challenge-intro-card {
-    background: var(--surface); border-radius: 24px; padding: 36px 32px 28px;
+    background: var(--surface); border-radius: 24px; padding: 32px 32px 28px;
     width: min(400px, 92vw); box-shadow: 0 24px 60px rgba(0,0,0,0.3);
-    display: flex; flex-direction: column; gap: 10px; text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center;
     animation: loginPop 0.3s cubic-bezier(.34,1.4,.64,1);
   }
-  #challenge-intro-badge {
-    align-self: center; padding: 4px 14px; border-radius: 50px;
-    background: linear-gradient(90deg, #1a6fd4, #7c3aed); color: #fff;
-    font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+  #challenge-intro-logo {
+    width: 80px; height: 80px; object-fit: contain; margin-bottom: 4px;
   }
   #challenge-intro-heading {
-    font-family: 'Playfair Display','Alef',serif; font-size: 0.95rem;
-    font-weight: 700; color: var(--muted); margin-top: 4px;
+    font-family: 'Alef',sans-serif; font-size: 1rem;
+    font-weight: 700; color: var(--muted);
   }
   #challenge-intro-town {
     font-family: 'Playfair Display','Alef',serif; font-size: 2.1rem; font-weight: 900;
     line-height: 1.15;
     background: linear-gradient(90deg, #1a6fd4, #7c3aed);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  }
-  #challenge-intro-sub {
-    font-size: 0.88rem; color: var(--muted); line-height: 1.55;
   }
   #challenge-intro-btn {
     margin-top: 8px; padding: 13px 24px; border-radius: 50px; border: none;
@@ -2698,11 +2693,10 @@
 <!-- CHALLENGE INTRO POPUP -->
 <div id="challenge-intro">
   <div id="challenge-intro-card">
-    <div id="challenge-intro-badge">Challenge</div>
-    <div id="challenge-intro-heading">Find this location</div>
+    <img id="challenge-intro-logo" src="logo_head.png" alt="Gilly"/>
+    <div id="challenge-intro-heading">מצא/י את המיקום הבא</div>
     <div id="challenge-intro-town"></div>
-    <div id="challenge-intro-sub">Click on the map where you think it is!</div>
-    <button id="challenge-intro-btn" onclick="startChallengeGame()">Let's go →</button>
+    <button id="challenge-intro-btn" onclick="startChallengeGame()">!בואו נתחיל</button>
   </div>
 </div>
 
