@@ -1438,7 +1438,8 @@
     background: var(--surface); border-radius: 20px;
     padding: 28px 32px 24px; max-width: 400px; width: 100%;
     box-shadow: 0 12px 48px rgba(0,0,0,0.25);
-    display: flex; flex-direction: column; gap: 14px;
+    display: flex; flex-direction: column; align-items: center; gap: 14px;
+    text-align: center;
     animation: factCardPop 0.25s cubic-bezier(.34,1.56,.64,1);
   }
   #daily-modal-title {
@@ -1448,10 +1449,11 @@
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   }
   #daily-modal-body {
-    font-size: 0.95rem; color: var(--text); line-height: 1.65;
+    font-size: 0.95rem; color: var(--text); line-height: 1.75;
+    white-space: pre-line; text-align: center;
   }
   #daily-modal-actions {
-    display: flex; gap: 10px; justify-content: flex-end; margin-top: 4px;
+    display: flex; gap: 10px; justify-content: center; margin-top: 4px;
   }
   #daily-modal-cancel {
     padding: 7px 20px; border-radius: 50px; border: 1px solid var(--border);
@@ -3510,7 +3512,7 @@ const STRINGS = {
     learn_btn:        "🗺️ Learning Mode",
     daily_btn:        "⚡ Daily Challenge",
     daily_modal_title:  "⚡ Daily Challenge",
-    daily_modal_body:   "Learn the area shown in the street map, then pin the location",
+    daily_modal_body:   "Learn the area shown in the street map\nThen pin the location",
     daily_modal_start:  "Let's go →",
     daily_modal_cancel: "Cancel",
     region_all_short: "All",
@@ -3552,7 +3554,7 @@ const STRINGS = {
     learn_btn:        "🗺️ מצב למידה",
     daily_btn:        "⚡ אתגר יומי",
     daily_modal_title:  "⚡ אתגר יומי",
-    daily_modal_body:   "למד את האיזור המוצג במפה במשך 15 שניות, לאחר מכן מצא את המיקום",
+    daily_modal_body:   "למד/י את האיזור המוצג במפה במשך 15 שניות\nלאחר מכן מצא/י את המיקום",
     daily_modal_start:  "← בואו נתחיל",
     daily_modal_cancel: "ביטול",
     region_all_short: "הכל",
