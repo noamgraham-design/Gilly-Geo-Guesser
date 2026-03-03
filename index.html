@@ -5149,13 +5149,36 @@ async function continueLearning() {
 
 // ── Daily Challenge ───────────────────────────────────────────────────────────
 
+// Mulberry32 seeded PRNG — fast, good distribution, no deps
+function _seededRand(seed) {
+  let s = seed >>> 0;
+  return function () {
+    s += 0x6d2b79f5;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
+    return ((t ^ (t >>> 14)) >>> 0) / 0x100000000;
+  };
+}
+
 function getDailyLocation() {
-  // Deterministic: everyone sees the same town on the same UTC day.
-  // Uses dayNumber mod TOWNS.length so every day is different with no repeats
-  // until the full cycle resets (step 4 will add Firestore-backed tracking).
+  // Deterministic global schedule: same town for every user on the same UTC day.
+  // Cycles through all TOWNS in a shuffled order with no repeats.
+  // Each full cycle (TOWNS.length days) uses a fresh shuffle seeded by the cycle number.
   const now = new Date();
   const dayNumber = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000);
-  return TOWNS[dayNumber % TOWNS.length];
+  const n = TOWNS.length;
+  const cycleNumber = Math.floor(dayNumber / n);
+  const posInCycle = dayNumber % n;
+
+  // Fisher-Yates shuffle using the cycle number as the PRNG seed
+  const rand = _seededRand(cycleNumber + 1); // +1 so seed=0 is never used
+  const indices = Array.from({ length: n }, (_, i) => i);
+  for (let i = n - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [indices[i], indices[j]] = [indices[j], indices[i]];
+  }
+
+  return TOWNS[indices[posInCycle]];
 }
 
 function getRandomPointNearby(lat, lng, radiusKm) {
