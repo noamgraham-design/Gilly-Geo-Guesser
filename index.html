@@ -3426,6 +3426,10 @@ const PLAYER_LEVEL_NAMES = {
 const TIME_BONUS_MAX  = 30;
 const TIME_BONUS_SECS = 30;
 
+// Daily challenge scoring: gradual linear decay across Israel's full extent
+const DAILY_MAX_KM  = 400; // ~max distance across Israel (Eilat→Metula)
+const DAILY_MIN_PTS = 5;   // floor — every guess scores at least this many base pts
+
 let roundStartTime = 0; // set in loadTown
 
 // ── POLYGON-BASED PERFECT SCORE ───────────────────────────────────────────────
@@ -3575,6 +3579,18 @@ function calcTimeBonusMs(elapsedMs) {
   return TIME_BONUS_MAX * (1 - elapsedMs / (TIME_BONUS_SECS * 1000));
 }
 
+// Daily challenge: gradual linear decay from 100 pts at perfect radius down to
+// DAILY_MIN_PTS at DAILY_MAX_KM, with tier multiplier. Never returns 0.
+function calcDailyPts(distKm, perfect, town) {
+  const perfectKm  = PERFECT_RADIUS_KM[town.tier] ?? 1;
+  const multiplier = TIER_MULTIPLIER[town.tier]   ?? 1;
+  const base = (perfect || distKm <= perfectKm)
+    ? 100
+    : Math.max(DAILY_MIN_PTS, Math.round(
+        100 - (100 - DAILY_MIN_PTS) * (distKm - perfectKm) / (DAILY_MAX_KM - perfectKm)
+      ));
+  return Math.round(base * multiplier);
+}
 
 const STRINGS = {
   en: {
@@ -5550,8 +5566,10 @@ function onMapClick(e) {
   const perfect = polyFeature
     ? pointInGeoJSONFeature(e.latlng.lat, e.latlng.lng, polyFeature)
     : distKm <= perfectKm;
-  // When a polygon is available, award full points for any click inside it
-  const basePts = (polyFeature && perfect) ? Math.round(DIFF[difficulty].maxPts * (TIER_MULTIPLIER[town.tier] ?? 1)) : calcPts(distKm, d, hintUsed, town.tier);
+  // Daily challenge uses its own gradual scoring; regular mode uses difficulty-based calcPts
+  const basePts = isDailyChallenge
+    ? calcDailyPts(distKm, perfect, town)
+    : (polyFeature && perfect) ? Math.round(DIFF[difficulty].maxPts * (TIER_MULTIPLIER[town.tier] ?? 1)) : calcPts(distKm, d, hintUsed, town.tier);
   // Time bonus: only awarded when you score any points (no reward for a fast miss)
   const elapsedMs = Date.now() - roundStartTime;
   const timeBonus = basePts > 0 && !streetUsedThisRound ? calcTimeBonus(elapsedMs) : 0;
