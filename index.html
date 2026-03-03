@@ -2696,7 +2696,7 @@
     <img id="challenge-intro-logo" src="logo_head.png" alt="Gilly"/>
     <div id="challenge-intro-heading">מצא/י את המיקום הבא</div>
     <div id="challenge-intro-town"></div>
-    <button id="challenge-intro-btn" onclick="startChallengeGame()">!בואו נתחיל</button>
+    <button id="challenge-intro-btn" dir="rtl" onclick="startChallengeGame()">!בואו נתחיל</button>
   </div>
 </div>
 
@@ -3534,7 +3534,7 @@ function applyLang() {
   if (cInput && !cInput.value) cInput.placeholder = lang === 'he' ? 'חפש/י מיקום...' : 'Search for a location...';
   // Challenge intro strings
   const ciH = document.getElementById('challenge-intro-heading');
-  if (ciH) ciH.textContent = lang === 'he' ? 'מצא/י את המיקום הזה' : 'Find this location';
+  if (ciH) ciH.textContent = lang === 'he' ? 'מצא/י את המיקום הבא' : 'Find this location';
   const ciS = document.getElementById('challenge-intro-sub');
   if (ciS) ciS.textContent = lang === 'he' ? '!לחץ/י על המפה איפה שאתה/ת חושב/ת שהוא נמצא' : 'Click on the map where you think it is!';
   const ciBtn = document.getElementById('challenge-intro-btn');
