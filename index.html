@@ -1261,12 +1261,18 @@
     display: flex; align-items: center; gap: 6px;
     padding: 6px 14px; border-radius: 50px;
     border: 1.5px solid var(--border);
-    background: var(--surface); color: var(--text);
+    background: linear-gradient(160deg, #fff 30%, #eef1ff 100%);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,0.9);
+    color: var(--text);
     font-family: 'Source Serif 4', 'Alef', serif;
     font-size: 0.85rem; font-weight: 600;
     cursor: pointer; transition: all 0.15s; flex-shrink: 0; white-space: nowrap;
   }
-  #share-btn:hover { border-color: rgba(0,0,0,0.2); background: var(--bg); }
+  #share-btn:hover {
+    border-color: rgba(100,120,220,0.3);
+    background: linear-gradient(160deg, #fff 20%, #e5eaff 100%);
+    box-shadow: 0 2px 8px rgba(100,120,220,0.12), inset 0 1px 0 rgba(255,255,255,0.9);
+  }
 
   /* ── SHARE POPUP ─────────────────────────────────────────────────────────── */
   #share-popup {
