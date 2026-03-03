@@ -6067,7 +6067,7 @@ function shareChallengeCreate(method) {
   const townName = lang === 'he' ? challengePickedTown.nameHe : challengePickedTown.name;
   if (method === 'wa') {
     const text = lang === 'he'
-      ? encodeURIComponent(`גילי מאתגר/ת אותך! תמצא/י את ${townName} על המפה 🗺️ ${url}`)
+      ? encodeURIComponent(`\u200Fגילי מאתגר/ת אותך! תמצא/י את ${townName} על המפה 🗺️ ${url}`)
       : encodeURIComponent(`Gilly challenges you to find ${townName} on the map! 🗺️ ${url}`);
     window.open('https://wa.me/?text=' + text, '_blank');
   } else {
@@ -6204,7 +6204,7 @@ function shareChallengeResult(method) {
   else resultStr = lang === 'he' ? `${distKm.toFixed(distKm<10?1:0)} ק"מ מהיעד` : `${distKm.toFixed(distKm<10?1:0)} km away`;
 
   const text = lang === 'he'
-    ? `מצאתי את ${townName}! ${resultStr} 🗺️ תנסה/י גם: ${url}`
+    ? `\u200Fמצאתי את ${townName}! ${resultStr} 🗺️ תנסה/י גם: ${url}`
     : `I found ${townName}! ${resultStr} 🗺️ Can you beat me? ${url}`;
 
   if (method === 'wa') {
