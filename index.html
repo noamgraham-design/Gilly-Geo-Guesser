@@ -1463,12 +1463,13 @@
   }
   #cr-copied-toast.show { display: block; }
   #cr-play-btn {
-    padding: 11px 24px; border-radius: 50px; border: 1.5px solid var(--border);
-    background: var(--surface); color: var(--text);
-    font-family: 'Source Serif 4','Alef',serif; font-size: 0.9rem; font-weight: 600;
-    cursor: pointer; transition: all 0.15s;
+    padding: 13px 28px; border-radius: 50px; border: none;
+    background: linear-gradient(90deg, #1a6fd4, #7c3aed); color: #fff;
+    font-family: 'Source Serif 4','Alef',serif; font-size: 1rem; font-weight: 700;
+    cursor: pointer; transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 18px rgba(80,80,220,0.32); margin-top: 4px; width: 100%;
   }
-  #cr-play-btn:hover { background: var(--bg); border-color: rgba(0,0,0,0.2); }
+  #cr-play-btn:hover { opacity: 0.92; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(80,80,220,0.38); }
 
   /* Background clouds (in overlay, not in card) */
   .overlay-bg-clouds {
@@ -2749,7 +2750,7 @@
       </button>
       <div id="cr-copied-toast"></div>
     </div>
-    <button id="cr-play-btn" onclick="exitChallengeMode()">Play the full game →</button>
+    <button id="cr-play-btn" dir="rtl" onclick="exitChallengeMode()">Play the full game →</button>
   </div>
 </div>
 
@@ -4353,15 +4354,8 @@ function showPtsPopup(pts, pct, perfect, distKm, timeBonus = 0) {
   else if (isClose) label = lang === 'he' ? 'לא רע!'       : 'Not bad!';
   else              label = lang === 'he' ? 'רחוק מאוד...' : 'Very far...';
 
-  const prefix = pts > 0 ? '+' : '';
-  const timeLine = timeBonus > 0
-    ? `<span class="pts-time-bonus" style="color:${color}">⚡ +${timeBonus} ${lang === 'he' ? 'מהיר' : 'speed'}</span>`
-    : '';
-
   el.innerHTML = `
-    <span class="pts-number" style="font-size:${fontSize};color:${color}">${prefix}${pts}</span>
     <span class="pts-label" dir="${lang === 'he' ? 'rtl' : 'ltr'}" style="color:${color};font-size:${labelSize}">${label}</span>
-    ${timeLine}
   `;
 
   const cls = perfect ? 'show-perfect' : isClose ? 'show-good' : 'show-miss';
@@ -6086,7 +6080,7 @@ function shareChallengeCreate(method) {
   const townName = lang === 'he' ? challengePickedTown.nameHe : challengePickedTown.name;
   if (method === 'wa') {
     const text = lang === 'he'
-      ? encodeURIComponent(`\u200Fגילי מאתגר/ת אותך! מצא/י את ${townName} על המפה 🇮🇱 ${url}`)
+      ? encodeURIComponent(`\u200Fגילי מאתגר/ת אותך! מצא/י את ${townName} על המפה \u200E🇮🇱\u200E ${url}`)
       : encodeURIComponent(`Gilly challenges you to find ${townName} on the map! 🇮🇱 ${url}`);
     window.open('https://wa.me/?text=' + text, '_blank');
   } else {
@@ -6146,7 +6140,7 @@ function startChallengeGame() {
   document.getElementById('hud').style.display = 'none';
   document.getElementById('btn-back').style.display = 'none';
   document.getElementById('btn-hint').style.display = 'none';
-  document.getElementById('mobile-tools-hint').style.display = 'none';
+  document.getElementById('mobile-tools-wrap').style.display = 'none';
 
   if (currentLayer === 'street') toggleMapLayer(true);
   document.getElementById('results-panel').className = '';
@@ -6223,7 +6217,7 @@ function shareChallengeResult(method) {
   else resultStr = lang === 'he' ? `${distKm.toFixed(distKm<10?1:0)} ק"מ מהיעד` : `${distKm.toFixed(distKm<10?1:0)} km away`;
 
   const text = lang === 'he'
-    ? `\u200Fמצאתי את ${townName}! ${resultStr} 🇮🇱 תנסה/י גם: ${url}`
+    ? `\u200Fמצאתי את ${townName}! ${resultStr} \u200E🇮🇱\u200E נסה/י גם: ${url}`
     : `I found ${townName}! ${resultStr} 🇮🇱 Can you beat me? ${url}`;
 
   if (method === 'wa') {
@@ -6249,7 +6243,7 @@ function exitChallengeMode() {
   // Restore HUD + controls
   document.getElementById('hud').style.display = '';
   document.getElementById('btn-hint').style.display = '';
-  document.getElementById('mobile-tools-hint').style.display = '';
+  document.getElementById('mobile-tools-wrap').style.display = '';
   // Clean challenge param from URL without reload
   const url = new URL(window.location.href);
   url.searchParams.delete('challenge');
