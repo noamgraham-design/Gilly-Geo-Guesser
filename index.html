@@ -1427,6 +1427,49 @@
   }
   #challenge-intro-btn:hover { opacity: 0.9; transform: translateY(-1px); }
 
+  /* ── DAILY CHALLENGE INTRO MODAL ──────────────────────────────────────── */
+  #daily-modal {
+    display: none; position: fixed; inset: 0; z-index: 9800;
+    background: rgba(0,0,0,0.55); backdrop-filter: blur(4px);
+    align-items: center; justify-content: center; padding: 24px;
+  }
+  #daily-modal.open { display: flex; }
+  #daily-modal-card {
+    background: var(--surface); border-radius: 20px;
+    padding: 28px 32px 24px; max-width: 400px; width: 100%;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.25);
+    display: flex; flex-direction: column; gap: 14px;
+    animation: factCardPop 0.25s cubic-bezier(.34,1.56,.64,1);
+  }
+  #daily-modal-title {
+    font-family: 'Playfair Display', 'Alef', serif;
+    font-size: 1.35rem; font-weight: 900;
+    background: linear-gradient(90deg, #7c3aed, #1a6fd4);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  #daily-modal-body {
+    font-size: 0.95rem; color: var(--text); line-height: 1.65;
+  }
+  #daily-modal-actions {
+    display: flex; gap: 10px; justify-content: flex-end; margin-top: 4px;
+  }
+  #daily-modal-cancel {
+    padding: 7px 20px; border-radius: 50px; border: 1px solid var(--border);
+    background: transparent; color: var(--muted);
+    font-family: 'Source Serif 4', 'Alef', serif; font-size: 0.9rem;
+    cursor: pointer; transition: background 0.15s;
+  }
+  #daily-modal-cancel:hover { background: var(--bg); }
+  #daily-modal-start {
+    padding: 8px 22px; border-radius: 50px; border: none;
+    background: linear-gradient(135deg, #7c3aed, #1a6fd4);
+    color: #fff; font-family: 'Source Serif 4', 'Alef', serif;
+    font-size: 0.9rem; font-weight: 700;
+    cursor: pointer; transition: opacity 0.15s, transform 0.15s;
+    box-shadow: 0 4px 14px rgba(124,58,237,0.3);
+  }
+  #daily-modal-start:hover { opacity: 0.9; transform: translateY(-1px); }
+
   /* ── CHALLENGE RESULT POPUP ───────────────────────────────────────────── */
   #challenge-result {
     display: none; position: fixed; inset: 0; z-index: 9800;
@@ -2755,6 +2798,18 @@
   </div>
 </div>
 
+<!-- DAILY CHALLENGE INTRO MODAL -->
+<div id="daily-modal">
+  <div id="daily-modal-card">
+    <div id="daily-modal-title"></div>
+    <div id="daily-modal-body"></div>
+    <div id="daily-modal-actions">
+      <button id="daily-modal-cancel" onclick="closeDailyModal()"></button>
+      <button id="daily-modal-start" onclick="beginDailyChallenge()"></button>
+    </div>
+  </div>
+</div>
+
 <!-- FACT MODAL (hidden by default) -->
 <div id="fact-modal" style="display:none">
   <div id="fact-modal-card">
@@ -3454,6 +3509,10 @@ const STRINGS = {
     start_btn:        "Start Game →",
     learn_btn:        "🗺️ Learning Mode",
     daily_btn:        "⚡ Daily Challenge",
+    daily_modal_title:  "⚡ Daily Challenge",
+    daily_modal_body:   "Learn the area shown in the street map, then pin the location",
+    daily_modal_start:  "Let's go →",
+    daily_modal_cancel: "Cancel",
     region_all_short: "All",
     region_north_short: "North",
     region_center_short: "Center",
@@ -3492,6 +3551,10 @@ const STRINGS = {
     start_btn:        "← התחל משחק",
     learn_btn:        "🗺️ מצב למידה",
     daily_btn:        "⚡ אתגר יומי",
+    daily_modal_title:  "⚡ אתגר יומי",
+    daily_modal_body:   "למד את האיזור המוצג במפה במשך 15 שניות, לאחר מכן מצא את המיקום",
+    daily_modal_start:  "← בואו נתחיל",
+    daily_modal_cancel: "ביטול",
     region_all_short: "הכל",
     region_north_short: "צפון",
     region_center_short: "מרכז",
@@ -3537,6 +3600,12 @@ function applyLang() {
   document.getElementById('start-btn').textContent    = t('start_btn');
   document.getElementById('learn-btn').textContent    = t('learn_btn');
   document.getElementById('daily-btn').textContent    = t('daily_btn');
+  document.getElementById('daily-modal-title').textContent  = t('daily_modal_title');
+  document.getElementById('daily-modal-body').textContent   = t('daily_modal_body');
+  document.getElementById('daily-modal-body').dir           = lang === 'he' ? 'rtl' : 'ltr';
+  document.getElementById('daily-modal-start').textContent  = t('daily_modal_start');
+  document.getElementById('daily-modal-cancel').textContent = t('daily_modal_cancel');
+  document.getElementById('daily-modal-card').dir           = lang === 'he' ? 'rtl' : 'ltr';
   document.getElementById('btn-play-again').textContent = t('play_again');
   document.getElementById('btn-menu').textContent      = t('menu_btn');
   document.getElementById('btn-back').textContent      = t('back_btn');
@@ -4282,6 +4351,9 @@ function closeFactModal() {
 // Close on backdrop click
 document.getElementById('fact-modal').addEventListener('click', (e) => {
   if (e.target === document.getElementById('fact-modal')) closeFactModal();
+});
+document.getElementById('daily-modal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('daily-modal')) closeDailyModal();
 });
 
 // Use Leaflet's DOM event system to intercept clicks on .fact-btn BEFORE
@@ -5089,7 +5161,26 @@ async function continueLearning() {
 }
 
 function startDailyChallenge() {
-  // Step 2–4 will be implemented in subsequent steps
+  openDailyModal();
+}
+
+function openDailyModal() {
+  document.getElementById('daily-modal-title').textContent  = t('daily_modal_title');
+  document.getElementById('daily-modal-body').textContent   = t('daily_modal_body');
+  document.getElementById('daily-modal-body').dir           = lang === 'he' ? 'rtl' : 'ltr';
+  document.getElementById('daily-modal-start').textContent  = t('daily_modal_start');
+  document.getElementById('daily-modal-cancel').textContent = t('daily_modal_cancel');
+  document.getElementById('daily-modal-card').dir           = lang === 'he' ? 'rtl' : 'ltr';
+  document.getElementById('daily-modal').classList.add('open');
+}
+
+function closeDailyModal() {
+  document.getElementById('daily-modal').classList.remove('open');
+}
+
+function beginDailyChallenge() {
+  closeDailyModal();
+  // Steps 3–4 will be implemented in subsequent steps
   showFeedback(lang === 'he' ? '🚧 בקרוב...' : '🚧 Coming soon...', '#d97706');
 }
 
