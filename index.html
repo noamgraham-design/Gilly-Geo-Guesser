@@ -6140,7 +6140,7 @@ function startChallengeGame() {
   document.getElementById('hud').style.display = 'none';
   document.getElementById('btn-back').style.display = 'none';
   document.getElementById('btn-hint').style.display = 'none';
-  document.getElementById('mobile-tools-hint').style.display = 'none';
+  document.getElementById('mobile-tools-wrap').style.display = 'none';
 
   if (currentLayer === 'street') toggleMapLayer(true);
   document.getElementById('results-panel').className = '';
@@ -6243,7 +6243,7 @@ function exitChallengeMode() {
   // Restore HUD + controls
   document.getElementById('hud').style.display = '';
   document.getElementById('btn-hint').style.display = '';
-  document.getElementById('mobile-tools-hint').style.display = '';
+  document.getElementById('mobile-tools-wrap').style.display = '';
   // Clean challenge param from URL without reload
   const url = new URL(window.location.href);
   url.searchParams.delete('challenge');
