@@ -6082,8 +6082,8 @@ function shareChallengeCreate(method) {
   const townName = lang === 'he' ? challengePickedTown.nameHe : challengePickedTown.name;
   if (method === 'wa') {
     const text = lang === 'he'
-      ? encodeURIComponent(`${url} 🇮🇱\nגילי מאתגר/ת אותך! מצא/י את ${townName} על המפה`)
-      : encodeURIComponent(`${url} 🇮🇱\nGilly challenges you to find ${townName} on the map!`);
+      ? encodeURIComponent(`${url}\n\u200Fגילי מאתגר/ת אותך! מצא/י את ${townName} על המפה \u200E🇮🇱`)
+      : encodeURIComponent(`${url}\nGilly challenges you to find ${townName} on the map! 🇮🇱`);
     window.open('https://wa.me/?text=' + text, '_blank');
   } else {
     const doShow = () => {
