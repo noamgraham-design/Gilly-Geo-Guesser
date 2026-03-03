@@ -22,6 +22,7 @@
            GoogleAuthProvider, signInWithPopup,
            createUserWithEmailAndPassword,
            signInWithEmailAndPassword,
+           signInAnonymously,
            updateProfile }                          from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import { getFirestore, collection, addDoc,
            query, where, orderBy, limit,
@@ -48,6 +49,7 @@
   window._fbFns  = {
     signOut, GoogleAuthProvider, signInWithPopup,
     createUserWithEmailAndPassword, signInWithEmailAndPassword,
+    signInAnonymously,
     updateProfile, collection, addDoc, query, where,
     orderBy, limit, getDocs, serverTimestamp,
     setDoc, getDoc, doc
@@ -301,6 +303,58 @@
     from { opacity: 0; transform: translateY(-100%); }
     to   { opacity: 1; transform: translateY(0); }
   }
+
+  /* ── DAILY PERCENTILE POPUP ─────────────────────────────────────────── */
+  #daily-percentile-popup {
+    display: none; position: fixed; inset: 0; z-index: 10000;
+    background: rgba(0,0,0,0.65); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center;
+  }
+  #daily-percentile-popup.show { display: flex; }
+  #daily-percentile-card {
+    background: var(--surface); border-radius: 24px;
+    padding: 32px 28px 24px; width: min(340px, 90vw);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    text-align: center;
+    animation: recordCardEntry 0.45s cubic-bezier(.34,1.3,.64,1);
+  }
+  #dp-title {
+    font-size: 1rem; font-weight: 700; color: var(--muted);
+    letter-spacing: 0.4px; margin-bottom: 4px;
+  }
+  #dp-score {
+    font-size: 2.2rem; font-weight: 900; color: var(--text);
+    margin-bottom: 20px;
+  }
+  #dp-ring-wrap {
+    width: 120px; height: 120px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    margin: 0 auto 16px; position: relative;
+    background: conic-gradient(#e8eaed 360deg, #e8eaed 360deg);
+    transition: background 0.6s ease;
+  }
+  #dp-ring-wrap::after {
+    content: ''; position: absolute; inset: 16px;
+    background: var(--surface); border-radius: 50%;
+  }
+  #dp-pct-value {
+    position: relative; z-index: 1;
+    font-size: 1.6rem; font-weight: 900; color: var(--text);
+  }
+  #dp-pct-label {
+    position: relative; z-index: 1;
+    font-size: 0.72rem; font-weight: 600; color: var(--muted);
+    margin-top: -2px;
+  }
+  #dp-message { font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  #dp-count   { font-size: 0.82rem; color: var(--muted); margin-bottom: 22px; }
+  #dp-close-btn {
+    background: var(--green); color: #fff;
+    border: none; border-radius: 999px; padding: 11px 32px;
+    font-size: 1rem; font-weight: 700; cursor: pointer; font-family: inherit;
+  }
+  #dp-close-btn:hover { opacity: 0.88; }
 
   /* ── NEW RECORD POPUP ─────────────────────────────────────────────────── */
   #new-record-popup {
@@ -2941,6 +2995,21 @@
       <a style="cursor:pointer;color:#1a6fd4;text-decoration:underline" onclick="openLoginModal()" id="sb-signin-link">Sign in</a>
       <span id="sb-signin-text"> to see the leaderboard</span>
     </div>
+  </div>
+</div>
+
+<!-- ── DAILY CHALLENGE PERCENTILE POPUP ──────────────────────────────── -->
+<div id="daily-percentile-popup">
+  <div id="daily-percentile-card">
+    <div id="dp-title">📅 Daily Challenge</div>
+    <div id="dp-score"></div>
+    <div id="dp-ring-wrap">
+      <span id="dp-pct-value"></span>
+      <span id="dp-pct-label"></span>
+    </div>
+    <div id="dp-message"></div>
+    <div id="dp-count"></div>
+    <button id="dp-close-btn" onclick="document.getElementById('daily-percentile-popup').classList.remove('show')">Got it!</button>
   </div>
 </div>
 
@@ -5917,6 +5986,83 @@ function toggleTop5View() {
   list.innerHTML = _sbTop5 ? renderTop5View() : renderContextView();
 }
 
+// ── Daily Challenge score saving & percentile display ─────────────────────
+
+async function saveDailyScore(myScore) {
+  const { collection, addDoc, serverTimestamp, signInAnonymously } = window._fbFns;
+  // Ensure an auth session exists (anonymous if not signed in) so Firestore rules pass
+  if (!window._fbUser) {
+    try { await signInAnonymously(window._fbAuth); } catch (_) {}
+  }
+  const today = new Date().toISOString().slice(0, 10); // UTC "YYYY-MM-DD"
+  try {
+    await addDoc(collection(window._fbDb, 'daily_scores'), {
+      date:      today,
+      score:     myScore,
+      timestamp: serverTimestamp(),
+    });
+  } catch (e) { console.error('saveDailyScore failed:', e); }
+}
+
+async function showDailyPercentile(myScore) {
+  const popup   = document.getElementById('daily-percentile-popup');
+  const scoreEl = document.getElementById('dp-score');
+  const ring    = document.getElementById('dp-ring-wrap');
+  const pctVal  = document.getElementById('dp-pct-value');
+  const pctLbl  = document.getElementById('dp-pct-label');
+  const msgEl   = document.getElementById('dp-message');
+  const countEl = document.getElementById('dp-count');
+
+  // Show popup immediately with score; fill percentile once data arrives
+  scoreEl.textContent = `${myScore} ${lang === 'he' ? 'נקודות' : 'pts'}`;
+  pctVal.textContent  = '…';
+  pctLbl.textContent  = '';
+  msgEl.textContent   = '';
+  countEl.textContent = '';
+  ring.style.background = 'conic-gradient(#e8eaed 360deg, #e8eaed 360deg)';
+  popup.classList.add('show');
+
+  // Save this score anonymously, then read today's full distribution
+  await saveDailyScore(myScore);
+
+  const { collection, query, where, getDocs } = window._fbFns;
+  const today = new Date().toISOString().slice(0, 10);
+  let allScores = [];
+  try {
+    const snap = await getDocs(query(
+      collection(window._fbDb, 'daily_scores'),
+      where('date', '==', today)
+    ));
+    snap.forEach(d => allScores.push(d.data().score));
+  } catch (e) { console.error('fetch daily_scores failed:', e); }
+
+  const total = allScores.length;
+  const below = allScores.filter(s => s < myScore).length;
+
+  if (total <= 1) {
+    // First (or only) player of the day
+    pctVal.textContent = '🥇';
+    pctLbl.textContent = '';
+    msgEl.textContent  = lang === 'he' ? 'אתה הראשון לשחק היום!' : "You're the first to play today!";
+    countEl.textContent = '';
+    ring.style.background = 'conic-gradient(#f4c430 360deg, #e8eaed 0deg)';
+  } else {
+    // Percentile: fraction of other players you beat
+    const pct   = Math.round((below / (total - 1)) * 100);
+    const deg   = Math.round(pct * 3.6); // map 0-100 → 0-360 degrees
+    const color = pct >= 80 ? '#1a7f37' : pct >= 50 ? '#1a6fd4' : '#f0883e';
+    ring.style.background = `conic-gradient(${color} ${deg}deg, #e8eaed ${deg}deg)`;
+    pctVal.textContent  = `${pct}%`;
+    pctLbl.textContent  = lang === 'he' ? 'אחוזון' : 'percentile';
+    msgEl.textContent   = lang === 'he'
+      ? `עקפת ${pct}% מהשחקנים היום`
+      : `You scored better than ${pct}% of today's players`;
+    countEl.textContent = lang === 'he'
+      ? `${total} שחקנים שיחקו היום`
+      : `${total} players played today`;
+  }
+}
+
 async function loadScoreboard(myScore) {
   const section = document.getElementById('scoreboard-panel');
   const list    = document.getElementById('scoreboard-list');
@@ -6037,6 +6183,13 @@ showResults = async function() {
   document.getElementById('scoreboard-list').innerHTML = '';
   _sbData = null;
   _sbTop5 = false;
+
+  // ── Daily Challenge: save score anonymously and show percentile popup ──
+  if (isDailyChallenge) {
+    document.getElementById('history-section').classList.remove('show');
+    showDailyPercentile(score);
+    return;
+  }
 
   const hits = results.filter(r => r.pts >= 90).length;
   const recPopup  = document.getElementById('new-record-popup');
