@@ -1385,9 +1385,29 @@
     display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center;
     animation: loginPop 0.3s cubic-bezier(.34,1.4,.64,1);
   }
-  #challenge-intro-logo {
-    width: 80px; height: 80px; object-fit: contain; margin-bottom: 4px;
+  @keyframes ciLogoFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-7px); }
   }
+  @keyframes ciSpark {
+    0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+    40%, 60% { opacity: 1; transform: scale(1) rotate(180deg); }
+  }
+  #challenge-intro-logo-wrap {
+    position: relative; width: 80px; height: 80px; margin-bottom: 4px;
+  }
+  #challenge-intro-logo {
+    width: 80px; height: 80px; object-fit: contain;
+    animation: ciLogoFloat 2.6s ease-in-out infinite;
+  }
+  .ci-spark {
+    position: absolute; font-size: 13px; line-height: 1;
+    animation: ciSpark 2.6s ease-in-out infinite;
+    pointer-events: none; user-select: none;
+  }
+  .ci-spark-1 { top: -6px; right: -4px; color: #7c3aed; animation-delay: 0s; font-size: 15px; }
+  .ci-spark-2 { bottom: 2px; left: -8px; color: #1a6fd4; animation-delay: 0.9s; font-size: 10px; }
+  .ci-spark-3 { top: 50%; right: -12px; color: #e57c1a; animation-delay: 1.7s; font-size: 11px; }
   #challenge-intro-heading {
     font-family: 'Alef',sans-serif; font-size: 1rem;
     font-weight: 700; color: var(--muted);
@@ -2693,10 +2713,15 @@
 <!-- CHALLENGE INTRO POPUP -->
 <div id="challenge-intro">
   <div id="challenge-intro-card">
-    <img id="challenge-intro-logo" src="logo_head.png" alt="Gilly"/>
+    <div id="challenge-intro-logo-wrap">
+      <img id="challenge-intro-logo" src="logo_head.png" alt="Gilly"/>
+      <span class="ci-spark ci-spark-1">✦</span>
+      <span class="ci-spark ci-spark-2">✦</span>
+      <span class="ci-spark ci-spark-3">✦</span>
+    </div>
     <div id="challenge-intro-heading">מצא/י את המיקום הבא</div>
     <div id="challenge-intro-town"></div>
-    <button id="challenge-intro-btn" dir="rtl" onclick="startChallengeGame()">!בואו נתחיל</button>
+    <button id="challenge-intro-btn" dir="rtl" onclick="startChallengeGame()">בואו נתחיל!</button>
   </div>
 </div>
 
@@ -3538,7 +3563,7 @@ function applyLang() {
   const ciS = document.getElementById('challenge-intro-sub');
   if (ciS) ciS.textContent = lang === 'he' ? '!לחץ/י על המפה איפה שאתה/ת חושב/ת שהוא נמצא' : 'Click on the map where you think it is!';
   const ciBtn = document.getElementById('challenge-intro-btn');
-  if (ciBtn) ciBtn.textContent = lang === 'he' ? '!בואו נתחיל ←' : "Let's go →";
+  if (ciBtn) ciBtn.textContent = lang === 'he' ? 'בואו נתחיל! ←' : "Let's go →";
   // Challenge result strings
   const lcrS = document.getElementById('lbl-cr-share');
   if (lcrS) lcrS.textContent = lang === 'he' ? 'שתפ/י את התוצאה' : 'Share your result';
