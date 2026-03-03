@@ -4336,34 +4336,16 @@ function showPtsPopup(pts, pct, perfect, distKm, timeBonus = 0) {
   void el.offsetWidth;
 
   let label, color, fontSize, labelSize, cls;
-
-  if (isChallengeMode) {
-    // Distance-based grading — matches the post-challenge result popup tiers
-    let emoji, grade;
-    if (perfect)          { emoji='🎯'; grade=lang==='he'?'מושלם!':'Nailed it!';        color='#1a7f37'; cls='show-perfect'; }
-    else if (distKm<=5)   { emoji='🌟'; grade=lang==='he'?'כמעט מושלם!':'Almost perfect!'; color='#2da44e'; cls='show-perfect'; }
-    else if (distKm<=15)  { emoji='👏'; grade=lang==='he'?'יפה מאוד!':'Nice one!';       color='#0d7377'; cls='show-good'; }
-    else if (distKm<=40)  { emoji='🗺️'; grade=lang==='he'?'לא רע!':'Not bad!';          color='#d29922'; cls='show-good'; }
-    else if (distKm<=100) { emoji='😅'; grade=lang==='he'?'לא מדויק...':'Off the mark…'; color='#e5670a'; cls='show-miss'; }
-    else                  { emoji='💀'; grade=lang==='he'?'רחוק מאוד!':'Way off!';       color='#cf2316'; cls='show-miss'; }
-    label     = `${emoji} ${grade}`;
-    fontSize  = perfect || distKm<=5 ? '5.5rem' : distKm<=15 ? '4.2rem' : '3rem';
-    labelSize = perfect || distKm<=5 ? '3.3rem' : distKm<=15 ? '2.5rem' : '1.8rem';
-  } else {
-    // pct is based on basePts (without time bonus) for color/label thresholds
-    const basePts = pts - timeBonus;
-    const isClose = basePts >= 85;
-    const isGood  = basePts >= 110;
-    fontSize  = perfect ? '5.5rem' : isGood ? '4.2rem' : isClose ? '3.2rem' : '2.5rem';
-    labelSize = perfect ? '3.3rem' : isGood ? '2.5rem' : isClose ? '1.9rem' : '1.5rem';
-    color = perfect || isGood ? '#1a7f37' : isClose ? '#2da44e' : '#cf2316';
-    if (pts === 0)    label = lang === 'he' ? 'פספוס!'       : 'Miss!';
-    else if (perfect) label = lang === 'he' ? '🎯 מושלם!'    : '🎯 Perfect!';
-    else if (isGood)  label = lang === 'he' ? 'קרוב מאוד!'   : 'Very close!';
-    else if (isClose) label = lang === 'he' ? 'לא רע!'       : 'Not bad!';
-    else              label = lang === 'he' ? 'רחוק מאוד...' : 'Very far...';
-    cls = perfect ? 'show-perfect' : isClose ? 'show-good' : 'show-miss';
-  }
+  let emoji, grade;
+  if (perfect)          { emoji='🎯'; grade=lang==='he'?'מושלם!':'Nailed it!';          color='#1a7f37'; cls='show-perfect'; }
+  else if (distKm<=5)   { emoji='🌟'; grade=lang==='he'?'כמעט מושלם!':'Almost perfect!'; color='#2da44e'; cls='show-perfect'; }
+  else if (distKm<=15)  { emoji='👏'; grade=lang==='he'?'יפה מאוד!':'Nice one!';         color='#0d7377'; cls='show-good'; }
+  else if (distKm<=40)  { emoji='🗺️'; grade=lang==='he'?'לא רע!':'Not bad!';            color='#d29922'; cls='show-good'; }
+  else if (distKm<=100) { emoji='😅'; grade=lang==='he'?'לא מדויק...':'Off the mark…';   color='#e5670a'; cls='show-miss'; }
+  else                  { emoji='💀'; grade=lang==='he'?'רחוק מאוד!':'Way off!';         color='#cf2316'; cls='show-miss'; }
+  label     = `${emoji} ${grade}`;
+  fontSize  = perfect || distKm<=5 ? '5.5rem' : distKm<=15 ? '4.2rem' : '3rem';
+  labelSize = perfect || distKm<=5 ? '3.3rem' : distKm<=15 ? '2.5rem' : '1.8rem';
 
   el.innerHTML = `
     <span class="pts-label" dir="${lang === 'he' ? 'rtl' : 'ltr'}" style="color:${color};font-size:${labelSize}">${label}</span>
