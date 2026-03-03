@@ -4335,32 +4335,22 @@ function showPtsPopup(pts, pct, perfect, distKm, timeBonus = 0) {
   el.className = '';
   void el.offsetWidth;
 
-  // pct is based on basePts (without time bonus) for color/label thresholds
-  const basePts   = pts - timeBonus;
-  const isClose   = basePts >= 85;
-  const isGood    = basePts >= 110;
-
-  const fontSize  = perfect ? '5.5rem' : isGood ? '4.2rem' : isClose ? '3.2rem' : '2.5rem';
-  const labelSize = perfect ? '3.3rem' : isGood ? '2.5rem' : isClose ? '1.9rem' : '1.5rem';
-
-  const color = perfect || isGood ? '#1a7f37'
-              : isClose           ? '#2da44e'
-              : pts > 0           ? '#cf2316'
-              :                     '#cf2316';
-
-  // Label text uses distance-based tiers (same as post-challenge popup)
-  let emoji, grade;
-  if (perfect)          { emoji='🎯'; grade=lang==='he'?'מושלם!':'Nailed it!'; }
-  else if (distKm<=5)   { emoji='🌟'; grade=lang==='he'?'כמעט מושלם!':'Almost perfect!'; }
-  else if (distKm<=15)  { emoji='👏'; grade=lang==='he'?'יפה מאוד!':'Nice one!'; }
-  else if (distKm<=40)  { emoji='🗺️'; grade=lang==='he'?'לא רע!':'Not bad!'; }
-  else if (distKm<=100) { emoji='😅'; grade=lang==='he'?'לא מדויק...':'Off the mark…'; }
-  else                  { emoji='💀'; grade=lang==='he'?'רחוק מאוד!':'Way off!'; }
+  // Color and label both keyed on distance (matches challenge post-game popup)
+  let emoji, grade, color;
+  if (perfect)          { emoji='🎯'; grade=lang==='he'?'מושלם!':'Nailed it!';         color='#1a7f37'; }
+  else if (distKm<=5)   { emoji='🌟'; grade=lang==='he'?'כמעט מושלם!':'Almost perfect!'; color='#2da44e'; }
+  else if (distKm<=15)  { emoji='👏'; grade=lang==='he'?'יפה מאוד!':'Nice one!';         color='#0d7377'; }
+  else if (distKm<=40)  { emoji='🗺️'; grade=lang==='he'?'לא רע!':'Not bad!';            color='#d29922'; }
+  else if (distKm<=100) { emoji='😅'; grade=lang==='he'?'לא מדויק...':'Off the mark…';  color='#e5670a'; }
+  else                  { emoji='💀'; grade=lang==='he'?'רחוק מאוד!':'Way off!';         color='#cf2316'; }
   const label = `${emoji} ${grade}`;
 
-  const cls = perfect ? 'show-perfect' : isClose ? 'show-good' : 'show-miss';
+  const fontSize  = perfect ? '5.5rem' : distKm<=15 ? '4.2rem' : distKm<=40 ? '3.2rem' : '2.5rem';
+  const labelSize = perfect ? '3.3rem' : distKm<=15 ? '2.5rem' : distKm<=40 ? '1.9rem' : '1.5rem';
+
+  const cls = perfect ? 'show-perfect' : distKm<=40 ? 'show-good' : 'show-miss';
   const dir = lang === 'he' ? 'rtl' : 'ltr';
-  const timeBonusLine = timeBonus > 0
+  const timeBonusLine = !isChallengeMode && perfect && timeBonus > 0
     ? `<span class="pts-time-bonus" style="color:${color}">+${timeBonus} ⏱ ${lang === 'he' ? 'בונוס זמן' : 'time bonus'}</span>`
     : '';
 
