@@ -6003,11 +6003,8 @@ function toggleTop5View() {
 // ── Daily Challenge score saving & percentile display ─────────────────────
 
 async function saveDailyScore(myScore) {
-  const { collection, addDoc, serverTimestamp, signInAnonymously } = window._fbFns;
-  // Ensure an auth session exists (anonymous if not signed in) so Firestore rules pass
-  if (!window._fbUser) {
-    try { await signInAnonymously(window._fbAuth); } catch (_) {}
-  }
+  if (!window._fbUser) return;   // don't create a ghost anonymous account
+  const { collection, addDoc, serverTimestamp } = window._fbFns;
   const today = _getDailyChallengeDay().dateStr; // Israel date, resets at 04:00 IST
   try {
     await addDoc(collection(window._fbDb, 'daily_scores'), {
@@ -6036,7 +6033,17 @@ async function showDailyPercentile(myScore) {
   ring.style.background = 'conic-gradient(#e8eaed 360deg, #e8eaed 360deg)';
   popup.classList.add('show');
 
-  // Save this score anonymously, then read today's full distribution
+  // Guest: nothing to save or fetch — prompt them to log in
+  if (!window._fbUser) {
+    pctVal.textContent  = '🔒';
+    pctLbl.textContent  = '';
+    msgEl.textContent   = lang === 'he' ? 'התחבר כדי לראות את הדירוג שלך' : 'Log in to see how you rank';
+    countEl.textContent = '';
+    ring.style.background = 'conic-gradient(#e8eaed 360deg, #e8eaed 0deg)';
+    return;
+  }
+
+  // Save score, then read today's full distribution
   await saveDailyScore(myScore);
 
   const { collection, query, where, getDocs } = window._fbFns;
