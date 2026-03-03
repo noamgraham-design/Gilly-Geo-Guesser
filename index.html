@@ -2951,7 +2951,6 @@
     <div class="lr-levelup-nickname" id="lr-levelup-nickname"></div>
     <div class="lr-levelup-level" id="lr-levelup-level"></div>
     <div class="lr-levelup-name" id="lr-levelup-name"></div>
-    <div class="lr-levelup-stars">⭐ ✨ ⭐</div>
     <button id="lr-levelup-close" onclick="closeLevelUpPopup()">💪 Let's Go!</button>
   </div>
 </div>
@@ -5037,6 +5036,7 @@ function showLevelUpPopup(newTier) {
   titleEl.dir = heDir;
   levelEl.dir = heDir;
   nameEl.dir = heDir;
+  closeEl.dir = heDir;
 
   if (isAllMastered) {
     titleEl.textContent = lang === 'he' ? 'שלטת בהכל!' : 'All Mastered!';
