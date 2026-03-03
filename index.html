@@ -3009,7 +3009,7 @@
     </div>
     <div id="dp-message"></div>
     <div id="dp-count"></div>
-    <button id="dp-close-btn" onclick="document.getElementById('daily-percentile-popup').classList.remove('show')">Got it!</button>
+    <button id="dp-close-btn" onclick="document.getElementById('daily-percentile-popup').classList.remove('show'); showMenu()">Got it!</button>
   </div>
 </div>
 
@@ -5348,6 +5348,14 @@ function startDailyChallengeGame() {
 
 function startDailyChallengePreview(town) {
   dailyChallengePreviewActive = true;
+
+  // Lock zoom during the street-view memorisation phase
+  map.scrollWheelZoom.disable();
+  map.doubleClickZoom.disable();
+  map.touchZoom.disable();
+  map.keyboard.disable();
+  if (map.zoomControl) map.zoomControl.getContainer().style.pointerEvents = 'none';
+
   let secondsLeft = 15;
   const bar = document.getElementById('learning-preview-bar');
   const msgEl = document.getElementById('learning-preview-msg');
@@ -5371,6 +5379,13 @@ function endDailyChallengePreview(town) {
   clearInterval(dailyChallengePreviewInterval);
   dailyChallengePreviewTimer = dailyChallengePreviewInterval = null;
   document.getElementById('learning-preview-bar').classList.remove('active');
+
+  // Restore zoom
+  map.scrollWheelZoom.enable();
+  map.doubleClickZoom.enable();
+  map.touchZoom.enable();
+  map.keyboard.enable();
+  if (map.zoomControl) map.zoomControl.getContainer().style.pointerEvents = '';
 
   // Switch to satellite view (step 3d)
   if (currentLayer === 'street') toggleMapLayer(true);
@@ -5396,6 +5411,11 @@ function clearDailyChallengePreview() {
   clearInterval(dailyChallengePreviewInterval);
   dailyChallengePreviewTimer = dailyChallengePreviewInterval = null;
   document.getElementById('learning-preview-bar').classList.remove('active');
+  map.scrollWheelZoom.enable();
+  map.doubleClickZoom.enable();
+  map.touchZoom.enable();
+  map.keyboard.enable();
+  if (map.zoomControl) map.zoomControl.getContainer().style.pointerEvents = '';
 }
 
 async function startLearning() {
