@@ -4,6 +4,15 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <title>Gilly Israel Quiz</title>
+<meta property="og:type"        content="website"/>
+<meta property="og:title"       content="Gilly Israel Quiz"/>
+<meta property="og:description" content="How well do you know Israel? Click on the map to find cities and towns!"/>
+<meta property="og:image"       content="logo.png"/>
+<meta property="og:image:width"  content="512"/>
+<meta property="og:image:height" content="512"/>
+<meta name="twitter:card"       content="summary"/>
+<meta name="twitter:title"      content="Gilly Israel Quiz"/>
+<meta name="twitter:image"      content="logo.png"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
@@ -6005,6 +6014,9 @@ function _shareCopyFallback(text) {
 /* ── CHALLENGE CREATE (share popup) ────────────────────────────────────────── */
 function onChallengeSearchInput(e) {
   const q = e.target.value.trim();
+  // Any manual edit invalidates the previously picked town
+  challengePickedTown = null;
+  document.getElementById('challenge-link-area').style.display = 'none';
   if (!q) { _hideChallengeDropdown(); return; }
   const lower = q.toLowerCase();
   const matches = TOWNS.filter(t =>
@@ -6055,8 +6067,8 @@ function shareChallengeCreate(method) {
   const townName = lang === 'he' ? challengePickedTown.nameHe : challengePickedTown.name;
   if (method === 'wa') {
     const text = lang === 'he'
-      ? encodeURIComponent(`אני מאתגר/ת אותך! תמצא/י את ${townName} על המפה 🗺️ ${url}`)
-      : encodeURIComponent(`I challenge you to find ${townName} on the map! 🗺️ ${url}`);
+      ? encodeURIComponent(`\u200Fגילי מאתגר/ת אותך! תמצא/י את ${townName} על המפה 🗺️ ${url}`)
+      : encodeURIComponent(`Gilly challenges you to find ${townName} on the map! 🗺️ ${url}`);
     window.open('https://wa.me/?text=' + text, '_blank');
   } else {
     const doShow = () => {
@@ -6192,7 +6204,7 @@ function shareChallengeResult(method) {
   else resultStr = lang === 'he' ? `${distKm.toFixed(distKm<10?1:0)} ק"מ מהיעד` : `${distKm.toFixed(distKm<10?1:0)} km away`;
 
   const text = lang === 'he'
-    ? `מצאתי את ${townName}! ${resultStr} 🗺️ תנסה/י גם: ${url}`
+    ? `\u200Fמצאתי את ${townName}! ${resultStr} 🗺️ תנסה/י גם: ${url}`
     : `I found ${townName}! ${resultStr} 🗺️ Can you beat me? ${url}`;
 
   if (method === 'wa') {
