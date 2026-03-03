@@ -2827,9 +2827,9 @@
     <div id="dci-icon">⚡</div>
     <div id="dci-title">אתגר יומי</div>
     <div id="dci-desc-box">
-      <span id="dci-desc-text">למד את האיזור המוצג במפה במשך 15 שניות, לאחר מכן מצא את המיקום</span>
+      <span id="dci-desc-text">למד/י את האיזור המוצג במפה במשך 15 שניות<br>לאחר מכן מצא/י את המיקום</span>
     </div>
-    <button id="dci-start-btn" onclick="startDailyChallengeGame()">בואו נתחיל! →</button>
+    <button id="dci-start-btn" dir="rtl" onclick="startDailyChallengeGame()">בואו נתחיל!</button>
   </div>
 </div>
 
@@ -5285,12 +5285,16 @@ function getRandomPointNearby(lat, lng, radiusKm) {
 
 function startDailyChallenge() {
   // Step 2: Show intro popup with explanation
+  const isHe = lang === 'he';
   const descEl = document.getElementById('dci-desc-text');
-  descEl.textContent = lang === 'he'
-    ? 'למד את האיזור המוצג במפה במשך 15 שניות, לאחר מכן מצא את המיקום'
-    : 'Learn the area shown in the street map, then pin the location';
-  document.getElementById('dci-title').textContent = lang === 'he' ? 'אתגר יומי' : 'Daily Challenge';
-  document.getElementById('dci-start-btn').textContent = lang === 'he' ? '!בואו נתחיל ←' : "Let's go! →";
+  descEl.innerHTML = isHe
+    ? 'למד/י את האיזור המוצג במפה במשך 15 שניות<br>לאחר מכן מצא/י את המיקום'
+    : 'Learn the area shown in the street map<br>Then pin the location';
+  descEl.style.direction = isHe ? 'rtl' : 'ltr';
+  document.getElementById('dci-title').textContent = isHe ? 'אתגר יומי' : 'Daily Challenge';
+  const startBtn = document.getElementById('dci-start-btn');
+  startBtn.textContent = isHe ? 'בואו נתחיל!' : "Let's go! →";
+  startBtn.style.direction = isHe ? 'rtl' : 'ltr';
   document.getElementById('daily-challenge-intro').classList.add('open');
 }
 
