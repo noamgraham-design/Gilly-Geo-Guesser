@@ -6005,6 +6005,9 @@ function _shareCopyFallback(text) {
 /* ── CHALLENGE CREATE (share popup) ────────────────────────────────────────── */
 function onChallengeSearchInput(e) {
   const q = e.target.value.trim();
+  // Any manual edit invalidates the previously picked town
+  challengePickedTown = null;
+  document.getElementById('challenge-link-area').style.display = 'none';
   if (!q) { _hideChallengeDropdown(); return; }
   const lower = q.toLowerCase();
   const matches = TOWNS.filter(t =>
