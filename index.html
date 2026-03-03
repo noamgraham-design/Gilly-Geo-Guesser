@@ -4354,15 +4354,8 @@ function showPtsPopup(pts, pct, perfect, distKm, timeBonus = 0) {
   else if (isClose) label = lang === 'he' ? 'לא רע!'       : 'Not bad!';
   else              label = lang === 'he' ? 'רחוק מאוד...' : 'Very far...';
 
-  const prefix = pts > 0 ? '+' : '';
-  const timeLine = timeBonus > 0
-    ? `<span class="pts-time-bonus" style="color:${color}">⚡ +${timeBonus} ${lang === 'he' ? 'מהיר' : 'speed'}</span>`
-    : '';
-
   el.innerHTML = `
-    <span class="pts-number" style="font-size:${fontSize};color:${color}">${prefix}${pts}</span>
     <span class="pts-label" dir="${lang === 'he' ? 'rtl' : 'ltr'}" style="color:${color};font-size:${labelSize}">${label}</span>
-    ${timeLine}
   `;
 
   const cls = perfect ? 'show-perfect' : isClose ? 'show-good' : 'show-miss';
