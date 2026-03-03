@@ -1326,6 +1326,126 @@
   }
   #share-copied-toast.show { display: block; }
 
+  /* ── CHALLENGE CREATE (in share popup) ────────────────────────────────── */
+  .share-divider {
+    height: 1px; background: var(--border); margin: 4px 0;
+  }
+  .share-section-label {
+    font-size: 0.72rem; text-transform: uppercase;
+    letter-spacing: 1.4px; color: var(--muted); font-weight: 700;
+  }
+  .challenge-search-wrap { position: relative; }
+  .challenge-search-input {
+    width: 100%; padding: 9px 12px; border-radius: 10px;
+    border: 1.5px solid var(--border); background: var(--bg);
+    color: var(--text); font-family: 'Source Serif 4', 'Alef', serif;
+    font-size: 0.88rem; outline: none; transition: border-color 0.15s;
+  }
+  .challenge-search-input:focus { border-color: rgba(100,120,220,0.45); }
+  .challenge-search-dropdown {
+    display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 10px; overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12); z-index: 10;
+    max-height: 216px; overflow-y: auto;
+  }
+  .challenge-dd-item {
+    display: block; width: 100%; text-align: left; padding: 9px 14px;
+    border: none; background: none; color: var(--text);
+    font-family: 'Source Serif 4', 'Alef', serif; font-size: 0.88rem; cursor: pointer;
+  }
+  .challenge-dd-item:hover { background: var(--bg); }
+  .challenge-dd-item + .challenge-dd-item { border-top: 1px solid var(--border); }
+  #challenge-link-area { display: none; flex-direction: column; gap: 8px; }
+  #challenge-copied-toast {
+    display: none; text-align: center; font-size: 0.85rem;
+    color: var(--green); font-weight: 600;
+  }
+  #challenge-copied-toast.show { display: block; }
+
+  /* ── CHALLENGE INTRO POPUP ────────────────────────────────────────────── */
+  #challenge-intro {
+    display: none; position: fixed; inset: 0; z-index: 9800;
+    background: rgba(0,0,0,0.62); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center;
+  }
+  #challenge-intro.open { display: flex; }
+  #challenge-intro-card {
+    background: var(--surface); border-radius: 24px; padding: 36px 32px 28px;
+    width: min(400px, 92vw); box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+    display: flex; flex-direction: column; gap: 10px; text-align: center;
+    animation: loginPop 0.3s cubic-bezier(.34,1.4,.64,1);
+  }
+  #challenge-intro-badge {
+    align-self: center; padding: 4px 14px; border-radius: 50px;
+    background: linear-gradient(90deg, #1a6fd4, #7c3aed); color: #fff;
+    font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+  }
+  #challenge-intro-heading {
+    font-family: 'Playfair Display','Alef',serif; font-size: 0.95rem;
+    font-weight: 700; color: var(--muted); margin-top: 4px;
+  }
+  #challenge-intro-town {
+    font-family: 'Playfair Display','Alef',serif; font-size: 2.1rem; font-weight: 900;
+    line-height: 1.15;
+    background: linear-gradient(90deg, #1a6fd4, #7c3aed);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  #challenge-intro-sub {
+    font-size: 0.88rem; color: var(--muted); line-height: 1.55;
+  }
+  #challenge-intro-btn {
+    margin-top: 8px; padding: 13px 24px; border-radius: 50px; border: none;
+    background: linear-gradient(90deg, #1a6fd4, #7c3aed); color: #fff;
+    font-family: 'Source Serif 4','Alef',serif; font-size: 1rem; font-weight: 700;
+    cursor: pointer; transition: opacity 0.15s, transform 0.15s;
+    box-shadow: 0 4px 16px rgba(80,80,220,0.28);
+  }
+  #challenge-intro-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+  /* ── CHALLENGE RESULT POPUP ───────────────────────────────────────────── */
+  #challenge-result {
+    display: none; position: fixed; inset: 0; z-index: 9800;
+    background: rgba(0,0,0,0.62); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  #challenge-result.open { display: flex; }
+  #challenge-result-card {
+    background: var(--surface); border-radius: 24px; padding: 32px 28px 24px;
+    width: min(400px, 92vw); box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+    display: flex; flex-direction: column; gap: 10px; text-align: center;
+    animation: loginPop 0.35s cubic-bezier(.34,1.4,.64,1);
+    max-height: 92vh; overflow-y: auto;
+  }
+  #cr-emoji {
+    font-size: 3.4rem; line-height: 1;
+    animation: factCardPop 0.4s cubic-bezier(.34,1.56,.64,1) 0.08s both;
+  }
+  #cr-grade {
+    font-family: 'Playfair Display','Alef',serif; font-size: 1.55rem; font-weight: 900; line-height: 1.1;
+  }
+  #cr-dist-num {
+    font-family: 'Playfair Display','Alef',serif; font-size: 2.6rem; font-weight: 900;
+    line-height: 1; margin: 2px 0;
+  }
+  #cr-distance { font-size: 0.82rem; color: var(--muted); font-weight: 600; }
+  #cr-bar-wrap {
+    height: 7px; background: rgba(0,0,0,0.08); border-radius: 99px; overflow: hidden; margin: 4px 0;
+  }
+  #cr-bar { height: 100%; border-radius: 99px; width: 0%; transition: width 0.9s cubic-bezier(.34,1.2,.64,1); }
+  #cr-share-section { display: flex; flex-direction: column; gap: 8px; text-align: left; margin-top: 4px; }
+  #cr-copied-toast {
+    display: none; text-align: center; font-size: 0.85rem; color: var(--green); font-weight: 600;
+  }
+  #cr-copied-toast.show { display: block; }
+  #cr-play-btn {
+    padding: 11px 24px; border-radius: 50px; border: 1.5px solid var(--border);
+    background: var(--surface); color: var(--text);
+    font-family: 'Source Serif 4','Alef',serif; font-size: 0.9rem; font-weight: 600;
+    cursor: pointer; transition: all 0.15s;
+  }
+  #cr-play-btn:hover { background: var(--bg); border-color: rgba(0,0,0,0.2); }
+
   /* Background clouds (in overlay, not in card) */
   .overlay-bg-clouds {
     position: absolute;
@@ -2537,6 +2657,71 @@
       </button>
     </div>
     <div id="share-copied-toast">✅ Link copied!</div>
+
+    <!-- Challenge a Friend section -->
+    <div class="share-divider"></div>
+    <div class="share-section-label" id="lbl-challenge-section">Challenge a Friend</div>
+    <div class="challenge-search-wrap">
+      <input id="challenge-search-input" type="text" class="challenge-search-input"
+             oninput="onChallengeSearchInput(event)"
+             onfocus="onChallengeSearchFocus(event)"
+             autocomplete="off"/>
+      <div id="challenge-search-dropdown" class="challenge-search-dropdown"></div>
+    </div>
+    <div id="challenge-link-area">
+      <button class="share-option share-option-whatsapp" onclick="shareChallengeCreate('wa')">
+        <span class="share-option-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        </span>
+        <span id="lbl-challenge-wa">Challenge on WhatsApp</span>
+      </button>
+      <button class="share-option share-option-link" onclick="shareChallengeCreate('copy')">
+        <span class="share-option-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        </span>
+        <span id="lbl-challenge-copy">Copy challenge link</span>
+      </button>
+      <div id="challenge-copied-toast"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CHALLENGE INTRO POPUP -->
+<div id="challenge-intro">
+  <div id="challenge-intro-card">
+    <div id="challenge-intro-badge">Challenge</div>
+    <div id="challenge-intro-heading">Find this location</div>
+    <div id="challenge-intro-town"></div>
+    <div id="challenge-intro-sub">Click on the map where you think it is!</div>
+    <button id="challenge-intro-btn" onclick="startChallengeGame()">Let's go →</button>
+  </div>
+</div>
+
+<!-- CHALLENGE RESULT POPUP -->
+<div id="challenge-result">
+  <div id="challenge-result-card">
+    <div id="cr-emoji"></div>
+    <div id="cr-grade"></div>
+    <div id="cr-dist-num"></div>
+    <div id="cr-distance"></div>
+    <div id="cr-bar-wrap"><div id="cr-bar"></div></div>
+    <div id="cr-share-section">
+      <div class="share-section-label" id="lbl-cr-share">Share your result</div>
+      <button class="share-option share-option-whatsapp" onclick="shareChallengeResult('wa')">
+        <span class="share-option-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        </span>
+        <span id="lbl-cr-wa">Share on WhatsApp</span>
+      </button>
+      <button class="share-option share-option-link" onclick="shareChallengeResult('copy')">
+        <span class="share-option-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        </span>
+        <span id="lbl-cr-copy">Copy result</span>
+      </button>
+      <div id="cr-copied-toast"></div>
+    </div>
+    <button id="cr-play-btn" onclick="exitChallengeMode()">Play the full game →</button>
   </div>
 </div>
 
@@ -3335,6 +3520,33 @@ function applyLang() {
   if (shareCopyLabel) shareCopyLabel.textContent = lang === 'he' ? 'העתק קישור' : 'Copy link';
   const shareCardTitle = document.getElementById('share-card-title');
   if (shareCardTitle) shareCardTitle.textContent = lang === 'he' ? 'שתף' : 'Share';
+  // Challenge create strings
+  const elCS = document.getElementById('lbl-challenge-section');
+  if (elCS) elCS.textContent = lang === 'he' ? 'אתגר חבר/ה' : 'Challenge a Friend';
+  const elCWA = document.getElementById('lbl-challenge-wa');
+  if (elCWA) elCWA.textContent = lang === 'he' ? 'אתגר בוואטסאפ' : 'Challenge on WhatsApp';
+  const elCC = document.getElementById('lbl-challenge-copy');
+  if (elCC) elCC.textContent = lang === 'he' ? 'העתק קישור אתגר' : 'Copy challenge link';
+  const cInput = document.getElementById('challenge-search-input');
+  if (cInput && !cInput.value) cInput.placeholder = lang === 'he' ? 'חפש/י מיקום...' : 'Search for a location...';
+  // Challenge intro strings
+  const ciH = document.getElementById('challenge-intro-heading');
+  if (ciH) ciH.textContent = lang === 'he' ? 'מצא/י את המיקום הזה' : 'Find this location';
+  const ciS = document.getElementById('challenge-intro-sub');
+  if (ciS) ciS.textContent = lang === 'he' ? '!לחץ/י על המפה איפה שאתה/ת חושב/ת שהוא נמצא' : 'Click on the map where you think it is!';
+  const ciBtn = document.getElementById('challenge-intro-btn');
+  if (ciBtn) ciBtn.textContent = lang === 'he' ? '!בואו נתחיל ←' : "Let's go →";
+  // Challenge result strings
+  const lcrS = document.getElementById('lbl-cr-share');
+  if (lcrS) lcrS.textContent = lang === 'he' ? 'שתפ/י את התוצאה' : 'Share your result';
+  const lcrWA = document.getElementById('lbl-cr-wa');
+  if (lcrWA) lcrWA.textContent = lang === 'he' ? 'שתפ/י בוואטסאפ' : 'Share on WhatsApp';
+  const lcrC = document.getElementById('lbl-cr-copy');
+  if (lcrC) lcrC.textContent = lang === 'he' ? 'העתק תוצאה' : 'Copy result';
+  const crPlay = document.getElementById('cr-play-btn');
+  if (crPlay) crPlay.textContent = lang === 'he' ? 'שחק/י את המשחק המלא ←' : 'Play the full game →';
+  const ciBadge = document.getElementById('challenge-intro-badge');
+  if (ciBadge) ciBadge.textContent = lang === 'he' ? 'אתגר' : 'Challenge';
   // Set text direction for text-heavy elements only (not the card itself, to keep button order stable)
   document.getElementById('menu-desc').style.direction = lang === 'he' ? 'rtl' : 'ltr';
   document.getElementById('menu-mode-title').style.direction = lang === 'he' ? 'rtl' : 'ltr';
@@ -3382,6 +3594,12 @@ let lang = "he";
 let difficulty = "medium", region = "all", sequence = [], currentIdx = 0, score = 0, roundCount = 8;
 let streak = 0, hintUsed = false, streetUsedThisRound = false, results = [], waiting = false;
 let correctMarkers = [], clickMarker = null, circle = null, hintCircle = null;
+
+// ── Challenge mode state ──────────────────────────────────────────────────────
+let isChallengeMode = false;
+let _challengeTown = null;        // town object for the active challenge link
+let _challengeResult = null;      // {distKm, perfect} stored after the guess
+let challengePickedTown = null;   // town selected in the share popup creator
 let hintsLeft = 3, hintAnimFrame = null;
 
 // ── Learning Mode State ───────────────────────────────────────────────────────
@@ -5016,8 +5234,10 @@ function onMapClick(e) {
     clearMapFeedback();
     currentIdx++;
     waiting = false;
-    if (currentIdx >= roundCount) showResults();
-    else {
+    if (currentIdx >= roundCount) {
+      if (isChallengeMode) showChallengeResult();
+      else showResults();
+    } else {
       // Zoom out to the same view the game started with
       const v = REGION_VIEWS[region];
       map.setView(v.center, v.zoom);
@@ -5067,6 +5287,10 @@ function showResults() {
 setDiff('medium');
 setRegion('all');
 applyLang();
+
+// Detect and launch challenge mode if URL param is present
+_initChallengeMode();
+if (isChallengeMode) showChallengeIntro();
 
 // ── RANDOM DEFAULT NICKNAME ────────────────────────────────────────────────
 function generateRandomNickname() {
@@ -5729,6 +5953,12 @@ async function saveSettings() {
 function openSharePopup() {
   document.getElementById('share-popup').classList.add('open');
   document.getElementById('share-copied-toast').classList.remove('show');
+  document.getElementById('share-card').dir = lang === 'he' ? 'rtl' : 'ltr';
+  // Reset challenge section
+  challengePickedTown = null;
+  document.getElementById('challenge-link-area').style.display = 'none';
+  document.getElementById('challenge-search-input').value = '';
+  _hideChallengeDropdown();
 }
 
 function closeSharePopup() {
@@ -5770,6 +6000,230 @@ function _shareCopyFallback(text) {
   ta.select();
   try { document.execCommand('copy'); } catch(e) {}
   document.body.removeChild(ta);
+}
+
+/* ── CHALLENGE CREATE (share popup) ────────────────────────────────────────── */
+function onChallengeSearchInput(e) {
+  const q = e.target.value.trim();
+  if (!q) { _hideChallengeDropdown(); return; }
+  const lower = q.toLowerCase();
+  const matches = TOWNS.filter(t =>
+    t.name.toLowerCase().includes(lower) || t.nameHe.includes(q)
+  ).slice(0, 8);
+  _renderChallengeDropdown(matches);
+}
+
+function onChallengeSearchFocus(e) {
+  if (e.target.value.trim()) onChallengeSearchInput(e);
+}
+
+function _renderChallengeDropdown(towns) {
+  const dd = document.getElementById('challenge-search-dropdown');
+  if (!towns.length) { _hideChallengeDropdown(); return; }
+  dd.innerHTML = towns.map(t => {
+    const display = lang === 'he' ? t.nameHe : t.name;
+    const sub = lang === 'he' ? t.name : t.nameHe;
+    return `<button class="challenge-dd-item" onclick="selectChallengeTown('${t.name.replace(/'/g,"\\'")}')">
+      ${display}<span style="color:var(--muted);font-size:0.78rem;margin-inline-start:6px">${sub}</span>
+    </button>`;
+  }).join('');
+  dd.style.display = 'block';
+}
+
+function _hideChallengeDropdown() {
+  const dd = document.getElementById('challenge-search-dropdown');
+  dd.style.display = 'none';
+  dd.innerHTML = '';
+}
+
+function selectChallengeTown(englishName) {
+  challengePickedTown = TOWNS.find(t => t.name === englishName);
+  if (!challengePickedTown) return;
+  _hideChallengeDropdown();
+  const input = document.getElementById('challenge-search-input');
+  input.value = lang === 'he' ? challengePickedTown.nameHe : challengePickedTown.name;
+  document.getElementById('challenge-link-area').style.display = 'flex';
+}
+
+function _getChallengeUrl(town) {
+  return window.location.origin + window.location.pathname + '?challenge=' + encodeURIComponent(town.name);
+}
+
+function shareChallengeCreate(method) {
+  if (!challengePickedTown) return;
+  const url = _getChallengeUrl(challengePickedTown);
+  const townName = lang === 'he' ? challengePickedTown.nameHe : challengePickedTown.name;
+  if (method === 'wa') {
+    const text = lang === 'he'
+      ? encodeURIComponent(`אני מאתגר/ת אותך! תמצא/י את ${townName} על המפה 🗺️ ${url}`)
+      : encodeURIComponent(`I challenge you to find ${townName} on the map! 🗺️ ${url}`);
+    window.open('https://wa.me/?text=' + text, '_blank');
+  } else {
+    const doShow = () => {
+      const toast = document.getElementById('challenge-copied-toast');
+      toast.textContent = lang === 'he' ? '✅ הקישור הועתק!' : '✅ Link copied!';
+      toast.classList.remove('show'); void toast.offsetWidth; toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(doShow).catch(() => { _shareCopyFallback(url); doShow(); });
+    } else { _shareCopyFallback(url); doShow(); }
+  }
+}
+
+// Close challenge dropdown when clicking outside
+document.addEventListener('click', e => {
+  const wrap = document.querySelector('.challenge-search-wrap');
+  if (wrap && !wrap.contains(e.target)) _hideChallengeDropdown();
+});
+
+/* ── CHALLENGE GAME (receiving end) ────────────────────────────────────────── */
+function _initChallengeMode() {
+  const param = new URLSearchParams(window.location.search).get('challenge');
+  if (!param) return;
+  const town = TOWNS.find(t => t.name === decodeURIComponent(param));
+  if (!town) return;
+  _challengeTown = town;
+  isChallengeMode = true;
+  // Show intro as soon as the page is interactive
+  // (called from after applyLang() at the bottom of the script)
+}
+
+function showChallengeIntro() {
+  const town = _challengeTown;
+  const townName = lang === 'he' ? town.nameHe : town.name;
+  document.getElementById('challenge-intro-town').textContent = townName;
+  document.getElementById('challenge-intro-card').dir = lang === 'he' ? 'rtl' : 'ltr';
+  document.getElementById('challenge-intro').classList.add('open');
+  // Hide the main menu overlay — challenge goes straight to the map
+  document.getElementById('overlay').style.display = 'none';
+}
+
+function startChallengeGame() {
+  document.getElementById('challenge-intro').classList.remove('open');
+  difficulty = 'medium';
+  region = 'all';
+  sequence = [_challengeTown];
+  roundCount = 1;
+  currentIdx = score = streak = 0;
+  results = [];
+  waiting = false;
+  hintsLeft = 0;
+  clearAllMarkers();
+
+  // Hide HUD (round + score counters) and back button for challenge mode
+  document.getElementById('hud').style.display = 'none';
+  document.getElementById('btn-back').style.display = 'none';
+  document.getElementById('btn-hint').style.display = 'none';
+  document.getElementById('mobile-tools-hint').style.display = 'none';
+
+  if (currentLayer === 'street') toggleMapLayer(true);
+  document.getElementById('results-panel').className = '';
+  document.getElementById('scoreboard-panel').className = '';
+
+  const v = REGION_VIEWS['all'];
+  map.setView(v.center, v.zoom);
+  loadTown();
+}
+
+/* ── CHALLENGE RESULT ───────────────────────────────────────────────────────── */
+function showChallengeResult() {
+  const r = results[0];
+  if (!r) return;
+  const distKm = parseFloat(r.distKm);
+  const perfect = r.hit;
+  _challengeResult = { distKm, perfect };
+
+  // Grade tiers
+  let emoji, grade, color;
+  if (perfect)         { emoji='🎯'; grade = lang==='he'?'פגיעה מושלמת!':'Nailed it!';      color='#1a7f37'; }
+  else if (distKm<=5)  { emoji='🌟'; grade = lang==='he'?'כמעט מושלם!':'Almost perfect!';   color='#2da44e'; }
+  else if (distKm<=15) { emoji='👏'; grade = lang==='he'?'יפה מאוד!':'Nice one!';            color='#0d7377'; }
+  else if (distKm<=40) { emoji='🗺️'; grade = lang==='he'?'לא רע!':'Not bad!';              color='#d29922'; }
+  else if (distKm<=100){ emoji='😅'; grade = lang==='he'?'לא מדויק...':'Off the mark...';   color='#e5670a'; }
+  else                  { emoji='💀'; grade = lang==='he'?'רחוק מאוד!':'Way off!';          color='#cf2316'; }
+
+  // Distance display
+  let distDisplay, distLabel;
+  if (perfect) {
+    distDisplay = '0';
+    distLabel = lang === 'he' ? 'ק"מ מהיעד' : 'km from target';
+  } else if (distKm < 1) {
+    distDisplay = Math.round(distKm * 1000).toString();
+    distLabel = lang === 'he' ? 'מטר מהיעד' : 'm from target';
+  } else {
+    distDisplay = distKm.toFixed(distKm < 10 ? 1 : 0);
+    distLabel = lang === 'he' ? 'ק"מ מהיעד' : 'km from target';
+  }
+
+  document.getElementById('cr-emoji').textContent = emoji;
+  document.getElementById('cr-grade').textContent = grade;
+  document.getElementById('cr-grade').style.color = color;
+  document.getElementById('cr-dist-num').textContent = distDisplay;
+  document.getElementById('cr-dist-num').style.color = color;
+  document.getElementById('cr-distance').textContent = distLabel;
+
+  // Accuracy bar: 100% = perfect, scales down with distance (max ~200km across Israel)
+  const accuracy = perfect ? 100 : Math.max(2, Math.round(100 * (1 - Math.min(distKm, 200) / 200)));
+  document.getElementById('cr-bar').style.background = color;
+
+  const card = document.getElementById('challenge-result-card');
+  card.dir = lang === 'he' ? 'rtl' : 'ltr';
+  document.getElementById('cr-copied-toast').classList.remove('show');
+  document.getElementById('challenge-result').classList.add('open');
+
+  // Animate bar after popup is visible
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      document.getElementById('cr-bar').style.width = accuracy + '%';
+    });
+  });
+}
+
+function shareChallengeResult(method) {
+  if (!_challengeResult || !_challengeTown) return;
+  const { distKm, perfect } = _challengeResult;
+  const url = _getChallengeUrl(_challengeTown);
+  const townName = lang === 'he' ? _challengeTown.nameHe : _challengeTown.name;
+
+  let resultStr;
+  if (perfect) resultStr = lang === 'he' ? 'פגיעה מושלמת' : 'perfect hit';
+  else if (distKm < 1) resultStr = lang === 'he' ? `${Math.round(distKm*1000)}מ' מהיעד` : `${Math.round(distKm*1000)}m away`;
+  else resultStr = lang === 'he' ? `${distKm.toFixed(distKm<10?1:0)} ק"מ מהיעד` : `${distKm.toFixed(distKm<10?1:0)} km away`;
+
+  const text = lang === 'he'
+    ? `מצאתי את ${townName}! ${resultStr} 🗺️ תנסה/י גם: ${url}`
+    : `I found ${townName}! ${resultStr} 🗺️ Can you beat me? ${url}`;
+
+  if (method === 'wa') {
+    window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+  } else {
+    const doShow = () => {
+      const toast = document.getElementById('cr-copied-toast');
+      toast.textContent = lang === 'he' ? '✅ הועתק!' : '✅ Copied!';
+      toast.classList.remove('show'); void toast.offsetWidth; toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(doShow).catch(() => { _shareCopyFallback(text); doShow(); });
+    } else { _shareCopyFallback(text); doShow(); }
+  }
+}
+
+function exitChallengeMode() {
+  isChallengeMode = false;
+  _challengeTown = null;
+  _challengeResult = null;
+  document.getElementById('challenge-result').classList.remove('open');
+  // Restore HUD + controls
+  document.getElementById('hud').style.display = '';
+  document.getElementById('btn-hint').style.display = '';
+  document.getElementById('mobile-tools-hint').style.display = '';
+  // Clean challenge param from URL without reload
+  const url = new URL(window.location.href);
+  url.searchParams.delete('challenge');
+  window.history.replaceState({}, '', url.toString());
+  showMenu();
 }
 </script>
 
