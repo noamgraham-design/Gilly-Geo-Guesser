@@ -3852,6 +3852,7 @@ let dailyChallengePreviewTimer = null, dailyChallengePreviewInterval = null;
 let _dcPreloadTown = null;        // town preloaded while intro popup is open
 let _dcPreloadNearbyPt = null;    // random nearby point used for preload view
 let _dcPreloadPrevLayer = null;   // layer before preloading (to restore on cancel)
+let _dpPendingScore = null;       // score stored so post-login can show percentile
 let _dcTileLoadListener = null;   // pending tile-load handler (cleaned up on cancel)
 
 // ── MAP — ESRI World Physical: free, no API key, no city labels ──────────────
@@ -5937,8 +5938,11 @@ async function signInGoogle() {
     const provider = new GoogleAuthProvider();
     await signInWithPopup(window._fbAuth, provider);
     closeLoginModal();
+    // If the daily-percentile popup is open, refresh it now that user is logged in
+    if (_dpPendingScore !== null && document.getElementById('daily-percentile-popup').classList.contains('show')) {
+      showDailyPercentile(_dpPendingScore);
     // If game just ended (scoreboard visible), save score and refresh leaderboard
-    if (document.getElementById('scoreboard-panel').classList.contains('show')) {
+    } else if (document.getElementById('scoreboard-panel').classList.contains('show')) {
       const hits = results.filter(r => r.pts >= 90).length;
       await saveScore({ score, difficulty, region, rounds: roundCount, hits });
       loadHistory();
@@ -5967,8 +5971,11 @@ async function submitEmailAuth() {
       await signInWithEmailAndPassword(window._fbAuth, email, password);
     }
     closeLoginModal();
+    // If the daily-percentile popup is open, refresh it now that user is logged in
+    if (_dpPendingScore !== null && document.getElementById('daily-percentile-popup').classList.contains('show')) {
+      showDailyPercentile(_dpPendingScore);
     // If game just ended (scoreboard visible), save score and refresh leaderboard
-    if (document.getElementById('scoreboard-panel').classList.contains('show')) {
+    } else if (document.getElementById('scoreboard-panel').classList.contains('show')) {
       const hits = results.filter(r => r.pts >= 90).length;
       await saveScore({ score, difficulty, region, rounds: roundCount, hits });
       loadHistory();
@@ -6248,13 +6255,18 @@ async function showDailyPercentile(myScore) {
 
   // Guest or leftover anonymous session: prompt them to log in
   if (!window._fbUser || window._fbUser.isAnonymous) {
+    _dpPendingScore = myScore;
     pctVal.textContent  = '🔒';
     pctLbl.textContent  = '';
-    msgEl.textContent   = lang === 'he' ? 'התחבר כדי לראות את הדירוג שלך' : 'Log in to see how you rank';
+    const loginWord = lang === 'he' ? 'התחבר' : 'Log in';
+    const restOfMsg = lang === 'he' ? ' כדי לראות את הדירוג שלך' : ' to see how you rank';
+    msgEl.innerHTML = `<a id="dp-login-link" style="cursor:pointer;color:#1a6fd4;text-decoration:underline">${loginWord}</a>${restOfMsg}`;
+    document.getElementById('dp-login-link').onclick = openLoginModal;
     countEl.textContent = '';
     ring.style.background = 'conic-gradient(#e8eaed 360deg, #e8eaed 0deg)';
     return;
   }
+  _dpPendingScore = null;
 
   // Save score, then read today's full distribution
   await saveDailyScore(myScore);
