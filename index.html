@@ -5388,6 +5388,17 @@ function startDailyChallenge() {
   _dcPreloadTown = getDailyLocation();
   _dcPreloadPrevLayer = currentLayer;
   _dcPreloadNearbyPt = getRandomPointNearby(_dcPreloadTown.lat, _dcPreloadTown.lng, 1);
+
+  // Pre-blur the location name now, while the popup is still open, so there
+  // is no unblurred flash the moment the popup closes.
+  const previewName = isHe ? _dcPreloadTown.nameHe : _dcPreloadTown.name;
+  document.getElementById('town-name').textContent = previewName;
+  document.getElementById('town-name').classList.add('blurred-location');
+  document.getElementById('town-desc').textContent = '';
+  const mobEl = document.querySelector('#mobile-topbar-town .mob-town-text');
+  mobEl.textContent = previewName;
+  mobEl.classList.add('blurred-location');
+
   if (currentLayer !== 'street') toggleMapLayer(true);
 
   // Re-enable the button once all tiles in the current view have loaded
@@ -5415,6 +5426,8 @@ function cancelDailyChallengeIntro() {
     if (_dcPreloadPrevLayer === 'satellite' && currentLayer !== 'satellite') {
       toggleMapLayer(true);
     }
+    document.getElementById('town-name').classList.remove('blurred-location');
+    document.querySelector('#mobile-topbar-town .mob-town-text').classList.remove('blurred-location');
     const v = REGION_VIEWS['all'];
     map.setView(v.center, v.zoom);
     _dcPreloadTown = null;
