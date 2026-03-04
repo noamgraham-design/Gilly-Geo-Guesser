@@ -1566,6 +1566,10 @@
     box-shadow: 0 10px 32px rgba(229,124,26,0.65), 0 1px 0 rgba(255,255,255,0.18) inset;
   }
   #dci-start-btn:active { transform: translateY(1px) scale(0.98); box-shadow: 0 3px 12px rgba(229,124,26,0.4); }
+  #dci-start-btn:disabled {
+    background: #888; animation: none; cursor: not-allowed;
+    box-shadow: none; opacity: 0.7;
+  }
 
   /* ── CHALLENGE RESULT POPUP ───────────────────────────────────────────── */
   #challenge-result {
@@ -3846,6 +3850,7 @@ let dailyChallengePreviewTimer = null, dailyChallengePreviewInterval = null;
 let _dcPreloadTown = null;        // town preloaded while intro popup is open
 let _dcPreloadNearbyPt = null;    // random nearby point used for preload view
 let _dcPreloadPrevLayer = null;   // layer before preloading (to restore on cancel)
+let _dcTileLoadListener = null;   // pending tile-load handler (cleaned up on cancel)
 
 // ── MAP — ESRI World Physical: free, no API key, no city labels ──────────────
 const ISRAEL_BOUNDS = L.latLngBounds(
@@ -5367,18 +5372,30 @@ function startDailyChallenge() {
   descEl.style.direction = isHe ? 'rtl' : 'ltr';
   document.getElementById('dci-title').textContent = isHe ? 'אתגר יומי' : 'Daily Challenge';
   const startBtn = document.getElementById('dci-start-btn');
-  startBtn.textContent = isHe ? 'בואו נתחיל!' : "Let's go! →";
+  // Disable button until tiles finish loading
+  startBtn.disabled = true;
+  startBtn.textContent = isHe ? 'מפה נטענת...' : 'Map rendering...';
   startBtn.style.direction = isHe ? 'rtl' : 'ltr';
   document.getElementById('daily-challenge-intro').classList.add('open');
 
   // Preload the street map in the background while the popup is open,
   // so tiles are ready before the user clicks "Let's go!".
-  // Use zoom 14 (wider area) to pre-buffer more tiles; the game will zoom
-  // in to zoom 16 at the nearby point after the user clicks "Let's go!".
+  // Zoom 14 covers ~4× more geographic area than zoom 16 at the cost of
+  // pre-buffering lower-res tiles (each zoom level is a separate tile set,
+  // so going below 14 would load even-lower-res tiles without extra benefit).
   _dcPreloadTown = getDailyLocation();
   _dcPreloadPrevLayer = currentLayer;
   _dcPreloadNearbyPt = getRandomPointNearby(_dcPreloadTown.lat, _dcPreloadTown.lng, 1);
   if (currentLayer !== 'street') toggleMapLayer(true);
+
+  // Re-enable the button once all tiles in the current view have loaded
+  _dcTileLoadListener = () => {
+    startBtn.disabled = false;
+    startBtn.textContent = isHe ? 'בואו נתחיל!' : "Let's go! →";
+    _dcTileLoadListener = null;
+  };
+  activeStreetLayer().once('load', _dcTileLoadListener);
+
   map.setView([_dcPreloadTown.lat, _dcPreloadTown.lng], 14, { animate: false });
 }
 
@@ -5389,6 +5406,10 @@ function closeDailyChallengeIntro() {
 function cancelDailyChallengeIntro() {
   // Revert the map preloading done in startDailyChallenge()
   if (_dcPreloadTown !== null) {
+    if (_dcTileLoadListener) {
+      activeStreetLayer().off('load', _dcTileLoadListener);
+      _dcTileLoadListener = null;
+    }
     if (_dcPreloadPrevLayer === 'satellite' && currentLayer !== 'satellite') {
       toggleMapLayer(true);
     }
@@ -5406,6 +5427,12 @@ function startDailyChallengeGame() {
 
   // Reuse the town and nearby point preloaded during the intro popup (to avoid
   // buffering). Fall back to a fresh lookup only if preloading didn't happen.
+  // Cancel any pending tile-load listener (button is about to be hidden anyway)
+  if (_dcTileLoadListener) {
+    activeStreetLayer().off('load', _dcTileLoadListener);
+    _dcTileLoadListener = null;
+  }
+
   const town = _dcPreloadTown || getDailyLocation();
   const alreadyPositioned = _dcPreloadTown !== null;
   const preloadedNearbyPt = _dcPreloadNearbyPt;
