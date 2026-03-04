@@ -1681,16 +1681,19 @@
     z-index: 1;
   }
   @keyframes planeFly {
-    0%   { transform: translateX(-64px); }
-    100% { transform: translateX(calc(100vw + 64px)); }
+    0%   { transform: translateX(-200px); }
+    100% { transform: translateX(calc(100vw + 200px)); }
+  }
+  .formation {
+    position: absolute;
+    left: 0;
+    pointer-events: none;
+    animation: planeFly linear infinite;
   }
   .bg-plane {
     position: absolute;
-    left: 0;
-    width: 28px;
     height: auto;
-    opacity: 0.82;
-    animation: planeFly linear infinite;
+    opacity: 0.85;
   }
 
   /* Menu card title area */
@@ -4472,6 +4475,7 @@ window.addEventListener('DOMContentLoaded', function() {
       toolsDD.classList.remove('show');
     }
   });
+  initPlaneAnimation();
 });
 
 // ── COUNTRY BORDERS — fetched from Natural Earth via public CDN ──────────────
@@ -5051,27 +5055,44 @@ function initPlaneAnimation() {
   if (!layer || layer.dataset.initialized) return;
   layer.dataset.initialized = 'true';
 
-  // Each batch: top position (% of viewport), plane count, fly duration (s)
+  // V-formation: positions relative to formation origin, leader at front-right
+  // Sizes vary slightly for a 3D depth feel (leader biggest, tips smallest)
+  const vFormation = [
+    { left: 135, top:   0, size: 29 }, // leader (point)
+    { left:  95, top: -13, size: 27 }, // wing port
+    { left:  95, top:  13, size: 27 }, // wing starboard
+    { left:  55, top: -24, size: 25 }, // outer port
+    { left:  55, top:  24, size: 25 }, // outer starboard
+    { left:  20, top:   0, size: 23 }, // tail
+  ];
+
+  // Each batch: vertical position and flight duration (s)
   const batches = [
-    { top:  '8%', count: 4, duration: 10 },
-    { top: '22%', count: 3, duration: 14 },
-    { top: '39%', count: 4, duration:  9 },
-    { top: '58%', count: 3, duration: 12 },
-    { top: '74%', count: 4, duration: 11 },
+    { top:  '8%', duration: 10 },
+    { top: '22%', duration: 14 },
+    { top: '39%', duration:  9 },
+    { top: '58%', duration: 12 },
+    { top: '74%', duration: 11 },
   ];
 
   batches.forEach(batch => {
-    for (let i = 0; i < batch.count; i++) {
+    const formation = document.createElement('div');
+    formation.className = 'formation';
+    formation.style.top = batch.top;
+    formation.style.animationDuration = batch.duration + 's';
+
+    vFormation.forEach(p => {
       const img = document.createElement('img');
       img.src = 'f16_nb.png';
       img.className = 'bg-plane';
       img.alt = '';
-      img.style.top = batch.top;
-      img.style.animationDuration = batch.duration + 's';
-      // Negative delay spreads planes evenly across the cycle from the start
-      img.style.animationDelay = (-batch.duration / batch.count * i) + 's';
-      layer.appendChild(img);
-    }
+      img.style.left = p.left + 'px';
+      img.style.top = p.top + 'px';
+      img.style.width = p.size + 'px';
+      formation.appendChild(img);
+    });
+
+    layer.appendChild(formation);
   });
 }
 
