@@ -3762,7 +3762,7 @@ function applyLang() {
   const lcrC = document.getElementById('lbl-cr-copy');
   if (lcrC) lcrC.textContent = lang === 'he' ? 'העתק תוצאה' : 'Copy result';
   const crPlay = document.getElementById('cr-play-btn');
-  if (crPlay) crPlay.textContent = lang === 'he' ? 'שחק/י את המשחק המלא ←' : 'Play the full game →';
+  if (crPlay) crPlay.textContent = lang === 'he' ? 'למשחק המלא ←' : 'Play the full game →';
   const ciBadge = document.getElementById('challenge-intro-badge');
   if (ciBadge) ciBadge.textContent = lang === 'he' ? 'אתגר' : 'Challenge';
   // Set text direction for text-heavy elements only (not the card itself, to keep button order stable)
@@ -6672,6 +6672,7 @@ function startChallengeGame() {
   document.getElementById('btn-back').style.display = 'none';
   document.getElementById('btn-hint').style.display = 'none';
   document.getElementById('mobile-tools-wrap').classList.add('challenge-hidden');
+  document.getElementById('mobile-home-btn').style.display = 'none';
 
   if (currentLayer === 'street') toggleMapLayer(true);
   document.getElementById('results-panel').className = '';
@@ -6775,6 +6776,7 @@ function exitChallengeMode() {
   document.getElementById('hud').style.display = '';
   document.getElementById('btn-hint').style.display = '';
   document.getElementById('mobile-tools-wrap').classList.remove('challenge-hidden');
+  document.getElementById('mobile-home-btn').style.display = '';
   // Clean challenge param from URL without reload
   const url = new URL(window.location.href);
   url.searchParams.delete('challenge');
