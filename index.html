@@ -2874,7 +2874,7 @@
 <!-- DAILY CHALLENGE INTRO POPUP -->
 <div id="daily-challenge-intro">
   <div id="daily-challenge-intro-card">
-    <button id="dci-close-btn" onclick="closeDailyChallengeIntro()">✕</button>
+    <button id="dci-close-btn" onclick="cancelDailyChallengeIntro()">✕</button>
     <div id="dci-icon">⚡</div>
     <div id="dci-title">אתגר יומי</div>
     <div id="dci-desc-box">
@@ -3843,6 +3843,9 @@ let learningPreviewActive = false, learningPreviewTimer = null, learningPreviewI
 let isDailyChallenge = false;
 let dailyChallengePreviewActive = false;
 let dailyChallengePreviewTimer = null, dailyChallengePreviewInterval = null;
+let _dcPreloadTown = null;        // town preloaded while intro popup is open
+let _dcPreloadNearbyPt = null;    // random nearby point used for preload view
+let _dcPreloadPrevLayer = null;   // layer before preloading (to restore on cancel)
 
 // ── MAP — ESRI World Physical: free, no API key, no city labels ──────────────
 const ISRAEL_BOUNDS = L.latLngBounds(
@@ -5367,16 +5370,46 @@ function startDailyChallenge() {
   startBtn.textContent = isHe ? 'בואו נתחיל!' : "Let's go! →";
   startBtn.style.direction = isHe ? 'rtl' : 'ltr';
   document.getElementById('daily-challenge-intro').classList.add('open');
+
+  // Preload the street map in the background while the popup is open,
+  // so tiles are ready before the user clicks "Let's go!"
+  _dcPreloadTown = getDailyLocation();
+  _dcPreloadPrevLayer = currentLayer;
+  _dcPreloadNearbyPt = getRandomPointNearby(_dcPreloadTown.lat, _dcPreloadTown.lng, 1);
+  if (currentLayer !== 'street') toggleMapLayer(true);
+  map.setView([_dcPreloadNearbyPt.lat, _dcPreloadNearbyPt.lng], 16, { animate: false });
 }
 
 function closeDailyChallengeIntro() {
   document.getElementById('daily-challenge-intro').classList.remove('open');
 }
 
+function cancelDailyChallengeIntro() {
+  // Revert the map preloading done in startDailyChallenge()
+  if (_dcPreloadTown !== null) {
+    if (_dcPreloadPrevLayer === 'satellite' && currentLayer !== 'satellite') {
+      toggleMapLayer(true);
+    }
+    const v = REGION_VIEWS['all'];
+    map.setView(v.center, v.zoom);
+    _dcPreloadTown = null;
+    _dcPreloadNearbyPt = null;
+    _dcPreloadPrevLayer = null;
+  }
+  closeDailyChallengeIntro();
+}
+
 function startDailyChallengeGame() {
   closeDailyChallengeIntro();
 
-  const town = getDailyLocation();
+  // Reuse the town and map position preloaded during the intro popup (to avoid
+  // buffering). Fall back to a fresh lookup only if preloading didn't happen.
+  const town = _dcPreloadTown || getDailyLocation();
+  const alreadyPositioned = _dcPreloadTown !== null;
+  _dcPreloadTown = null;
+  _dcPreloadNearbyPt = null;
+  _dcPreloadPrevLayer = null;
+
   isDailyChallenge = true;
   isLearningMode = false;
 
@@ -5393,8 +5426,15 @@ function startDailyChallengeGame() {
   streetUsedThisRound = false;
   clearAllMarkers();
 
-  // Ensure we start in street view for the preview phase
-  if (currentLayer !== 'street') toggleMapLayer(true);
+  // If not already preloaded, switch to street view and zoom now
+  if (!alreadyPositioned) {
+    if (currentLayer !== 'street') toggleMapLayer(true);
+    const nearbyPoint = getRandomPointNearby(town.lat, town.lng, 1);
+    map.setView([nearbyPoint.lat, nearbyPoint.lng], 16, { animate: false });
+  } else if (currentLayer !== 'street') {
+    // Preload set the view but layer toggle may have been skipped in edge cases
+    toggleMapLayer(true);
+  }
 
   // Hide overlay and results panels
   document.getElementById('overlay').style.display = 'none';
@@ -5420,11 +5460,7 @@ function startDailyChallengeGame() {
   // Prefetch polygon for scoring
   fetchCityPolygon(town.name);
 
-  // Zoom to random point 1km from target in street view (step 3b)
-  const nearbyPoint = getRandomPointNearby(town.lat, town.lng, 1);
-  map.setView([nearbyPoint.lat, nearbyPoint.lng], 16, { animate: false });
-
-  // Start the 15-second street-view preview
+  // Start the 15-second street-view countdown (only now, after "Let's go!")
   startDailyChallengePreview(town);
 }
 
