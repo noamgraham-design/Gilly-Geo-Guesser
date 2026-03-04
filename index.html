@@ -5603,7 +5603,7 @@ function onMapClick(e) {
   // Daily challenge uses its own gradual scoring; regular mode uses difficulty-based calcPts
   const basePts = isDailyChallenge
     ? calcDailyPts(distKm, perfect, town)
-    : (polyFeature && perfect) ? Math.round(DIFF[difficulty].maxPts * (TIER_MULTIPLIER[town.tier] ?? 1)) : calcPts(distKm, d, hintUsed, town.tier);
+    : (polyFeature && perfect) ? (streetUsedThisRound ? Math.min(20, Math.round(DIFF[difficulty].maxPts * (TIER_MULTIPLIER[town.tier] ?? 1))) : Math.round(DIFF[difficulty].maxPts * (TIER_MULTIPLIER[town.tier] ?? 1))) : calcPts(distKm, d, hintUsed, town.tier);
   // Time bonus: only awarded when you score any points (no reward for a fast miss)
   const elapsedMs = Date.now() - roundStartTime;
   const timeBonus = basePts > 0 && !streetUsedThisRound ? calcTimeBonus(elapsedMs) : 0;
