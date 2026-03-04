@@ -76,6 +76,7 @@
     background: var(--bg);
     color: var(--text);
     height: 100vh;
+    height: 100dvh; /* adjusts for mobile browser chrome (URL bar) */
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -2838,7 +2839,7 @@
   </div>
 </div>
 
-<div style="flex:1;position:relative;">
+<div style="flex:1;position:relative;overflow:hidden;">
   <div id="streak-banner"></div>
   <div id="easy-mode-banner"></div>
   <div id="pts-popup"></div>
@@ -3916,6 +3917,9 @@ const map = L.map('map', {
   maxBounds: ISRAEL_BOUNDS,
   maxBoundsViscosity: 1.0,
 });
+
+// Keep map sized correctly as browser chrome (URL bar) shows/hides on mobile
+(window.visualViewport || window).addEventListener('resize', () => { map.invalidateSize(); });
 
 // Create two tile layers - satellite and street map
 const satelliteLayer = L.tileLayer(
@@ -5119,6 +5123,8 @@ function showMenu() {
   // Restore mobile assistance button when leaving learning mode
   document.getElementById('mobile-tools-wrap').classList.remove('learning-hidden');
   initPlaneAnimation();
+  // Recalculate map size after layout changes (e.g. HUD restored changes topbar height)
+  requestAnimationFrame(() => { map.invalidateSize(); });
 }
 
 // ── Learning Mode ─────────────────────────────────────────────────────────────
