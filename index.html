@@ -528,10 +528,14 @@
     padding: 20px 18px 18px;
     height: auto;
     max-height: 75vh;
-    overflow-y: auto;
+    overflow: hidden;
   }
-  #scoreboard-card::-webkit-scrollbar { width: 4px; }
-  #scoreboard-card::-webkit-scrollbar-thumb { background: #c8ccd2; border-radius: 99px; }
+  #scoreboard-list {
+    overflow-y: auto;
+    min-height: 0;
+  }
+  #scoreboard-list::-webkit-scrollbar { width: 4px; }
+  #scoreboard-list::-webkit-scrollbar-thumb { background: #c8ccd2; border-radius: 99px; }
   #sb-header {
     display: flex; align-items: center; justify-content: space-between;
     margin-bottom: 6px;
@@ -1866,6 +1870,7 @@
       box-shadow: 0 8px 28px rgba(0,0,0,0.18) !important;
       height: auto !important;
       max-height: 55vh !important;
+      overflow: hidden !important;
       padding: 14px 16px !important;
     }
     #sb-close-btn { display: block !important; }
@@ -6053,33 +6058,24 @@ function renderPlayerRow(p, globalRank) {
     </div>`;
 }
 
-function renderContextView() {
+function renderScrollableView() {
   if (!_sbData) return '';
   const { players, summaryHtml, insertIdx } = _sbData;
 
-  let start = Math.max(0, insertIdx - 2);
-  let end   = Math.min(players.length - 1, start + 3);
-  start     = Math.max(0, end - 3);
-  const visible = players.slice(start, end + 1);
-
+  const visible = players.slice(0, 100);
   let html = '';
   let gameInserted = false;
 
-  if (start > 0) html += `<div class="sb-divider">· · ·</div>`;
-
   visible.forEach((p, i) => {
-    const globalIdx  = start + i;
-    const globalRank = globalIdx + 1;
-
-    if (!gameInserted && globalIdx >= insertIdx) {
+    if (!gameInserted && i >= insertIdx) {
       html += summaryHtml;
       gameInserted = true;
     }
-    html += renderPlayerRow(p, globalRank);
+    html += renderPlayerRow(p, i + 1);
   });
 
   if (!gameInserted) html += summaryHtml;
-  if (end < players.length - 1) html += `<div class="sb-divider">· · ·</div>`;
+  if (players.length > 100) html += `<div class="sb-divider">· · ·</div>`;
 
   return html;
 }
@@ -6101,7 +6097,17 @@ function toggleTop5View() {
   _sbTop5 = !_sbTop5;
   btn.classList.toggle('active', _sbTop5);
   btn.textContent = _sbTop5 ? '▼' : '▲';
-  list.innerHTML = _sbTop5 ? renderTop5View() : renderContextView();
+  list.innerHTML = _sbTop5 ? renderTop5View() : renderScrollableView();
+  if (!_sbTop5) {
+    requestAnimationFrame(() => {
+      const target = list.querySelector('.sb-summary') || list.querySelector('.sb-me');
+      if (target) {
+        const listRect   = list.getBoundingClientRect();
+        const targetRect = target.getBoundingClientRect();
+        list.scrollTop += targetRect.top - listRect.top - listRect.height / 2 + targetRect.height / 2;
+      }
+    });
+  }
 }
 
 // ── Daily Challenge score saving & percentile display ─────────────────────
@@ -6321,8 +6327,16 @@ async function loadScoreboard(myScore) {
     // Show Top 5 button now that data is loaded
     top5Btn.style.display = 'inline-block';
 
-    // Render default context view
-    list.innerHTML = renderContextView();
+    // Render scrollable 100-score view
+    list.innerHTML = renderScrollableView();
+    requestAnimationFrame(() => {
+      const target = list.querySelector('.sb-summary') || list.querySelector('.sb-me');
+      if (target) {
+        const listRect   = list.getBoundingClientRect();
+        const targetRect = target.getBoundingClientRect();
+        list.scrollTop += targetRect.top - listRect.top - listRect.height / 2 + targetRect.height / 2;
+      }
+    });
   } catch(e) {
     console.error('Scoreboard failed:', e);
     list.innerHTML = `<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:8px 0">${lang === 'he' ? 'שגיאה בטעינה' : 'Could not load'}</div>`;
