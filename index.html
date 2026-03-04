@@ -892,6 +892,15 @@
     60%  { opacity: 1; }
     100% { opacity: 0; }
   }
+  /* Guess-to-answer line: visible then fades out */
+  @keyframes guessLineFade {
+    0%   { opacity: 1; }
+    70%  { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  .guess-line-path {
+    animation: guessLineFade 10s forwards;
+  }
   #pts-popup.show-perfect .pts-number {
     animation: ptsPulseGlow 0.7s ease-in-out 0.3s 3;
   }
@@ -3840,7 +3849,7 @@ function applyLang() {
 let lang = "he";
 let difficulty = "medium", region = "all", sequence = [], currentIdx = 0, score = 0, roundCount = 8;
 let streak = 0, hintUsed = false, streetUsedThisRound = false, results = [], waiting = false;
-let correctMarkers = [], clickMarker = null, circle = null, hintCircle = null;
+let correctMarkers = [], clickMarker = null, circle = null, hintCircle = null, guessLine = null;
 
 // ── Challenge mode state ──────────────────────────────────────────────────────
 let isChallengeMode = false;
@@ -4540,11 +4549,40 @@ function haversineKm(lat1, lng1, lat2, lng2) {
   return R * 2 * Math.asin(Math.sqrt(a));
 }
 
+function calcBearing(lat1, lng1, lat2, lng2) {
+  const toR = Math.PI / 180;
+  const φ1 = lat1 * toR, φ2 = lat2 * toR, Δλ = (lng2 - lng1) * toR;
+  const y = Math.sin(Δλ) * Math.cos(φ2);
+  const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+  return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+}
+
+function drawGuessArrow(fromLat, fromLng, toLat, toLng) {
+  if (guessLine) map.removeLayer(guessLine);
+  const angle = calcBearing(fromLat, fromLng, toLat, toLng);
+  const shaft = L.polyline([[fromLat, fromLng], [toLat, toLng]], {
+    color: '#ff4444', weight: 2, opacity: 0.3,
+  });
+  const head = L.marker([toLat, toLng], {
+    icon: L.divIcon({
+      className: '',
+      html: `<svg width="18" height="18" viewBox="-9 -9 18 18" xmlns="http://www.w3.org/2000/svg" style="transform:rotate(${angle}deg);display:block;"><polygon points="0,-9 6,5 -6,5" fill="#ff4444" fill-opacity="0.3"/></svg>`,
+      iconSize: [18, 18],
+      iconAnchor: [9, 9],
+    }),
+    interactive: false,
+  });
+  guessLine = L.layerGroup([shaft, head]).addTo(map);
+  [shaft.getElement(), head.getElement()].forEach(el => {
+    if (el) el.classList.add('guess-line-path');
+  });
+}
+
 function clearMapFeedback() {
   if (hintAnimFrame) { clearInterval(hintAnimFrame); hintAnimFrame = null; }
   // Keep correctMarkers (city pins) on map — only clear hint/click/scoring layers
-  [clickMarker, circle, hintCircle].forEach(l => l && map.removeLayer(l));
-  clickMarker = circle = hintCircle = null;
+  [clickMarker, circle, hintCircle, guessLine].forEach(l => l && map.removeLayer(l));
+  clickMarker = circle = hintCircle = guessLine = null;
   if (cityPolyLayer) { map.removeLayer(cityPolyLayer); cityPolyLayer = null; }
 }
 
@@ -4552,8 +4590,8 @@ function clearAllMarkers() {
   if (hintAnimFrame) { clearInterval(hintAnimFrame); hintAnimFrame = null; }
   correctMarkers.forEach(l => l && map.removeLayer(l));
   correctMarkers = [];
-  [clickMarker, circle, hintCircle].forEach(l => l && map.removeLayer(l));
-  clickMarker = circle = hintCircle = null;
+  [clickMarker, circle, hintCircle, guessLine].forEach(l => l && map.removeLayer(l));
+  clickMarker = circle = hintCircle = guessLine = null;
   if (cityPolyLayer) { map.removeLayer(cityPolyLayer); cityPolyLayer = null; }
 }
 
@@ -5110,6 +5148,8 @@ function handleLearningClick(e) {
 
   learningAttempt++;
   updateLearningDots(learningAttempt);
+
+  drawGuessArrow(e.latlng.lat, e.latlng.lng, town.lat, town.lng);
 
   if (perfect) {
     haptic([60, 40, 100]);
@@ -5773,6 +5813,8 @@ function onMapClick(e) {
   clickMarker = L.circleMarker([e.latlng.lat, e.latlng.lng], {
     radius: 7, color: '#fff', weight: 2, fillColor: '#666', fillOpacity: 0.8,
   }).addTo(map);
+
+  drawGuessArrow(e.latlng.lat, e.latlng.lng, town.lat, town.lng);
 
   updateHUD();
 
