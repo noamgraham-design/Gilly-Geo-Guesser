@@ -6313,9 +6313,13 @@ async function showDailyPercentile(myScore) {
     msgEl.textContent   = lang === 'he'
       ? `עקפת ${pct}% מהשחקנים היום`
       : `You scored better than ${pct}% of today's players`;
-    countEl.textContent = lang === 'he'
-      ? `${total} שחקנים שיחקו היום`
-      : `${total} players played today`;
+    if (lang === 'he') {
+      countEl.dir = 'rtl';
+      countEl.textContent = `${total} שחקנים שיחקו היום`;
+    } else {
+      countEl.dir = '';
+      countEl.textContent = `${total} players played today`;
+    }
     _setShare(lang === 'he' ? `עקפתי ${pct}% מהשחקנים` : `better than ${pct}% of players`);
   }
 }
