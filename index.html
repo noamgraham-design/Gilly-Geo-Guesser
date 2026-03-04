@@ -1969,6 +1969,9 @@
     #mobile-tools-wrap.challenge-hidden {
       display: none !important;
     }
+    #mobile-home-btn.challenge-hidden {
+      display: none !important;
+    }
     #mobile-tools-btn {
       display: flex;
       align-items: center;
@@ -6676,7 +6679,8 @@ function startChallengeGame() {
   document.getElementById('btn-back').style.display = 'none';
   document.getElementById('btn-hint').style.display = 'none';
   document.getElementById('mobile-tools-wrap').classList.add('challenge-hidden');
-  document.getElementById('mobile-home-btn').style.display = 'none';
+  document.getElementById('mobile-home-btn').classList.add('challenge-hidden');
+  document.getElementById('btn-layer').style.display = 'none';
 
   if (currentLayer === 'street') toggleMapLayer(true);
   document.getElementById('results-panel').className = '';
@@ -6780,7 +6784,8 @@ function exitChallengeMode() {
   document.getElementById('hud').style.display = '';
   document.getElementById('btn-hint').style.display = '';
   document.getElementById('mobile-tools-wrap').classList.remove('challenge-hidden');
-  document.getElementById('mobile-home-btn').style.display = '';
+  document.getElementById('mobile-home-btn').classList.remove('challenge-hidden');
+  document.getElementById('btn-layer').style.display = '';
   // Clean challenge param from URL without reload
   const url = new URL(window.location.href);
   url.searchParams.delete('challenge');
