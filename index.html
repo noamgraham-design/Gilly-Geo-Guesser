@@ -5234,7 +5234,6 @@ function handleLearningClick(e) {
   learningAttempt++;
   updateLearningDots(learningAttempt);
 
-  if (!perfect && distKm > perfectKm * 2) drawGuessArrow(e.latlng.lat, e.latlng.lng, town.lat, town.lng);
 
   if (perfect) {
     haptic([60, 40, 100]);
