@@ -892,6 +892,15 @@
     60%  { opacity: 1; }
     100% { opacity: 0; }
   }
+  /* Guess-to-answer line: visible then fades out */
+  @keyframes guessLineFade {
+    0%   { opacity: 1; }
+    70%  { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  .guess-line-path {
+    animation: guessLineFade 10s forwards;
+  }
   #pts-popup.show-perfect .pts-number {
     animation: ptsPulseGlow 0.7s ease-in-out 0.3s 3;
   }
@@ -3840,7 +3849,7 @@ function applyLang() {
 let lang = "he";
 let difficulty = "medium", region = "all", sequence = [], currentIdx = 0, score = 0, roundCount = 8;
 let streak = 0, hintUsed = false, streetUsedThisRound = false, results = [], waiting = false;
-let correctMarkers = [], clickMarker = null, circle = null, hintCircle = null;
+let correctMarkers = [], clickMarker = null, circle = null, hintCircle = null, guessLine = null;
 
 // ── Challenge mode state ──────────────────────────────────────────────────────
 let isChallengeMode = false;
@@ -4543,8 +4552,8 @@ function haversineKm(lat1, lng1, lat2, lng2) {
 function clearMapFeedback() {
   if (hintAnimFrame) { clearInterval(hintAnimFrame); hintAnimFrame = null; }
   // Keep correctMarkers (city pins) on map — only clear hint/click/scoring layers
-  [clickMarker, circle, hintCircle].forEach(l => l && map.removeLayer(l));
-  clickMarker = circle = hintCircle = null;
+  [clickMarker, circle, hintCircle, guessLine].forEach(l => l && map.removeLayer(l));
+  clickMarker = circle = hintCircle = guessLine = null;
   if (cityPolyLayer) { map.removeLayer(cityPolyLayer); cityPolyLayer = null; }
 }
 
@@ -4552,8 +4561,8 @@ function clearAllMarkers() {
   if (hintAnimFrame) { clearInterval(hintAnimFrame); hintAnimFrame = null; }
   correctMarkers.forEach(l => l && map.removeLayer(l));
   correctMarkers = [];
-  [clickMarker, circle, hintCircle].forEach(l => l && map.removeLayer(l));
-  clickMarker = circle = hintCircle = null;
+  [clickMarker, circle, hintCircle, guessLine].forEach(l => l && map.removeLayer(l));
+  clickMarker = circle = hintCircle = guessLine = null;
   if (cityPolyLayer) { map.removeLayer(cityPolyLayer); cityPolyLayer = null; }
 }
 
@@ -5110,6 +5119,14 @@ function handleLearningClick(e) {
 
   learningAttempt++;
   updateLearningDots(learningAttempt);
+
+  // Draw a faint red line from guess to true location; fades out after 10 s
+  if (guessLine) map.removeLayer(guessLine);
+  guessLine = L.polyline([[e.latlng.lat, e.latlng.lng], [town.lat, town.lng]], {
+    color: '#ff4444', weight: 2, opacity: 0.5,
+  }).addTo(map);
+  const _learningGuessLineEl = guessLine.getElement();
+  if (_learningGuessLineEl) _learningGuessLineEl.classList.add('guess-line-path');
 
   if (perfect) {
     haptic([60, 40, 100]);
@@ -5773,6 +5790,14 @@ function onMapClick(e) {
   clickMarker = L.circleMarker([e.latlng.lat, e.latlng.lng], {
     radius: 7, color: '#fff', weight: 2, fillColor: '#666', fillOpacity: 0.8,
   }).addTo(map);
+
+  // Draw a faint red line from guess to true location; fades out after 10 s
+  if (guessLine) map.removeLayer(guessLine);
+  guessLine = L.polyline([[e.latlng.lat, e.latlng.lng], [town.lat, town.lng]], {
+    color: '#ff4444', weight: 2, opacity: 0.5,
+  }).addTo(map);
+  const _guessLineEl = guessLine.getElement();
+  if (_guessLineEl) _guessLineEl.classList.add('guess-line-path');
 
   updateHUD();
 
