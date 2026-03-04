@@ -4476,20 +4476,14 @@ fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/coun
 
 map.on('click', onMapClick);
 
-// ── TOUCH-HOLD GUARD: ignore ghost touches shorter than 30 ms ──────────────────
-// _touchDuration is -1 when the last input was a mouse event (no hold check),
-// or ≥0 (ms) when the last input was a touchstart/touchend pair.
-let _touchStartMs = 0;
-let _touchDuration = -1;
+// ── TOUCH-DRAG GUARD: block the click that fires after a map pan/scroll ────────
+// Leaflet fires 'click' after touchend even when the finger moved (panned the map).
+// We track movement during the touch so onMapClick can ignore post-drag clicks.
+let _touchMoved = false;
 (function () {
   const mapEl = document.getElementById('map');
-  mapEl.addEventListener('touchstart', () => {
-    _touchStartMs = Date.now();
-    _touchDuration = -1;
-  }, { passive: true });
-  mapEl.addEventListener('touchend', () => {
-    _touchDuration = Date.now() - _touchStartMs;
-  }, { passive: true });
+  mapEl.addEventListener('touchstart', () => { _touchMoved = false; }, { passive: true });
+  mapEl.addEventListener('touchmove',  () => { _touchMoved = true;  }, { passive: true });
 })();
 
 // ── DEV: coordinate extractor (add ?devcoords to URL) ────────────────────────
@@ -5739,10 +5733,10 @@ function startGame() {
 }
 
 function onMapClick(e) {
-  // On touch screens, ignore ghost contacts shorter than 30 ms (accidental brush).
-  // Mouse clicks (_touchDuration === -1) are always allowed.
-  if (_touchDuration >= 0 && _touchDuration < 30) { _touchDuration = -1; return; }
-  _touchDuration = -1;
+  // Ignore clicks that follow a touch-drag (pan/scroll). A stationary tap leaves
+  // _touchMoved false; a finger that moved to scroll the map sets it true.
+  if (_touchMoved) { _touchMoved = false; return; }
+  _touchMoved = false;
 
   if (factModalOpen || document.getElementById('overlay').style.display !== 'none') return;
   if (isLearningMode && learningPreviewActive) { endLearningPreview(); return; }
