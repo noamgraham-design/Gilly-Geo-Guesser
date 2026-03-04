@@ -6285,7 +6285,21 @@ async function showDailyPercentile(myScore) {
       collection(window._fbDb, 'daily_scores'),
       where('date', '==', today)
     ));
-    snap.forEach(d => allScores.push(d.data().score));
+    // Deduplicate by uid (one score per player); skip current user's stored
+    // score — myScore (this session) will be added below so pct stays ≤ 100%.
+    // Old docs without a uid field are kept as-is.
+    const myUid = window._fbUser && window._fbUser.uid;
+    const seenUids = new Set();
+    snap.forEach(d => {
+      const data = d.data();
+      if (data.uid) {
+        if (data.uid === myUid) return; // replaced by myScore below
+        if (seenUids.has(data.uid)) return; // duplicate old doc
+        seenUids.add(data.uid);
+      }
+      allScores.push(data.score);
+    });
+    allScores.push(myScore); // always include current session's score
     fetchOk = true;
   } catch (e) { console.error('fetch daily_scores failed:', e.code, e.message); }
 
