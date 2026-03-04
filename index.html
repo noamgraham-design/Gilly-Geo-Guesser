@@ -4476,7 +4476,7 @@ fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/coun
 
 map.on('click', onMapClick);
 
-// ── TOUCH-HOLD GUARD: require ≥500 ms press before treating touch as a click ──
+// ── TOUCH-HOLD GUARD: ignore ghost touches shorter than 30 ms ──────────────────
 // _touchDuration is -1 when the last input was a mouse event (no hold check),
 // or ≥0 (ms) when the last input was a touchstart/touchend pair.
 let _touchStartMs = 0;
@@ -5739,9 +5739,9 @@ function startGame() {
 }
 
 function onMapClick(e) {
-  // On touch screens, ignore presses shorter than 500 ms to avoid accidental taps.
+  // On touch screens, ignore ghost contacts shorter than 30 ms (accidental brush).
   // Mouse clicks (_touchDuration === -1) are always allowed.
-  if (_touchDuration >= 0 && _touchDuration < 500) { _touchDuration = -1; return; }
+  if (_touchDuration >= 0 && _touchDuration < 30) { _touchDuration = -1; return; }
   _touchDuration = -1;
 
   if (factModalOpen || document.getElementById('overlay').style.display !== 'none') return;
