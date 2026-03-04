@@ -3037,7 +3037,7 @@
     <div id="sb-header">
       <h3 id="scoreboard-title">🏆 Leaderboard</h3>
       <div id="sb-header-actions">
-        <button id="sb-top5-btn" onclick="toggleTop5View()">▲</button>
+        <button id="sb-top5-btn" onclick="toggleTop5View()">▲ Top 10</button>
         <button id="sb-close-btn" onclick="document.getElementById('scoreboard-panel').classList.remove('show')">✕</button>
       </div>
     </div>
@@ -6080,13 +6080,13 @@ function renderScrollableView() {
   return html;
 }
 
-function renderTop5View() {
+function renderTop10View() {
   if (!_sbData) return '';
   const { players } = _sbData;
-  const top = players.slice(0, 5);
+  const top = players.slice(0, 10);
   let html = '';
   top.forEach((p, i) => { html += renderPlayerRow(p, i + 1); });
-  if (players.length > 5) html += `<div class="sb-divider">· · ·</div>`;
+  if (players.length > 10) html += `<div class="sb-divider">· · ·</div>`;
   return html;
 }
 
@@ -6096,8 +6096,8 @@ function toggleTop5View() {
   const list = document.getElementById('scoreboard-list');
   _sbTop5 = !_sbTop5;
   btn.classList.toggle('active', _sbTop5);
-  btn.textContent = _sbTop5 ? '▼' : '▲';
-  list.innerHTML = _sbTop5 ? renderTop5View() : renderScrollableView();
+  btn.innerHTML = _sbTop5 ? '▼ Top 10' : '▲ Top 10';
+  list.innerHTML = _sbTop5 ? renderTop10View() : renderScrollableView();
   if (!_sbTop5) {
     requestAnimationFrame(() => {
       const target = list.querySelector('.sb-summary') || list.querySelector('.sb-me');
@@ -6232,7 +6232,7 @@ async function loadScoreboard(myScore) {
   _sbData  = null;
   _sbTop5  = false;
   top5Btn.classList.remove('active');
-  top5Btn.textContent = '▲';
+  top5Btn.innerHTML = '▲ Top 10';
 
   // Update lang labels
   document.getElementById('scoreboard-title').textContent    = lang === 'he' ? '🏆 לוח תוצאות' : '🏆 Leaderboard';
