@@ -550,11 +550,11 @@
     -webkit-text-fill-color: transparent;
     letter-spacing: 0.5px;
   }
-  #sb-header-actions { display: flex; align-items: center; gap: 12px; }
+  #sb-header-actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
   #sb-top5-btn {
     display: none; background: var(--bg); border: 1px solid var(--border);
     color: var(--muted); font-size: 0.75rem; font-weight: 700; cursor: pointer;
-    padding: 4px 8px; border-radius: 8px; line-height: 1;
+    padding: 4px 8px; border-radius: 8px; line-height: 1; white-space: nowrap;
     transition: all 0.18s;
   }
   #sb-top5-btn:hover { background: rgba(26,111,212,0.08); border-color: rgba(26,111,212,0.3); color: #1a6fd4; }
@@ -3035,7 +3035,7 @@
 <div id="scoreboard-panel">
   <div id="scoreboard-card">
     <div id="sb-header">
-      <h3 id="scoreboard-title">🏆 Leaderboard</h3>
+      <h3 id="scoreboard-title"><span style="-webkit-text-fill-color:initial;background:none">🏆</span> Leaderboard</h3>
       <div id="sb-header-actions">
         <button id="sb-top5-btn" onclick="toggleTop5View()">▲ Top 10</button>
         <button id="sb-close-btn" onclick="document.getElementById('scoreboard-panel').classList.remove('show')">✕</button>
@@ -6235,7 +6235,7 @@ async function loadScoreboard(myScore) {
   top5Btn.innerHTML = '▲ Top 10';
 
   // Update lang labels
-  document.getElementById('scoreboard-title').textContent    = lang === 'he' ? '🏆 לוח תוצאות' : '🏆 Leaderboard';
+  document.getElementById('scoreboard-title').innerHTML = '<span style="-webkit-text-fill-color:initial;background:none">🏆</span> ' + (lang === 'he' ? 'לוח תוצאות' : 'Leaderboard');
   document.getElementById('sb-signin-link').textContent      = lang === 'he' ? 'התחברות' : 'Sign in';
   document.getElementById('sb-signin-text').textContent      = lang === 'he' ? ' כדי לראות את לוח התוצאות' : ' to see the leaderboard';
 
