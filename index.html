@@ -695,6 +695,8 @@
   }
   #town-name { font-family: 'Playfair Display', 'Alef', serif; font-size: 2.4rem; font-weight: 900; line-height: 1; background: linear-gradient(90deg, #1a6fd4, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   #town-desc { font-size: 0.95rem; color: var(--muted); font-style: italic; margin-top: 4px; }
+  /* Blurred location name shown during street-view preview phase */
+  .blurred-location { filter: blur(8px); user-select: none; pointer-events: none; transition: filter 0.4s ease; }
   #town-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
   #mobile-confirm-modal { display: none; }
   .btn {  border-radius: 50px; padding: 7px 16px; border: none; font-family: 'Source Serif 4', 'Alef', serif; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
@@ -5478,10 +5480,14 @@ function startDailyChallengeGame() {
   });
   document.getElementById('mobile-tools-wrap').classList.add('learning-hidden');
 
-  // Hide location name during preview (step 3c)
-  document.getElementById('town-name').textContent = '—';
+  // Show location name blurred during preview — unreadable but present (step 3c)
+  const previewTownName = lang === 'he' ? town.nameHe : town.name;
+  document.getElementById('town-name').textContent = previewTownName;
+  document.getElementById('town-name').classList.add('blurred-location');
   document.getElementById('town-desc').textContent = '';
-  document.querySelector('#mobile-topbar-town .mob-town-text').textContent = '—';
+  const mobPreviewEl = document.querySelector('#mobile-topbar-town .mob-town-text');
+  mobPreviewEl.textContent = previewTownName;
+  mobPreviewEl.classList.add('blurred-location');
 
   // Prefetch polygon for scoring
   fetchCityPolygon(town.name);
@@ -5538,12 +5544,15 @@ function endDailyChallengePreview(town) {
   const v = REGION_VIEWS['all'];
   map.setView(v.center, v.zoom);
 
-  // Now reveal the location name in the top bar (step 3d)
+  // Reveal the location name by removing the blur (step 3d)
   const townName = lang === 'he' ? town.nameHe : town.name;
   const townDesc = lang === 'he' ? town.descHe : town.desc;
   document.getElementById('town-name').textContent = townName;
+  document.getElementById('town-name').classList.remove('blurred-location');
   document.getElementById('town-desc').textContent = townDesc;
-  document.querySelector('#mobile-topbar-town .mob-town-text').textContent = townName;
+  const mobRevealEl = document.querySelector('#mobile-topbar-town .mob-town-text');
+  mobRevealEl.textContent = townName;
+  mobRevealEl.classList.remove('blurred-location');
   adjustMobileTownFontSize(townName);
 
   roundStartTime = Date.now();
@@ -5555,6 +5564,8 @@ function clearDailyChallengePreview() {
   clearInterval(dailyChallengePreviewInterval);
   dailyChallengePreviewTimer = dailyChallengePreviewInterval = null;
   document.getElementById('learning-preview-bar').classList.remove('active');
+  document.getElementById('town-name').classList.remove('blurred-location');
+  document.querySelector('#mobile-topbar-town .mob-town-text').classList.remove('blurred-location');
   map.scrollWheelZoom.enable();
   map.doubleClickZoom.enable();
   map.touchZoom.enable();
