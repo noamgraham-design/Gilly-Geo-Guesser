@@ -6207,10 +6207,15 @@ function toggleTop5View() {
 
 async function saveDailyScore(myScore) {
   if (!window._fbUser || window._fbUser.isAnonymous) return;
-  const { collection, addDoc, serverTimestamp } = window._fbFns;
+  const { collection, setDoc, getDoc, doc, serverTimestamp } = window._fbFns;
+  const uid   = window._fbUser.uid;
   const today = _getDailyChallengeDay().dateStr; // Israel date, resets at 04:00 IST
+  const docRef = doc(collection(window._fbDb, 'daily_scores'), `${uid}_${today}`);
   try {
-    await addDoc(collection(window._fbDb, 'daily_scores'), {
+    const existing = await getDoc(docRef);
+    if (existing.exists()) return; // already saved first result for today
+    await setDoc(docRef, {
+      uid,
       date:      today,
       score:     myScore,
       timestamp: serverTimestamp(),
