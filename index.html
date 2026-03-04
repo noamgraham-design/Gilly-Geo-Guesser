@@ -1672,6 +1672,27 @@
   .bg-cloud5 .cloud-body::before { width: 30px; height: 30px; top: -15px; left: 8px; }
   .bg-cloud5 .cloud-body::after  { width: 22px; height: 22px; top: -10px; left: 28px; }
 
+  /* Background planes layer */
+  .planes-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 1;
+  }
+  @keyframes planeFly {
+    0%   { transform: translateX(-64px); }
+    100% { transform: translateX(calc(100vw + 64px)); }
+  }
+  .bg-plane {
+    position: absolute;
+    left: 0;
+    width: 28px;
+    height: auto;
+    opacity: 0.82;
+    animation: planeFly linear infinite;
+  }
+
   /* Menu card title area */
   .menu-title-section {
     text-align: center;
@@ -2984,6 +3005,9 @@
     <div class="bg-cloud bg-cloud4"><div class="cloud-body"></div></div>
     <div class="bg-cloud bg-cloud5"><div class="cloud-body"></div></div>
   </div>
+
+  <!-- Background planes -->
+  <div class="planes-layer" id="planes-layer"></div>
 
   <!-- Main menu card -->
   <div class="card" id="menu-card" style="z-index:2;background:transparent;border:none;box-shadow:none;">
@@ -5022,6 +5046,35 @@ function useHint() {
   map.fitBounds(hintCircle.getBounds(), { padding: [40, 40], duration: 0.8 });
 }
 
+function initPlaneAnimation() {
+  const layer = document.getElementById('planes-layer');
+  if (!layer || layer.dataset.initialized) return;
+  layer.dataset.initialized = 'true';
+
+  // Each batch: top position (% of viewport), plane count, fly duration (s)
+  const batches = [
+    { top:  '8%', count: 4, duration: 10 },
+    { top: '22%', count: 3, duration: 14 },
+    { top: '39%', count: 4, duration:  9 },
+    { top: '58%', count: 3, duration: 12 },
+    { top: '74%', count: 4, duration: 11 },
+  ];
+
+  batches.forEach(batch => {
+    for (let i = 0; i < batch.count; i++) {
+      const img = document.createElement('img');
+      img.src = 'f16_nb.png';
+      img.className = 'bg-plane';
+      img.alt = '';
+      img.style.top = batch.top;
+      img.style.animationDuration = batch.duration + 's';
+      // Negative delay spreads planes evenly across the cycle from the start
+      img.style.animationDelay = (-batch.duration / batch.count * i) + 's';
+      layer.appendChild(img);
+    }
+  });
+}
+
 function showMenu() {
   isLearningMode = false;
   isDailyChallenge = false;
@@ -5044,6 +5097,7 @@ function showMenu() {
   });
   // Restore mobile assistance button when leaving learning mode
   document.getElementById('mobile-tools-wrap').classList.remove('learning-hidden');
+  initPlaneAnimation();
 }
 
 // ── Learning Mode ─────────────────────────────────────────────────────────────
