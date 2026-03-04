@@ -3820,9 +3820,19 @@ function applyLang() {
   }
   // Swap street tile layer to match the new language
   if (currentLayer === 'street') {
+    // If the daily-challenge intro popup has a pending tile-load listener,
+    // detach it from whichever layer currently holds it before swapping, then
+    // reattach it to the new language's layer so the button still gets enabled.
+    if (_dcTileLoadListener) {
+      streetLayer.off('load', _dcTileLoadListener);
+      streetLayerEn.off('load', _dcTileLoadListener);
+    }
     map.removeLayer(streetLayer);
     map.removeLayer(streetLayerEn);
     activeStreetLayer().addTo(map);
+    if (_dcTileLoadListener) {
+      activeStreetLayer().once('load', _dcTileLoadListener);
+    }
   }
   updateArabVillageLabels();
 }
@@ -5421,7 +5431,8 @@ function cancelDailyChallengeIntro() {
   // Revert the map preloading done in startDailyChallenge()
   if (_dcPreloadTown !== null) {
     if (_dcTileLoadListener) {
-      activeStreetLayer().off('load', _dcTileLoadListener);
+      streetLayer.off('load', _dcTileLoadListener);
+      streetLayerEn.off('load', _dcTileLoadListener);
       _dcTileLoadListener = null;
     }
     if (_dcPreloadPrevLayer === 'satellite' && currentLayer !== 'satellite') {
@@ -5445,7 +5456,8 @@ function startDailyChallengeGame() {
   // buffering). Fall back to a fresh lookup only if preloading didn't happen.
   // Cancel any pending tile-load listener (button is about to be hidden anyway)
   if (_dcTileLoadListener) {
-    activeStreetLayer().off('load', _dcTileLoadListener);
+    streetLayer.off('load', _dcTileLoadListener);
+    streetLayerEn.off('load', _dcTileLoadListener);
     _dcTileLoadListener = null;
   }
 
