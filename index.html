@@ -5090,11 +5090,15 @@ function initPlaneAnimation() {
     return mc && mc.style.display !== 'none';
   }
 
+  function clearFormations() {
+    layer.querySelectorAll('.formation').forEach(f => f.remove());
+  }
+
   function scheduleWave() {
     const delay = 7000 + Math.random() * 3000; // 7–10s between waves
     setTimeout(() => {
-      // Only spawn when the menu is actually visible
-      if (!menuVisible()) { scheduleWave(); return; }
+      // Only spawn when the menu is visible and the page is in the foreground
+      if (!menuVisible() || document.hidden) { scheduleWave(); return; }
       // Spawn 1 or 2 formations, keeping them at least 15% apart vertically
       const count = Math.random() < 0.5 ? 1 : 2;
       const tops = [];
@@ -5108,6 +5112,11 @@ function initPlaneAnimation() {
       scheduleWave();
     }, delay);
   }
+
+  // Purge accumulated formations when the screen/tab becomes visible again
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) clearFormations();
+  });
 
   // First wave after a short pause so the menu finishes rendering
   setTimeout(() => spawnFormation(10 + Math.random() * 60), 1500);
