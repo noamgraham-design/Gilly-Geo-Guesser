@@ -6648,7 +6648,7 @@ function onChallengeSearchInput(e) {
   document.getElementById('challenge-link-area').style.display = 'none';
   if (!q) { _hideChallengeDropdown(); return; }
   const lower = q.toLowerCase();
-  const matches = TOWNS.filter(t =>
+  const matches = ALL_TOWNS.filter(t =>
     t.name.toLowerCase().includes(lower) || t.nameHe.includes(q)
   ).slice(0, 8);
   _renderChallengeDropdown(matches);
@@ -6722,7 +6722,7 @@ document.addEventListener('click', e => {
 function _initChallengeMode() {
   const param = new URLSearchParams(window.location.search).get('challenge');
   if (!param) return;
-  const town = TOWNS.find(t => t.name === decodeURIComponent(param));
+  const town = ALL_TOWNS.find(t => t.name === decodeURIComponent(param));
   if (!town) return;
   _challengeTown = town;
   isChallengeMode = true;
