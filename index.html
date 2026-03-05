@@ -5866,7 +5866,7 @@ function onMapClick(e) {
   const pct = pts / d.maxPts;
   const color = pct >= 0.7 ? '#1a7f37' : pct >= 0.3 ? '#d29922' : '#cf2316';
 
-  showPtsPopup(pts, pct, perfect, distKm, timeBonus);
+  showPtsPopup(basePts, pct, perfect, distKm, timeBonus);
   showCityPolygon(polyFeature, perfect);
 
   waiting = true;
