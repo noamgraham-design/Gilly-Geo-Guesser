@@ -5085,9 +5085,16 @@ function initPlaneAnimation() {
     layer.appendChild(el);
   }
 
+  function menuVisible() {
+    const mc = document.getElementById('menu-card');
+    return mc && mc.style.display !== 'none';
+  }
+
   function scheduleWave() {
     const delay = 7000 + Math.random() * 3000; // 7–10s between waves
     setTimeout(() => {
+      // Only spawn when the menu is actually visible
+      if (!menuVisible()) { scheduleWave(); return; }
       // Spawn 1 or 2 formations, keeping them at least 15% apart vertically
       const count = Math.random() < 0.5 ? 1 : 2;
       const tops = [];
@@ -5119,6 +5126,8 @@ function showMenu() {
   clearLearningPins();
   document.getElementById('overlay').style.display = 'flex';
   document.getElementById('menu-card').style.display = 'flex';
+  // Clear any formations that accumulated while the menu was hidden
+  document.querySelectorAll('#planes-layer .formation').forEach(f => f.remove());
   document.getElementById('results-panel').className = '';
   document.getElementById('scoreboard-panel').className = '';
   document.getElementById('btn-back').style.display = 'none';
