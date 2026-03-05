@@ -6678,7 +6678,7 @@ function _hideChallengeDropdown() {
 }
 
 function selectChallengeTown(englishName) {
-  challengePickedTown = TOWNS.find(t => t.name === englishName);
+  challengePickedTown = ALL_TOWNS.find(t => t.name === englishName);
   if (!challengePickedTown) return;
   _hideChallengeDropdown();
   const input = document.getElementById('challenge-search-input');
