@@ -4431,7 +4431,7 @@ function showPtsPopup(pts, pct, perfect, distKm, timeBonus = 0) {
   const cls = perfect ? 'show-perfect' : distKm<=40 ? 'show-good' : 'show-miss';
   const dir = lang === 'he' ? 'rtl' : 'ltr';
   const timeBonusLine = !isChallengeMode && perfect && timeBonus > 20
-    ? `<span class="pts-time-bonus" ${lang === 'he' ? 'dir="rtl"' : ''}><span style="color:initial">⏱</span> <span style="color:${color}">${lang === 'he' ? 'בונוס זמן!' : 'Time Bonus!'}</span></span>`
+    ? `<span class="pts-time-bonus" ${lang === 'he' ? 'dir="rtl"' : ''}><span style="color:initial">⏱</span> <span style="color:${color}">${lang === 'he' ? 'בונוס זמן!' : 'Time Bonus!'} +${timeBonus}</span></span>`
     : '';
 
   el.innerHTML = !isChallengeMode && pts > 0 ? `
@@ -5633,7 +5633,7 @@ function onMapClick(e) {
     : (polyFeature && perfect) ? (streetUsedThisRound ? Math.min(20, Math.round(DIFF[difficulty].maxPts * (TIER_MULTIPLIER[town.tier] ?? 1))) : Math.round(DIFF[difficulty].maxPts * (TIER_MULTIPLIER[town.tier] ?? 1))) : calcPts(distKm, d, hintUsed, town.tier);
   // Time bonus: only awarded when you score any points (no reward for a fast miss)
   const elapsedMs = Date.now() - roundStartTime;
-  const timeBonus = basePts > 0 && !streetUsedThisRound ? calcTimeBonus(elapsedMs) : 0;
+  const timeBonus = basePts > 0 && !streetUsedThisRound && elapsedMs < 10000 ? calcTimeBonus(elapsedMs) : 0;
   const pts = basePts + timeBonus;
   // Daily challenge: ms-precision time bonus for leaderboard differentiation
   const scorePts = isDailyChallenge && basePts > 0 && !streetUsedThisRound
@@ -5648,7 +5648,7 @@ function onMapClick(e) {
   const pct = pts / d.maxPts;
   const color = pct >= 0.7 ? '#1a7f37' : pct >= 0.3 ? '#d29922' : '#cf2316';
 
-  showPtsPopup(pts, pct, perfect, distKm, timeBonus);
+  showPtsPopup(basePts, pct, perfect, distKm, timeBonus);
   showCityPolygon(polyFeature, perfect);
 
   waiting = true;
