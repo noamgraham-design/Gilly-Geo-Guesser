@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-<title>Gilly Israel Quiz</title>
+<title>Gilly's Israel Quiz</title>
 <meta property="og:type"        content="website"/>
 <meta property="og:title"       content="Gilly's Israel Quiz"/>
 <meta property="og:description" content="How well do you know Israel? Click on the map to find cities and towns!"/>
@@ -11,7 +11,7 @@
 <meta property="og:image:width"  content="512"/>
 <meta property="og:image:height" content="512"/>
 <meta name="twitter:card"       content="summary"/>
-<meta name="twitter:title"      content="Gilly Israel Quiz"/>
+<meta name="twitter:title"      content="Gilly's Israel Quiz"/>
 <meta name="twitter:image"      content="logo.png"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -2793,7 +2793,7 @@
       <polygon points="19.0,12.5 24.6,22.2 13.4,22.2" fill="none" stroke="#0038b8" stroke-width="1.6"/>
       <polygon points="19.0,25.5 13.4,15.8 24.6,15.8" fill="none" stroke="#0038b8" stroke-width="1.6"/>
     </svg>
-    <span id="title-text">Gilly Israel Quiz</span>
+    <span id="title-text">Gilly's Israel Quiz</span>
   </h1>
   <div id="hud">
     <div class="hud-block">
@@ -2974,7 +2974,7 @@
   <!-- Top navigation bar -->
   <div class="overlay-topbar">
     <div class="overlay-topbar-left">
-      <span class="overlay-topbar-title" id="overlay-title-text">Gilly Israel Quiz</span>
+      <span class="overlay-topbar-title" id="overlay-title-text">Gilly's Israel Quiz</span>
       <button class="overlay-lang-btn" id="lang-toggle" onclick="toggleLang()">🌐 English</button>
     </div>
     <div class="overlay-topbar-right">
@@ -3025,7 +3025,7 @@
   <!-- Main menu card -->
   <div class="card" id="menu-card" style="z-index:2;background:transparent;border:none;box-shadow:none;">
     <div class="menu-title-section">
-      <img src="logo_nb.png" alt="Gilly Israel Quiz" class="menu-logo" id="menu-logo">
+      <img src="logo_nb.png" alt="Gilly's Israel Quiz" class="menu-logo" id="menu-logo">
       <div class="menu-mode-title" id="menu-mode-title">מצב משחק</div>
     </div>
     <button id="daily-btn" class="btn btn-learn" onclick="startDailyChallenge()">⚡ אתגר יומי</button>
@@ -3453,7 +3453,7 @@ function calcDailyPts(distKm, perfect, town) {
 
 const STRINGS = {
   en: {
-    title:            "Gilly Israel Quiz",
+    title:            "Gilly's Israel Quiz",
     score:            "Score",
     round:            "Round",
     placeholder_desc: "Select a difficulty and start the game",
@@ -6204,7 +6204,7 @@ async function showDailyPercentile(myScore) {
   function _setShare(extra) {
     const msg = lang === 'he'
       ? `🗺️ גילי – אתגר יומי\nניקוד: ${Math.floor(myScore)} נקודות${extra ? ' | ' + extra : ''}\nשחקו גם: ${_gameUrl}`
-      : `🗺️ Gilly Israel Quiz – Daily Challenge\nScore: ${Math.floor(myScore)} pts${extra ? ' | ' + extra : ''}\nPlay now: ${_gameUrl}`;
+      : `🗺️ Gilly's Israel Quiz – Daily Challenge\nScore: ${Math.floor(myScore)} pts${extra ? ' | ' + extra : ''}\nPlay now: ${_gameUrl}`;
     shareBtnEl.onclick = () => window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
   }
   _setShare(null); // initial: score only, updated per branch below
@@ -6623,7 +6623,7 @@ function closeSharePopup() {
 
 function shareWhatsApp() {
   const url = window.location.href;
-  const text = encodeURIComponent('Play Gilly Israel Quiz! 🇮🇱 ' + url);
+  const text = encodeURIComponent("Play Gilly's Israel Quiz! 🇮🇱 " + url);
   window.open('https://wa.me/?text=' + text, '_blank');
 }
 
