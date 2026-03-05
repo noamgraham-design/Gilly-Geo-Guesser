@@ -1688,7 +1688,7 @@
     position: absolute;
     left: 0;
     pointer-events: none;
-    animation: planeFly linear infinite;
+    animation: planeFly linear 1 forwards;
   }
   .bg-plane {
     position: absolute;
@@ -5055,8 +5055,7 @@ function initPlaneAnimation() {
   if (!layer || layer.dataset.initialized) return;
   layer.dataset.initialized = 'true';
 
-  // V-formation: positions relative to formation origin, leader at front-right
-  // Sizes vary slightly for a 3D depth feel (leader biggest, tips smallest)
+  // V-formation layout: leader at point, wing pairs, tail
   const vFormation = [
     { left: 135, top:   0, size: 29 }, // leader (point)
     { left:  95, top: -13, size: 27 }, // wing port
@@ -5066,21 +5065,12 @@ function initPlaneAnimation() {
     { left:  20, top:   0, size: 23 }, // tail
   ];
 
-  // Each batch: vertical position and flight duration (s)
-  const batches = [
-    { top:  '8%', duration: 10 },
-    { top: '22%', duration: 14 },
-    { top: '39%', duration:  9 },
-    { top: '58%', duration: 12 },
-    { top: '74%', duration: 11 },
-  ];
-
-  batches.forEach(batch => {
-    const formation = document.createElement('div');
-    formation.className = 'formation';
-    formation.style.top = batch.top;
-    formation.style.animationDuration = batch.duration + 's';
-
+  function spawnFormation(topPct) {
+    const duration = 8 + Math.random() * 6; // 8–14s to cross
+    const el = document.createElement('div');
+    el.className = 'formation';
+    el.style.top = topPct + '%';
+    el.style.animationDuration = duration + 's';
     vFormation.forEach(p => {
       const img = document.createElement('img');
       img.src = 'f16_nb.png';
@@ -5089,11 +5079,32 @@ function initPlaneAnimation() {
       img.style.left = p.left + 'px';
       img.style.top = p.top + 'px';
       img.style.width = p.size + 'px';
-      formation.appendChild(img);
+      el.appendChild(img);
     });
+    el.addEventListener('animationend', () => el.remove());
+    layer.appendChild(el);
+  }
 
-    layer.appendChild(formation);
-  });
+  function scheduleWave() {
+    const delay = 7000 + Math.random() * 3000; // 7–10s between waves
+    setTimeout(() => {
+      // Spawn 1 or 2 formations, keeping them at least 15% apart vertically
+      const count = Math.random() < 0.5 ? 1 : 2;
+      const tops = [];
+      for (let i = 0; i < count; i++) {
+        let top, attempts = 0;
+        do { top = 5 + Math.random() * 75; attempts++; }
+        while (tops.some(t => Math.abs(t - top) < 15) && attempts < 10);
+        tops.push(top);
+        spawnFormation(top);
+      }
+      scheduleWave();
+    }, delay);
+  }
+
+  // First wave after a short pause so the menu finishes rendering
+  setTimeout(() => spawnFormation(10 + Math.random() * 60), 1500);
+  scheduleWave();
 }
 
 function showMenu() {
