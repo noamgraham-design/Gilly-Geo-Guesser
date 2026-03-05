@@ -977,6 +977,15 @@
 
   #map { width:100%; height:100%; cursor: crosshair !important; }
   #map .leaflet-container { cursor: crosshair !important; }
+  .leaflet-control-attribution {
+    font-size: 10px !important;
+    padding: 1px 5px !important;
+    line-height: 1.2 !important;
+    max-width: 60vw;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   /* Tooltip */
   .city-label {
     background: rgba(255,255,255,0.75) !important;
@@ -3697,7 +3706,7 @@ const map = L.map('map', {
 // Create two tile layers - satellite and street map
 const satelliteLayer = L.tileLayer(
   'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-  { attribution: 'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics', maxZoom: 18 }
+  { attribution: '&copy; Esri', maxZoom: 18 }
 );
 
 // Hebrew street map (OSM default — labels in Hebrew)
