@@ -4657,7 +4657,7 @@ function showPtsPopup(pts, pct, perfect, distKm, timeBonus = 0) {
 
   const cls = perfect ? 'show-perfect' : distKm<=40 ? 'show-good' : 'show-miss';
   const dir = lang === 'he' ? 'rtl' : 'ltr';
-  const timeBonusLine = !isChallengeMode && perfect && timeBonus > 0
+  const timeBonusLine = !isChallengeMode && perfect && timeBonus > 20
     ? `<span class="pts-time-bonus" ${lang === 'he' ? 'dir="rtl"' : ''}><span style="color:initial">⏱</span> <span style="color:${color}">${lang === 'he' ? 'בונוס זמן!' : 'Time Bonus!'}</span></span>`
     : '';
 
