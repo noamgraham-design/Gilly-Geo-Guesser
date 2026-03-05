@@ -226,7 +226,11 @@ const TOWNS = [
   { name:"Nahef",            lat:32.9347, lng:35.317, region:"North",     tier:3, desc:"Arab village in the western Galilee between Acre and Karmiel", nameHe:"נחף", descHe:"כפר ערבי בגליל המערבי בין עכו לכרמיאל", fact:"The village of Nahf is located in the Beit Kerem Valley and is known for its high-quality marble and stone industry, used in construction throughout the country.", factHe:"הכפר נחף ממוקם בבקעת בית כרם וידוע בתעשיית השיש והאבן האיכותית שלו, המשמשת לבנייה בכל רחבי הארץ." , arabVillage: true },
 
   { name:"Tzomet HaGader Interchange",  lat:33.1280, lng:35.7560, region:"North",   tier:4, desc:"Highway 91/98 junction near the Syrian border", nameHe:"מחלף תצומת הגדר", descHe:"מחלף כביש 91/98 בסמוך לגבול סוריה", fact:"This interchange is located in the seam zone area and serves as an important transit point and infrastructure connecting seam line communities to the national road network.", factHe:"מחלף זה שוכן באזור התפר ומשמש כנקודת מעבר ותשתית חשובה המחברת בין יישובי קו התפר למערכת הכבישים הארצית." },
+];
 
+// Locations only available in Challenge mode (Create & Play).
+// Not included in Daily Challenge, Quiz, or Learning mode.
+const CHALLENGE_ONLY_TOWNS = [
   // ── Imported from israel_localities_with_coords.json ──────────────────────
   { name:"Alfe Menashe", lat:32.1745, lng:35.009, region:"Center", tier:2, desc:"Israeli locality", nameHe:"אלפי מנשה", descHe:"יישוב ישראלי", fact:"", factHe:"", arabVillage:false },
   { name:"Ar'Ara", lat:32.4981, lng:35.0887, region:"Center", tier:2, desc:"Israeli locality", nameHe:"ערערה", descHe:"יישוב ישראלי", fact:"", factHe:"", arabVillage:false },
@@ -1310,3 +1314,5 @@ const TOWNS = [
   { name:"Zurit", lat:32.903, lng:35.2499, region:"North", tier:3, desc:"Israeli locality", nameHe:"צורית", descHe:"יישוב ישראלי", fact:"", factHe:"", arabVillage:false },
   { name:"Zviyya", lat:32.8895, lng:35.3306, region:"North", tier:3, desc:"Israeli locality", nameHe:"צביה", descHe:"יישוב ישראלי", fact:"", factHe:"", arabVillage:false },
 ];
+
+const ALL_TOWNS = [...TOWNS, ...CHALLENGE_ONLY_TOWNS];
