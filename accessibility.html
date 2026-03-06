@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>הצהרת נגישות — חידון ישראל של גילי</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #1a1a2e;
+    background: #f7f8fa;
+    padding: 0 16px;
+  }
+  .container {
+    max-width: 800px;
+    margin: 40px auto 60px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 40px 48px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  header { margin-bottom: 32px; }
+  .site-title {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 4px;
+  }
+  h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #0038b8;
+    margin-bottom: 8px;
+  }
+  .lang-switch {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 0.9rem;
+    color: #1a6fd4;
+    text-decoration: none;
+    border: 1px solid #1a6fd4;
+    border-radius: 20px;
+    padding: 3px 12px;
+  }
+  .lang-switch:hover { background: #e8f0fe; }
+  :focus-visible { outline: 3px solid #1a6fd4; outline-offset: 2px; }
+
+  section { margin-bottom: 32px; }
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0038b8;
+    margin-bottom: 8px;
+    border-bottom: 2px solid #e8f0fe;
+    padding-bottom: 4px;
+  }
+  p { margin-bottom: 10px; }
+  ul { padding-right: 20px; margin-bottom: 10px; }
+  li { margin-bottom: 4px; }
+  a { color: #1a6fd4; }
+  a:hover { text-decoration: none; }
+
+  .contact-table { border-collapse: collapse; width: 100%; }
+  .contact-table td {
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    font-size: 0.95rem;
+  }
+  .contact-table td:first-child { font-weight: 600; width: 40%; }
+
+  .badge {
+    display: inline-block;
+    background: #e8f0fe;
+    color: #0038b8;
+    font-weight: 700;
+    font-size: 0.85rem;
+    border-radius: 4px;
+    padding: 2px 8px;
+    margin-bottom: 6px;
+  }
+
+  footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid #eee;
+    font-size: 0.85rem;
+    color: #777;
+    text-align: center;
+  }
+
+  /* English section — hidden by default, shown via JS */
+  #en-content { display: none; }
+
+  @media (max-width: 600px) {
+    .container { padding: 24px 20px; }
+    h1 { font-size: 1.5rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Language toggle -->
+  <div style="text-align:left;margin-bottom:16px;">
+    <a href="#" class="lang-switch" id="lang-btn" onclick="toggleLang(event)">🌐 English</a>
+  </div>
+
+  <!-- ── HEBREW CONTENT ──────────────────────────────────────────────── -->
+  <div id="he-content">
+
+    <header>
+      <p class="site-title">חידון ישראל של גילי — <a href="index.html">gilly.co.il</a></p>
+      <h1>הצהרת נגישות</h1>
+      <p>אנו מחויבים להנגשת האתר לכלל המשתמשים, לרבות אנשים עם מוגבלויות.</p>
+    </header>
+
+    <section aria-labelledby="compliance-he">
+      <h2 id="compliance-he">רמת הנגישות</h2>
+      <p><span class="badge">WCAG 2.0 רמה AA</span></p>
+      <p>
+        האתר פועל לעמידה בדרישות תקן ישראלי <strong>ת"י 5568</strong> (המבוסס על
+        <a href="https://www.w3.org/TR/WCAG20/" rel="noreferrer noopener" target="_blank">WCAG 2.0 רמה AA</a>),
+        בהתאם לחוק שוויון זכויות לאנשים עם מוגבלות, תשנ"ח-1998, ותקנות שוויון זכויות לאנשים עם מוגבלות
+        (התאמות נגישות לשירות), תשע"ג-2013.
+      </p>
+      <p>תאריך עדכון הצהרה זו: <strong>מרץ 2026</strong>.</p>
+    </section>
+
+    <section aria-labelledby="measures-he">
+      <h2 id="measures-he">אמצעי הנגישות שיושמו</h2>
+      <ul>
+        <li>תמיכה בהגדלת טקסט עד 200% ללא פגיעה בתוכן (הסרת חסימת זום)</li>
+        <li>אינדיקטורי פוקוס גלויים לכל האלמנטים האינטראקטיביים</li>
+        <li>תגיות ARIA לדיאלוגים, הודעות סטטוס ואזורים דינמיים</li>
+        <li>ניהול פוקוס בחלונות קופצים (focus trap)</li>
+        <li>קישור דילוג לתוכן הראשי</li>
+        <li>עדכון שפת המסמך (<code>lang</code>) בעת מעבר בין עברית לאנגלית</li>
+        <li>תמיכה בהגדרת "הפחת תנועה" של מערכת ההפעלה</li>
+        <li>תוויות נגישות (<code>aria-label</code>) לכפתורים ללא טקסט גלוי</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="limitations-he">
+      <h2 id="limitations-he">מגבלות ידועות</h2>
+      <ul>
+        <li>
+          <strong>מפה אינטראקטיבית (Leaflet.js):</strong> המפה היא הממשק המרכזי של המשחק.
+          ניווט מלא בקורא מסך מוגבל מאחר שמפות אינטראקטיביות הן בגדר "אפליקציית ריץ'" (role="application").
+          המשחק מוגדר כ-<em>בידור</em> ולא כשירות חיוני; אנו ממשיכים לבחון שיפורים.
+        </li>
+        <li>
+          <strong>תמונות בטבלת תוצאות:</strong> חלק מהאייקונים הם אמוג'י קלים ואינם נושאים משמעות פונקציונלית.
+        </li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="tech-he">
+      <h2 id="tech-he">טכנולוגיות המשמשות את האתר</h2>
+      <ul>
+        <li>HTML5, CSS3, JavaScript (Vanilla)</li>
+        <li><a href="https://leafletjs.com/" rel="noreferrer noopener" target="_blank">Leaflet.js</a> — מיפוי אינטראקטיבי</li>
+        <li>Firebase Authentication &amp; Firestore</li>
+        <li>גופנים מ-Google Fonts (Alef, Playfair Display, Source Serif 4)</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="testing-he">
+      <h2 id="testing-he">שיטות הבדיקה</h2>
+      <ul>
+        <li>בדיקה אוטומטית עם Lighthouse (Chrome DevTools) — ציון נגישות 90+</li>
+        <li>ניווט מלא במקלדת בלבד — בדיקת סדר פוקוס וטבאות בכל המודאלים</li>
+        <li>בדיקה ידנית עם VoiceOver (macOS) ו-NVDA (Windows)</li>
+        <li>בדיקת זום עד 200% בדפדפנים Chrome, Firefox ו-Safari</li>
+        <li>בדיקת "הפחת תנועה" דרך הגדרות מערכת ההפעלה</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="report-he">
+      <h2 id="report-he">פנייה בנושא נגישות</h2>
+      <p>
+        נתקלתם בבעיית נגישות? אנחנו כאן לעזור. ניתן לפנות לרכז הנגישות של האתר:
+      </p>
+      <table class="contact-table" aria-label="פרטי רכז הנגישות">
+        <tbody>
+          <tr><td>שם (עברית)</td><td>נועם גרהם</td></tr>
+          <tr><td>שם (English)</td><td>Noam Graham</td></tr>
+          <tr><td>טלפון</td><td><a href="tel:+972522641062">‎+972-52-264-1062</a></td></tr>
+          <tr><td>דוא"ל</td><td><a href="mailto:gillyisraelquiz@gmail.com">gillyisraelquiz@gmail.com</a></td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:12px;">
+        לאחר קבלת פנייה, נשתדל לחזור אליך תוך <strong>14 ימי עסקים</strong>.
+      </p>
+    </section>
+
+    <section aria-labelledby="complaint-he">
+      <h2 id="complaint-he">הגשת תלונה</h2>
+      <p>
+        אם לא קיבלתם מענה מספק, ניתן לפנות לנציב שוויון זכויות לאנשים עם מוגבלות במשרד המשפטים:
+        <a href="https://www.gov.il/he/departments/ministry_of_justice" rel="noreferrer noopener" target="_blank">www.gov.il</a>.
+      </p>
+    </section>
+
+  </div><!-- /#he-content -->
+
+  <!-- ── ENGLISH CONTENT ─────────────────────────────────────────────── -->
+  <div id="en-content" lang="en" dir="ltr">
+
+    <header>
+      <p class="site-title">Gilly's Israel Quiz — <a href="index.html">gilly.co.il</a></p>
+      <h1>Accessibility Statement</h1>
+      <p>We are committed to making this site accessible to everyone, including people with disabilities.</p>
+    </header>
+
+    <section aria-labelledby="compliance-en">
+      <h2 id="compliance-en">Compliance Level</h2>
+      <p><span class="badge">WCAG 2.0 Level AA</span></p>
+      <p>
+        This site strives to conform to <strong>Israeli Standard IS 5568</strong>, based on
+        <a href="https://www.w3.org/TR/WCAG20/" rel="noreferrer noopener" target="_blank">WCAG 2.0 Level AA</a>,
+        as required under Israel's Equal Rights for Persons with Disabilities Law (1998) and related
+        accessibility regulations.
+      </p>
+      <p>This statement was last updated: <strong>March 2026</strong>.</p>
+    </section>
+
+    <section aria-labelledby="measures-en">
+      <h2 id="measures-en">Accessibility Measures Implemented</h2>
+      <ul>
+        <li>Text can be resized up to 200% without loss of content (zoom blocking removed)</li>
+        <li>Visible focus indicators on all interactive elements</li>
+        <li>ARIA roles and labels on dialogs, status messages, and dynamic regions</li>
+        <li>Focus trap management in modal dialogs</li>
+        <li>Skip-to-main-content link</li>
+        <li>Document language (<code>lang</code> attribute) updated on Hebrew/English toggle</li>
+        <li>Respects OS "Reduce Motion" preference — animations are suppressed</li>
+        <li>Accessible labels (<code>aria-label</code>) on icon-only buttons</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="limitations-en">
+      <h2 id="limitations-en">Known Limitations</h2>
+      <ul>
+        <li>
+          <strong>Interactive map (Leaflet.js):</strong> The map is the primary game interface.
+          Full screen-reader navigation is limited because interactive maps are inherently visual
+          (exposed as <code>role="application"</code>). The site is entertainment, not an essential
+          service; we continue to explore improvements.
+        </li>
+        <li>
+          <strong>Scoreboard icons:</strong> Some icons are decorative emoji and carry no functional meaning.
+        </li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="tech-en">
+      <h2 id="tech-en">Technologies Used</h2>
+      <ul>
+        <li>HTML5, CSS3, JavaScript (Vanilla)</li>
+        <li><a href="https://leafletjs.com/" rel="noreferrer noopener" target="_blank">Leaflet.js</a> — interactive mapping</li>
+        <li>Firebase Authentication &amp; Firestore</li>
+        <li>Google Fonts (Alef, Playfair Display, Source Serif 4)</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="testing-en">
+      <h2 id="testing-en">Testing Methods</h2>
+      <ul>
+        <li>Automated testing with Lighthouse (Chrome DevTools) — accessibility score 90+</li>
+        <li>Full keyboard-only navigation — tab order and focus cycle verified in all modals</li>
+        <li>Manual testing with VoiceOver (macOS) and NVDA (Windows)</li>
+        <li>Zoom testing to 200% in Chrome, Firefox, and Safari</li>
+        <li>OS "Reduce Motion" setting tested</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="report-en">
+      <h2 id="report-en">Reporting an Accessibility Issue</h2>
+      <p>Found an accessibility barrier? Please contact the site's accessibility coordinator:</p>
+      <table class="contact-table" aria-label="Accessibility coordinator contact details">
+        <tbody>
+          <tr><td>Name (English)</td><td>Noam Graham</td></tr>
+          <tr><td>שם (עברית)</td><td>נועם גרהם</td></tr>
+          <tr><td>Phone</td><td><a href="tel:+972522641062">+972-52-264-1062</a></td></tr>
+          <tr><td>Email</td><td><a href="mailto:gillyisraelquiz@gmail.com">gillyisraelquiz@gmail.com</a></td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:12px;">We aim to respond within <strong>14 business days</strong>.</p>
+    </section>
+
+    <section aria-labelledby="complaint-en">
+      <h2 id="complaint-en">Filing a Complaint</h2>
+      <p>
+        If you are not satisfied with our response, you may contact the Israeli Commissioner for Equal Rights
+        of Persons with Disabilities at the Ministry of Justice:
+        <a href="https://www.gov.il/en/departments/ministry_of_justice" rel="noreferrer noopener" target="_blank">www.gov.il</a>.
+      </p>
+    </section>
+
+  </div><!-- /#en-content -->
+
+  <footer>
+    <p>
+      <a href="index.html">← חזרה למשחק / Back to the game</a>
+    </p>
+  </footer>
+
+</div><!-- /.container -->
+
+<script>
+  var _accLang = 'he';
+  function toggleLang(e) {
+    if (e) e.preventDefault();
+    _accLang = _accLang === 'he' ? 'en' : 'he';
+    document.documentElement.lang = _accLang;
+    document.documentElement.dir = _accLang === 'he' ? 'rtl' : 'ltr';
+    document.getElementById('he-content').style.display = _accLang === 'he' ? '' : 'none';
+    document.getElementById('en-content').style.display = _accLang === 'en' ? '' : 'none';
+    document.getElementById('lang-btn').textContent = _accLang === 'he' ? '🌐 English' : '🌐 עברית';
+    document.title = _accLang === 'he'
+      ? 'הצהרת נגישות — חידון ישראל של גילי'
+      : 'Accessibility Statement — Gilly\'s Israel Quiz';
+  }
+</script>
+
+</body>
+</html>

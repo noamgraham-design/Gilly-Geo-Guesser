@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Gilly's Israel Quiz</title>
 <meta property="og:type"        content="website"/>
 <meta property="og:title"       content="Gilly's Israel Quiz"/>
@@ -2776,9 +2776,57 @@
     pointer-events: none;
     direction: rtl;
   }
+
+  /* ── ACCESSIBILITY ─────────────────────────────────────────────────────── */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+  .skip-link {
+    position: absolute;
+    top: -100%;
+    left: 0;
+    background: #1a6fd4;
+    color: #fff;
+    padding: 8px 16px;
+    z-index: 99999;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 0 0 4px 0;
+  }
+  .skip-link:focus { top: 0; }
+
+  :focus-visible {
+    outline: 3px solid #1a6fd4;
+    outline-offset: 2px;
+  }
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible {
+    outline: 3px solid #1a6fd4;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 </style>
 </head>
 <body>
+<a href="#main-content" class="skip-link" id="skip-nav">דלג לתוכן הראשי / Skip to main content</a>
 
 <div id="topbar">
   <h1>
@@ -2798,11 +2846,11 @@
   <div id="hud">
     <div class="hud-block">
       <span class="hud-label" id="lbl-round">Round</span>
-      <span class="hud-value" id="round-val">1/—</span>
+      <span class="hud-value" id="round-val" aria-live="polite" aria-atomic="true">1/—</span>
     </div>
     <div class="hud-block">
       <span class="hud-label" id="lbl-score">Score</span>
-      <span class="hud-value" id="score-val" style="color:#1a6fd4">0</span>
+      <span class="hud-value" id="score-val" aria-live="polite" aria-atomic="true" style="color:#1a6fd4">0</span>
     </div>
   </div>
   <div id="learning-hud">
@@ -2849,17 +2897,18 @@
 </div>
 
 <div style="flex:1;position:relative;overflow:hidden;">
-  <div id="streak-banner"></div>
+  <div id="streak-banner" aria-live="polite" aria-atomic="true"></div>
   <div id="easy-mode-banner"></div>
-  <div id="pts-popup"></div>
-  <div id="map" style="position:absolute;inset:0;"></div>
+  <div id="pts-popup" aria-live="assertive" aria-atomic="true"></div>
+  <span id="main-content" aria-hidden="true" style="position:absolute;top:0;left:0;"></span>
+  <div id="map" role="application" aria-label="מפת ישראל האינטראקטיבית / Interactive map of Israel" style="position:absolute;inset:0;"></div>
 </div>
 <div id="feedback"></div>
 
 <!-- SHARE POPUP -->
-<div id="share-popup" onclick="if(event.target===this)closeSharePopup()">
+<div id="share-popup" role="dialog" aria-modal="true" aria-labelledby="share-card-title" onclick="if(event.target===this)closeSharePopup()">
   <div id="share-card">
-    <button id="share-popup-close" onclick="closeSharePopup()">✕</button>
+    <button id="share-popup-close" onclick="closeSharePopup()" aria-label="סגור / Close">✕</button>
     <div id="share-card-title">Share</div>
     <div class="share-options">
       <button class="share-option share-option-whatsapp" onclick="shareWhatsApp()">
@@ -2906,7 +2955,7 @@
 </div>
 
 <!-- CHALLENGE INTRO POPUP -->
-<div id="challenge-intro">
+<div id="challenge-intro" role="dialog" aria-modal="true" aria-labelledby="challenge-intro-heading">
   <div id="challenge-intro-card">
     <div id="challenge-intro-logo-wrap">
       <img id="challenge-intro-logo" src="logo_head.png" alt="Gilly"/>
@@ -2921,9 +2970,9 @@
 </div>
 
 <!-- DAILY CHALLENGE INTRO POPUP -->
-<div id="daily-challenge-intro">
+<div id="daily-challenge-intro" role="dialog" aria-modal="true" aria-labelledby="dci-title">
   <div id="daily-challenge-intro-card">
-    <button id="dci-close-btn" onclick="cancelDailyChallengeIntro()">✕</button>
+    <button id="dci-close-btn" onclick="cancelDailyChallengeIntro()" aria-label="סגור / Close">✕</button>
     <div id="dci-icon">⚡</div>
     <div id="dci-title">אתגר יומי</div>
     <div id="dci-desc-box">
@@ -2962,7 +3011,7 @@
 </div>
 
 <!-- FACT MODAL (hidden by default) -->
-<div id="fact-modal" style="display:none">
+<div id="fact-modal" role="dialog" aria-modal="true" aria-labelledby="fact-modal-title" style="display:none">
   <div id="fact-modal-card">
     <div id="fact-modal-title"></div>
     <div id="fact-modal-body"></div>
@@ -2975,7 +3024,8 @@
   <div class="overlay-topbar">
     <div class="overlay-topbar-left">
       <span class="overlay-topbar-title" id="overlay-title-text">Gilly's Israel Quiz</span>
-      <button class="overlay-lang-btn" id="lang-toggle" onclick="toggleLang()">🌐 English</button>
+      <button class="overlay-lang-btn" id="lang-toggle" onclick="toggleLang()" aria-label="שינוי שפה / Change language">🌐 English</button>
+      <a href="accessibility.html" id="accessibility-link" class="overlay-lang-btn" style="text-decoration:none;font-size:0.78rem;">♿ נגישות</a>
     </div>
     <div class="overlay-topbar-right">
       <button id="share-btn" onclick="openSharePopup()">
@@ -2983,7 +3033,7 @@
         <span id="share-btn-label">Share</span>
       </button>
       <div id="auth-wrap" style="position:relative;flex-shrink:0;">
-        <button id="auth-btn" onclick="handleAuthBtnClick()">
+        <button id="auth-btn" onclick="handleAuthBtnClick()" aria-label="התחברות / Log in" aria-expanded="false" aria-haspopup="true">
           <span class="auth-avatar" id="auth-avatar">👤</span>
           <span id="auth-label">התחברות</span>
         </button>
@@ -3090,7 +3140,7 @@
       <h3 id="scoreboard-title"><span style="-webkit-text-fill-color:initial;background:none">🏆</span> Leaderboard</h3>
       <div id="sb-header-actions">
         <button id="sb-top5-btn" onclick="toggleTop5View()">▲ Top 10</button>
-        <button id="sb-close-btn" onclick="document.getElementById('scoreboard-panel').classList.remove('show')">✕</button>
+        <button id="sb-close-btn" onclick="document.getElementById('scoreboard-panel').classList.remove('show')" aria-label="סגור לוח תוצאות / Close scoreboard">✕</button>
       </div>
     </div>
     <div id="scoreboard-list"></div>
@@ -3102,7 +3152,7 @@
 </div>
 
 <!-- ── DAILY CHALLENGE PERCENTILE POPUP ──────────────────────────────── -->
-<div id="daily-percentile-popup">
+<div id="daily-percentile-popup" role="dialog" aria-modal="true" aria-labelledby="dp-title">
   <div id="daily-percentile-card">
     <div id="dp-accent-bar"></div>
     <div id="dp-title"><span class="dp-emoji">📅 </span>Daily Challenge</div>
@@ -3115,13 +3165,13 @@
     <div id="dp-count"></div>
     <div id="dp-btn-row">
       <button id="dp-share-btn"></button>
-      <button id="dp-close-btn" onclick="document.getElementById('daily-percentile-popup').classList.remove('show'); showMenu()"></button>
+      <button id="dp-close-btn" onclick="document.getElementById('daily-percentile-popup').classList.remove('show'); showMenu()" aria-label="סגור / Close"></button>
     </div>
   </div>
 </div>
 
 <!-- ── NEW RECORD POPUP ─────────────────────────────────────────────────── -->
-<div id="new-record-popup">
+<div id="new-record-popup" role="dialog" aria-modal="true" aria-label="שיא אישי חדש / New Personal Best">
   <div id="new-record-card">
     <div class="record-sparkle" style="top:12%;left:10%;background:#f4c430;animation-delay:0s"></div>
     <div class="record-sparkle" style="top:20%;right:12%;background:#cf2316;animation-delay:0.4s"></div>
@@ -3188,13 +3238,13 @@
 <div id="nickname-error-popup"></div>
 
 <!-- ── SETTINGS MODAL ─────────────────────────────────────────────────────── -->
-<div id="settings-modal">
+<div id="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
   <div id="settings-card">
-    <button id="settings-modal-close" onclick="closeSettingsModal()">✕</button>
+    <button id="settings-modal-close" onclick="closeSettingsModal()" aria-label="סגור / Close">✕</button>
     <h2 id="settings-title">⚙️ Settings</h2>
 
     <div class="settings-field">
-      <label class="settings-label" id="settings-lbl-nickname">Nickname</label>
+      <label class="settings-label" id="settings-lbl-nickname" for="settings-nickname">Nickname</label>
       <input class="login-input" id="settings-nickname" type="text" placeholder="Your nickname…" maxlength="15" pattern="[A-Za-z0-9_]{1,15}"/>
     </div>
 
@@ -3219,10 +3269,10 @@
   </div>
 </div>
 
-<div id="login-modal">
+<div id="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-modal-heading">
   <div id="login-card" style="position:relative">
-    <button id="login-modal-close" onclick="closeLoginModal()">✕</button>
-    <h2>🇮🇱 התחברות</h2>
+    <button id="login-modal-close" onclick="closeLoginModal()" aria-label="סגור / Close">✕</button>
+    <h2 id="login-modal-heading">🇮🇱 התחברות</h2>
     <p class="login-sub">Save your scores and track your progress</p>
 
     <button class="btn-google" onclick="signInGoogle()">
@@ -3234,9 +3284,12 @@
 
     <div id="login-form-section">
       <div style="display:flex;flex-direction:column;gap:8px">
-        <input class="login-input" id="login-name" type="text" placeholder="Display name" style="display:none"/>
-        <input class="login-input" id="login-email" type="email" placeholder="Email address"/>
-        <input class="login-input" id="login-password" type="password" placeholder="Password"/>
+        <label for="login-name" style="display:none" id="login-name-label">Display name</label>
+        <input class="login-input" id="login-name" type="text" placeholder="Display name" aria-label="Display name" style="display:none"/>
+        <label for="login-email" class="sr-only">Email address</label>
+        <input class="login-input" id="login-email" type="email" placeholder="Email address" aria-label="Email address"/>
+        <label for="login-password" class="sr-only">Password</label>
+        <input class="login-input" id="login-password" type="password" placeholder="Password" aria-label="Password"/>
       </div>
       <div id="login-error"></div>
       <button class="btn-auth-submit" id="login-submit-btn" onclick="submitEmailAuth()">Sign in</button>
@@ -3250,6 +3303,44 @@
 <script src="towns.js"></script>
 
 <script>
+// ── FOCUS TRAP UTILITY ─────────────────────────────────────────────────────
+const FOCUSABLE_SELECTORS = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+let _focusTrapHandlers = {};
+let _focusTrapPrevious = {};
+
+function trapFocus(modal) {
+  const id = modal.id;
+  if (_focusTrapHandlers[id]) modal.removeEventListener('keydown', _focusTrapHandlers[id]);
+  _focusTrapPrevious[id] = document.activeElement;
+
+  function handler(e) {
+    if (e.key !== 'Tab') return;
+    const focusable = Array.from(modal.querySelectorAll(FOCUSABLE_SELECTORS)).filter(el => !el.closest('[style*="display:none"]') && !el.closest('[style*="display: none"]'));
+    if (!focusable.length) return;
+    const first = focusable[0], last = focusable[focusable.length - 1];
+    if (e.shiftKey) {
+      if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+    } else {
+      if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  }
+  _focusTrapHandlers[id] = handler;
+  modal.addEventListener('keydown', handler);
+  const focusable = Array.from(modal.querySelectorAll(FOCUSABLE_SELECTORS)).filter(el => !el.closest('[style*="display:none"]') && !el.closest('[style*="display: none"]'));
+  if (focusable.length) focusable[0].focus();
+}
+
+function releaseFocus(modal) {
+  const id = modal.id;
+  if (_focusTrapHandlers[id]) {
+    modal.removeEventListener('keydown', _focusTrapHandlers[id]);
+    delete _focusTrapHandlers[id];
+  }
+  if (_focusTrapPrevious[id] && _focusTrapPrevious[id].focus) {
+    _focusTrapPrevious[id].focus();
+    delete _focusTrapPrevious[id];
+  }
+}
 
 const DIFF = {
   // maxPts: base points for a perfect click; maxKm: distance beyond which you score 0; maxTier: highest town tier included
@@ -3534,6 +3625,8 @@ function t(key) { return STRINGS[lang][key]; }
 
 function setLang(l) {
   lang = l;
+  document.documentElement.lang = l === 'he' ? 'he' : 'en';
+  document.title = l === 'he' ? 'חידון ישראל של גילי' : "Gilly's Israel Quiz";
   applyLang();
 }
 function toggleLang() {
@@ -3569,6 +3662,9 @@ function applyLang() {
   document.getElementById('mobile-tools-layer').innerHTML = currentLayer === 'satellite' ? t('layer_street') : t('layer_satellite');
   // Update single lang toggle button — shows the OTHER language to switch to
   document.getElementById('lang-toggle').textContent = lang === 'he' ? '🌐 English' : '🌐 עברית';
+  // Update accessibility statement link text
+  const accLink = document.getElementById('accessibility-link');
+  if (accLink) accLink.textContent = lang === 'he' ? '♿ נגישות' : '♿ Accessibility';
   // Share button & popup
   const shareBtnLabel = document.getElementById('share-btn-label');
   if (shareBtnLabel) shareBtnLabel.textContent = lang === 'he' ? 'שתף' : 'Share';
@@ -4328,13 +4424,17 @@ function openFactModal(townName) {
   document.getElementById('fact-modal-body').textContent = fact;
   document.getElementById('fact-modal-body').dir = lang === 'he' ? 'rtl' : 'ltr';
   document.getElementById('fact-modal-title').dir = lang === 'he' ? 'rtl' : 'ltr';
-  document.getElementById('fact-modal').style.display = 'flex';
+  const factModal = document.getElementById('fact-modal');
+  factModal.style.display = 'flex';
   factModalOpen = true;
+  trapFocus(factModal);
 }
 
 function closeFactModal() {
-  document.getElementById('fact-modal').style.display = 'none';
+  const factModal = document.getElementById('fact-modal');
+  factModal.style.display = 'none';
   factModalOpen = false;
+  releaseFocus(factModal);
 }
 
 // Close on backdrop click
@@ -5854,10 +5954,14 @@ function handleAuthBtnClick() {
   if (window._fbUser) { toggleAuthDropdown(); } else { openLoginModal(); }
 }
 function toggleAuthDropdown() {
-  document.getElementById('auth-dropdown').classList.toggle('open');
+  const dd = document.getElementById('auth-dropdown');
+  const btn = document.getElementById('auth-btn');
+  dd.classList.toggle('open');
+  btn.setAttribute('aria-expanded', dd.classList.contains('open') ? 'true' : 'false');
 }
 function closeAuthDropdown() {
   document.getElementById('auth-dropdown').classList.remove('open');
+  document.getElementById('auth-btn').setAttribute('aria-expanded', 'false');
 }
 document.addEventListener('click', e => {
   const wrap = document.getElementById('auth-wrap');
@@ -5870,11 +5974,15 @@ function switchAccount() {
 }
 
 function openLoginModal() {
-  document.getElementById('login-modal').classList.add('open');
+  const modal = document.getElementById('login-modal');
+  modal.classList.add('open');
   document.getElementById('login-error').textContent = '';
+  trapFocus(modal);
 }
 function closeLoginModal() {
-  document.getElementById('login-modal').classList.remove('open');
+  const modal = document.getElementById('login-modal');
+  modal.classList.remove('open');
+  releaseFocus(modal);
 }
 // Close on backdrop click
 document.getElementById('login-modal').addEventListener('click', e => {
@@ -6491,7 +6599,9 @@ function selectSettingsLang(l) {
 async function openSettingsModal() {
   closeAuthDropdown();
   document.getElementById('settings-save-msg').textContent = '';
-  document.getElementById('settings-modal').classList.add('open');
+  const settingsModal = document.getElementById('settings-modal');
+  settingsModal.classList.add('open');
+  trapFocus(settingsModal);
   _settingsLoading = true;
 
   try {
@@ -6532,7 +6642,9 @@ async function openSettingsModal() {
 }
 
 function closeSettingsModal() {
-  document.getElementById('settings-modal').classList.remove('open');
+  const modal = document.getElementById('settings-modal');
+  modal.classList.remove('open');
+  releaseFocus(modal);
 }
 document.getElementById('settings-modal').addEventListener('click', e => {
   if (e.target === document.getElementById('settings-modal')) closeSettingsModal();
@@ -6607,7 +6719,9 @@ async function saveSettings() {
 
 /* ── SHARE ──────────────────────────────────────────────────────────────── */
 function openSharePopup() {
-  document.getElementById('share-popup').classList.add('open');
+  const shareModal = document.getElementById('share-popup');
+  shareModal.classList.add('open');
+  trapFocus(shareModal);
   document.getElementById('share-copied-toast').classList.remove('show');
   document.getElementById('share-card').dir = lang === 'he' ? 'rtl' : 'ltr';
   // Reset challenge section
@@ -6618,7 +6732,9 @@ function openSharePopup() {
 }
 
 function closeSharePopup() {
-  document.getElementById('share-popup').classList.remove('open');
+  const shareModal = document.getElementById('share-popup');
+  shareModal.classList.remove('open');
+  releaseFocus(shareModal);
 }
 
 function shareWhatsApp() {
