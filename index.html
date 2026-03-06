@@ -1168,16 +1168,16 @@
     padding-top: 80px;
     overflow-y: auto;
   }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 14px 28px 16px; max-width: 440px; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 4px; box-shadow: 0 8px 40px rgba(0,0,0,0.08); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 14px 28px 16px; max-width: 640px; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 4px; box-shadow: 0 8px 40px rgba(0,0,0,0.08); }
   .card h2 { font-family: 'Playfair Display', 'Alef', serif; font-size: 1.8rem; font-weight: 900; margin-bottom: 10px; background: linear-gradient(90deg, #1a6fd4, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   .card p { color: var(--muted); font-size: 1.05rem; line-height: 1.75; margin-bottom: 22px; }
-  .diff-row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-  .diff-btn { padding: 8px 28px; border-radius: 50px; border: 2px solid var(--border); background: transparent; color: var(--muted); font-family: 'Source Serif 4', 'Alef', serif; font-size: 1.7rem; font-weight: 600; cursor: pointer; transition: all 0.15s; min-width: 148px; text-align: center; }
+  .diff-row { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin: 6px 0; }
+  .diff-btn { padding: 14px 40px; border-radius: 50px; border: 2px solid var(--border); background: transparent; color: var(--muted); font-family: 'Source Serif 4', 'Alef', serif; font-size: 3.4rem; font-weight: 600; cursor: pointer; transition: all 0.15s; min-width: 180px; text-align: center; }
   .diff-btn.active-easy   { border-color: var(--green); color: var(--green); background: rgba(26,127,55,0.08); }
   .diff-btn.active-medium { border-color: var(--gold);  color: var(--gold);  background: rgba(154,103,0,0.08); }
   .diff-btn.active-hard   { border-color: var(--red);   color: var(--red);   background: rgba(207,35,22,0.08); }
   .diff-btn.active-region { border-color: #1a6fd4; color: #1a6fd4; background: rgba(26,111,212,0.08); }
-  .diff-note { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .diff-note { font-size: 3rem; font-weight: 700; color: var(--text); margin-bottom: 8px; line-height: 1.2; }
   #results-list { margin: 8px 0; width: 100%; text-align: start; }
   #results-list::-webkit-scrollbar { width: 4px; }
   #results-list::-webkit-scrollbar-thumb { background: #c8ccd2; border-radius: 99px; }
@@ -1877,12 +1877,12 @@
       gap: 10px;
     }
     .diff-btn {
-      padding: 6px 18px;
-      font-size: 1.2rem;
-      min-width: 90px;
+      padding: 10px 24px;
+      font-size: 2.4rem;
+      min-width: 130px;
     }
     .diff-note {
-      font-size: 0.95rem;
+      font-size: 2.4rem;
     }
     .region-grid {
       gap: 16px;
@@ -2231,8 +2231,8 @@
 
     /* Difficulty buttons */
     .diff-btn {
-      padding: 6px 14px;
-      font-size: 1.1rem;
+      padding: 8px 18px;
+      font-size: 2rem;
     }
 
     /* Tighten diff-row gaps */
@@ -2243,8 +2243,8 @@
 
     /* Diff note */
     .diff-note {
-      font-size: 0.9rem;
-      margin-bottom: 10px;
+      font-size: 2rem;
+      margin-bottom: 12px;
     }
 
     /* Menu mode title */
