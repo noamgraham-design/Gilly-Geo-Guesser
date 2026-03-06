@@ -5909,23 +5909,27 @@ applyLang();
 function toggleFullscreen() {
   if (!document.fullscreenElement) {
     document.documentElement.requestFullscreen();
-  } else {
-    document.exitFullscreen();
   }
 }
 let userWantsFullscreen = false;
 
 document.addEventListener('fullscreenchange', function() {
+  const btn   = document.getElementById('menu-fullscreen-btn');
   const enter = document.getElementById('fs-icon-enter');
   const exit  = document.getElementById('fs-icon-exit');
   if (document.fullscreenElement) {
     userWantsFullscreen = true;
     enter.style.display = 'none';
     exit.style.display  = '';
+    btn.disabled = true;
+    btn.style.opacity = '0.4';
+    btn.style.cursor = 'default';
   } else {
     enter.style.display = '';
     exit.style.display  = 'none';
-    // Only clear the flag if the user explicitly exited (page is still visible)
+    btn.disabled = false;
+    btn.style.opacity = '';
+    btn.style.cursor = '';
     if (!document.hidden) userWantsFullscreen = false;
   }
 });
