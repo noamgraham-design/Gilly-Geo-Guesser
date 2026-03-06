@@ -1063,13 +1063,13 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 20px;
-    padding: 28px 32px 24px;
-    max-width: 420px;
+    padding: 40px 48px 36px;
+    max-width: 700px;
     width: 100%;
     box-shadow: 0 12px 48px rgba(0,0,0,0.25);
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 20px;
     animation: factCardPop 0.25s cubic-bezier(.34,1.56,.64,1);
   }
   @keyframes factCardPop {
@@ -1078,27 +1078,29 @@
   }
   #fact-modal-title {
     font-family: 'Playfair Display', 'Alef', serif;
-    font-size: 1.4rem;
+    font-size: 2.8rem;
     font-weight: 900;
+    line-height: 1.2;
     background: linear-gradient(90deg, #1a6fd4, #7c3aed);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
   #fact-modal-body {
-    font-size: 1rem;
+    font-size: 2rem;
+    font-weight: 700;
     color: var(--text);
     line-height: 1.7;
   }
   #fact-modal-close {
     align-self: flex-end;
     margin-top: 6px;
-    padding: 7px 20px;
+    padding: 10px 28px;
     border-radius: 50px;
     border: 1px solid var(--border);
     background: transparent;
     color: var(--muted);
     font-family: 'Source Serif 4', 'Alef', serif;
-    font-size: 0.95rem;
+    font-size: 1.4rem;
     cursor: pointer;
     transition: background 0.15s;
   }
@@ -2455,10 +2457,10 @@
       padding: 20px;
     }
     #fact-modal-title {
-      font-size: 1.5rem;
+      font-size: 2.2rem;
     }
     #fact-modal-body {
-      font-size: 0.95rem;
+      font-size: 1.6rem;
     }
   }
   
