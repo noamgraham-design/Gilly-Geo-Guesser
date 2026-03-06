@@ -677,7 +677,7 @@
 
   /* TOWN CARD */
   #town-card {
-    padding: 14px 18px;
+    padding: 22px 18px;
     background: linear-gradient(135deg, rgba(26,111,212,0.06), rgba(124,58,237,0.06));
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
@@ -690,7 +690,7 @@
   #town-center {
     position: absolute;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(calc(-50% - 100px));
     text-align: center;
     pointer-events: none;
   }
@@ -700,7 +700,7 @@
   .blurred-location { filter: blur(8px); user-select: none; pointer-events: none; transition: filter 0.4s ease; }
   #town-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
   #mobile-confirm-modal { display: none; }
-  .btn {  border-radius: 50px; padding: 7px 16px; border: none; font-family: 'Source Serif 4', 'Alef', serif; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+  .btn {  border-radius: 50px; padding: 14px 32px; border: none; font-family: 'Source Serif 4', 'Alef', serif; font-size: 2rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
   .btn-hint { background: transparent; border: 1px dashed #444; color: var(--muted); }
   .btn-hint:hover { border-color: var(--gold); color: var(--gold); }
   .btn-hint:disabled { opacity: 0.4; cursor: default; }
@@ -2156,7 +2156,7 @@
     
     /* Town card adjustments */
     #town-card {
-      padding: 8px 12px;
+      padding: 18px 12px;
       font-size: 0.9rem;
     }
     #town-name {
@@ -2176,8 +2176,8 @@
       min-height: 44px; /* Apple's minimum touch target */
     }
     .btn-hint {
-      padding: 8px 14px;
-      font-size: 0.85rem;
+      padding: 16px 28px;
+      font-size: 1.7rem;
     }
     #btn-back {
       padding: 8px 14px;
