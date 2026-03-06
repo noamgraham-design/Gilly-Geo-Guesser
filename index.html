@@ -1773,6 +1773,33 @@
     font-weight: 700;
   }
 
+  /* Fullscreen button */
+  #menu-fullscreen-btn {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 9999;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    color: var(--muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    opacity: 0.7;
+    transition: opacity 0.15s, background 0.15s;
+  }
+  #menu-fullscreen-btn:hover {
+    opacity: 1;
+    background: rgba(26,111,212,0.08);
+    border-color: #1a6fd4;
+    color: #1a6fd4;
+  }
+
   /* Start button */
   .btn-start-gold {
     background: linear-gradient(135deg, #1a6fd4, #1558b0);
@@ -3020,6 +3047,12 @@
 
   <!-- Background planes -->
   <div class="planes-layer" id="planes-layer"></div>
+
+  <!-- Fullscreen button -->
+  <button id="menu-fullscreen-btn" onclick="toggleFullscreen()" title="Fullscreen">
+    <svg id="fs-icon-enter" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+    <svg id="fs-icon-exit" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="10" y1="14" x2="3" y2="21"/><line x1="21" y1="3" x2="14" y2="10"/></svg>
+  </button>
 
   <!-- Main menu card -->
   <div class="card" id="menu-card" style="z-index:2;background:transparent;border:none;box-shadow:none;">
@@ -5780,6 +5813,25 @@ function showResults() {
 setDiff('medium');
 setRegion('all');
 applyLang();
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+}
+document.addEventListener('fullscreenchange', function() {
+  const enter = document.getElementById('fs-icon-enter');
+  const exit  = document.getElementById('fs-icon-exit');
+  if (document.fullscreenElement) {
+    enter.style.display = 'none';
+    exit.style.display  = '';
+  } else {
+    enter.style.display = '';
+    exit.style.display  = 'none';
+  }
+});
 
 // Detect and launch challenge mode if URL param is present
 _initChallengeMode();
