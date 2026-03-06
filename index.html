@@ -634,7 +634,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 18px 28px;
+    padding: 14px 28px;
     background: var(--surface);
     border-bottom: 1px solid var(--border);
     box-shadow: 0 1px 6px rgba(0,0,0,0.07);
@@ -642,7 +642,7 @@
     gap: 16px;
     flex-wrap: nowrap;
     position: relative;
-    min-height: 100px;
+    min-height: 130px;
   }
   #topbar h1 {
     font-family: 'Playfair Display', 'Alef', serif;
@@ -693,7 +693,7 @@
     min-width: 0;
     pointer-events: none;
   }
-  #town-name { font-family: 'Playfair Display', 'Alef', serif; font-size: 2.6rem; font-weight: 900; line-height: 1; background: linear-gradient(90deg, #1a6fd4, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #town-name { font-family: 'Playfair Display', 'Alef', serif; font-size: 5.2rem; font-weight: 900; line-height: 1; background: linear-gradient(90deg, #1a6fd4, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   #town-desc { font-size: 0.95rem; color: var(--muted); font-style: italic; margin-top: 4px; }
   /* Blurred location name shown during street-view preview phase */
   .blurred-location { filter: blur(8px); user-select: none; pointer-events: none; transition: filter 0.4s ease; }
@@ -2013,6 +2013,10 @@
     #topbar h1 {
       display: none !important;
     }
+    /* Hide desktop town-center on mobile — mobile-topbar-town handles it */
+    #town-center {
+      display: none !important;
+    }
     
     /* Reorganize topbar for mobile — hud left, town center, ☰ right */
     #topbar {
@@ -2218,7 +2222,7 @@
       font-size: 0.9rem;
     }
     #town-name {
-      font-size: 2.21rem;
+      font-size: 3.6rem;
     }
     #town-desc {
       font-size: 0.85rem;
@@ -2487,7 +2491,7 @@
     #mobile-topbar-town .mob-town-text.mob-size-xs { font-size: 0.75rem; }
     
     #town-name {
-      font-size: 1.87rem;
+      font-size: 3.0rem;
     }
     #town-desc {
       font-size: 0.8rem;
