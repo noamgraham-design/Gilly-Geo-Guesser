@@ -320,8 +320,8 @@
     _accLang = _accLang === 'he' ? 'en' : 'he';
     document.documentElement.lang = _accLang;
     document.documentElement.dir = _accLang === 'he' ? 'rtl' : 'ltr';
-    document.getElementById('he-content').style.display = _accLang === 'he' ? '' : 'none';
-    document.getElementById('en-content').style.display = _accLang === 'en' ? '' : 'none';
+    document.getElementById('he-content').style.display = _accLang === 'he' ? 'block' : 'none';
+    document.getElementById('en-content').style.display = _accLang === 'en' ? 'block' : 'none';
     document.getElementById('lang-btn').textContent = _accLang === 'he' ? '🌐 English' : '🌐 עברית';
     document.title = _accLang === 'he'
       ? 'הצהרת נגישות — חידון ישראל של גילי'
