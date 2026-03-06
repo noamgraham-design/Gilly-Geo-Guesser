@@ -1177,7 +1177,7 @@
   .diff-btn.active-medium { border-color: var(--gold);  color: var(--gold);  background: rgba(154,103,0,0.08); }
   .diff-btn.active-hard   { border-color: var(--red);   color: var(--red);   background: rgba(207,35,22,0.08); }
   .diff-btn.active-region { border-color: #1a6fd4; color: #1a6fd4; background: rgba(26,111,212,0.08); }
-  .diff-note { font-size: 0.78rem; color: #777; margin-bottom: 0; }
+  .diff-note { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
   #results-list { margin: 8px 0; width: 100%; text-align: start; }
   #results-list::-webkit-scrollbar { width: 4px; }
   #results-list::-webkit-scrollbar-thumb { background: #c8ccd2; border-radius: 99px; }
@@ -1877,12 +1877,12 @@
       gap: 10px;
     }
     .diff-btn {
-      padding: 4px 18px;
-      font-size: 0.92rem;
-      min-width: 82px;
+      padding: 6px 18px;
+      font-size: 1.2rem;
+      min-width: 90px;
     }
     .diff-note {
-      font-size: 0.82rem;
+      font-size: 0.95rem;
     }
     .region-grid {
       gap: 16px;
@@ -1917,8 +1917,8 @@
       margin-bottom: 0;
     }
     #menu-desc {
-      font-size: 0.92rem !important;
-      line-height: 1.3 !important;
+      font-size: 1rem !important;
+      line-height: 1.4 !important;
     }
     #lbl-region {
       font-size: 0.85rem !important;
@@ -2229,10 +2229,10 @@
       min-width: 120px;
     }
 
-    /* Difficulty buttons more compact */
+    /* Difficulty buttons */
     .diff-btn {
-      padding: 6px 13px;
-      font-size: 0.85rem;
+      padding: 6px 14px;
+      font-size: 1.1rem;
     }
 
     /* Tighten diff-row gaps */
@@ -2241,9 +2241,9 @@
       margin-bottom: 4px;
     }
 
-    /* Diff note smaller */
+    /* Diff note */
     .diff-note {
-      font-size: 0.82rem;
+      font-size: 0.9rem;
       margin-bottom: 10px;
     }
 
@@ -2283,8 +2283,8 @@
 
     /* Restore menu description text to original size on mobile */
     #menu-desc {
-      font-size: 0.9rem !important;
-      line-height: 1.5 !important;
+      font-size: 1rem !important;
+      line-height: 1.4 !important;
     }
 
     /* Results panel — compact top bar on mobile */
@@ -3061,7 +3061,7 @@
       <div class="menu-mode-title" id="menu-mode-title">מצב משחק</div>
     </div>
 
-    <p id="menu-desc" style="margin:0;font-size:0.88rem;line-height:1.35;text-align:center;">
+    <p id="menu-desc" style="margin:0 0 6px;font-size:1.1rem;font-weight:700;line-height:1.4;text-align:center;color:var(--text);">
       מצא/י את המיקום על המפה
     </p>
     <div class="diff-row" id="diff-row">
