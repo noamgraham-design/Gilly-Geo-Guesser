@@ -686,16 +686,14 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    position: relative;
   }
   #town-center {
-    position: absolute;
-    left: 50%;
-    transform: translateX(calc(-50% - 60px));
+    flex: 1;
     text-align: center;
+    min-width: 0;
     pointer-events: none;
   }
-  #town-name { font-family: 'Playfair Display', 'Alef', serif; font-size: 4.08rem; font-weight: 900; line-height: 1; background: linear-gradient(90deg, #1a6fd4, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  #town-name { font-family: 'Playfair Display', 'Alef', serif; font-size: 2.6rem; font-weight: 900; line-height: 1; background: linear-gradient(90deg, #1a6fd4, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   #town-desc { font-size: 0.95rem; color: var(--muted); font-style: italic; margin-top: 4px; }
   /* Blurred location name shown during street-view preview phase */
   .blurred-location { filter: blur(8px); user-select: none; pointer-events: none; transition: filter 0.4s ease; }
@@ -2885,6 +2883,10 @@
       <polygon points="19.0,25.5 13.4,15.8 24.6,15.8" fill="none" stroke="#0038b8" stroke-width="1.6"/>
     </svg>
   </h1>
+  <div id="town-center">
+    <div id="town-name">—</div>
+    <div id="town-desc">בחר/י רמת קושי והתחל/י את המשחק</div>
+  </div>
   <div id="hud">
     <div class="hud-block">
       <span class="hud-label" id="lbl-round">Round</span>
@@ -2927,10 +2929,6 @@
 <div id="town-card">
   <div style="min-width:260px">
     <button class="btn btn-hint" id="btn-back" onclick="showMenu()" style="display:none">← תפריט</button>
-  </div>
-  <div id="town-center">
-    <div id="town-name">—</div>
-    <div id="town-desc">בחר/י רמת קושי והתחל/י את המשחק</div>
   </div>
   <div id="town-actions">
     <button class="btn btn-hint" id="btn-hint" onclick="useHint()">💡 Hint · 3 left</button>
