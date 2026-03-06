@@ -5912,15 +5912,27 @@ function toggleFullscreen() {
     document.exitFullscreen();
   }
 }
+let userWantsFullscreen = false;
+
 document.addEventListener('fullscreenchange', function() {
   const enter = document.getElementById('fs-icon-enter');
   const exit  = document.getElementById('fs-icon-exit');
   if (document.fullscreenElement) {
+    userWantsFullscreen = true;
     enter.style.display = 'none';
     exit.style.display  = '';
   } else {
     enter.style.display = '';
     exit.style.display  = 'none';
+    // Only clear the flag if the user explicitly exited (page is still visible)
+    if (!document.hidden) userWantsFullscreen = false;
+  }
+});
+
+// Re-enter fullscreen when the tablet screen wakes up, if it was active before
+document.addEventListener('visibilitychange', function() {
+  if (!document.hidden && userWantsFullscreen && !document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {});
   }
 });
 
