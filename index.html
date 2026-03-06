@@ -5699,6 +5699,7 @@ async function startLearning() {
 }
 
 function startGame() {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
   const tierFilter = TOWNS.filter(t => t.tier <= DIFF[difficulty].maxTier);
   const regionFilter = REGION_GROUPS[region];
   const pool = regionFilter
