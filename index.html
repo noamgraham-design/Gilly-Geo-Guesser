@@ -725,8 +725,9 @@
     50%       { box-shadow: 0 4px 22px rgba(124,58,237,0.55); }
   }
   #btn-play-again {
-    font-size: 1.05rem;
-    padding: 10px 28px;
+    font-size: 2.1rem;
+    font-weight: 700;
+    padding: 20px 56px;
     animation: gentlePulse 2.5s ease-in-out infinite;
   }
   #btn-play-again:hover { animation: none; }
@@ -1249,8 +1250,8 @@
   .result-pts { font-weight: 700; }
   .result-pts.hit  { color: var(--green); }
   .result-pts.miss { color: var(--red); }
-  .btn-row { display: flex; gap: 10px; justify-content: center; margin-top: 6px; }
-  .btn-secondary { background: transparent; border: 1px solid rgba(255,255,255,0.12); color: var(--muted); border-radius: 50px; padding: 10px 20px; font-family: 'Source Serif 4', 'Alef', serif; font-size: 1rem; cursor: pointer; }
+  .btn-row { display: flex; flex-direction: column; align-items: center; gap: 16px; justify-content: center; margin-top: 6px; }
+  .btn-secondary { background: transparent; border: 2px solid rgba(255,255,255,0.2); color: var(--muted); border-radius: 50px; padding: 20px 56px; font-family: 'Source Serif 4', 'Alef', serif; font-size: 2rem; font-weight: 700; cursor: pointer; }
 
   /* ── SUN & CLOUDS ─────────────────────────────────────────────────── */
   @keyframes sunSpin {
@@ -2404,21 +2405,19 @@
       min-width: 0;
     }
     .btn-row {
-      flex-wrap: nowrap !important;
-      margin-top: 0 !important;
-      gap: 6px !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      gap: 12px !important;
       flex-shrink: 0 !important;
     }
     #btn-play-again {
-      font-size: 0.85rem !important;
-      padding: 8px 14px !important;
+      font-size: 1.3rem !important;
+      padding: 14px 32px !important;
       animation: none !important;
-      white-space: nowrap;
     }
     #btn-menu {
-      font-size: 0.85rem !important;
-      padding: 8px 14px !important;
-      white-space: nowrap;
+      font-size: 1.3rem !important;
+      padding: 14px 32px !important;
     }
     
     /* Streak banner smaller */
