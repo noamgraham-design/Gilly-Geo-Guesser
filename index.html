@@ -1104,6 +1104,65 @@
   }
   #fact-modal-close:hover { background: var(--bg); }
 
+  /* CONFIRM LOCATION POPUP */
+  #confirm-popup {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #confirm-box {
+    background: #fff;
+    border-radius: 22px;
+    padding: 52px 64px 44px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    box-shadow: 0 12px 60px rgba(0,0,0,0.35);
+    min-width: 420px;
+    max-width: 90vw;
+  }
+  #confirm-text {
+    font-size: 3rem;
+    font-weight: 900;
+    color: #111;
+    margin: 0;
+    text-align: center;
+    line-height: 1.2;
+    font-family: 'Alef', 'Heebo', sans-serif;
+    letter-spacing: 0.01em;
+  }
+  #confirm-buttons {
+    display: flex;
+    gap: 28px;
+    flex-direction: row-reverse;
+  }
+  #confirm-yes, #confirm-no {
+    font-size: 2rem;
+    font-weight: 800;
+    border: none;
+    border-radius: 14px;
+    padding: 18px 52px;
+    cursor: pointer;
+    font-family: 'Alef', 'Heebo', sans-serif;
+    transition: filter 0.15s, transform 0.1s;
+    min-width: 140px;
+  }
+  #confirm-yes {
+    background: #90ee90;
+    color: #1a4d1a;
+  }
+  #confirm-no {
+    background: #ffb3b3;
+    color: #6b0000;
+  }
+  #confirm-yes:hover { filter: brightness(0.93); transform: scale(1.03); }
+  #confirm-no:hover  { filter: brightness(0.93); transform: scale(1.03); }
+
   /* FEEDBACK TOAST */
   #feedback {
     position: fixed;
@@ -2997,6 +3056,17 @@
     <div id="fact-modal-title"></div>
     <div id="fact-modal-body"></div>
     <button id="fact-modal-close" onclick="closeFactModal()">סגור</button>
+  </div>
+</div>
+
+<!-- Confirm-location popup -->
+<div id="confirm-popup" style="display:none">
+  <div id="confirm-box">
+    <p id="confirm-text" dir="rtl">?אתה בטוח</p>
+    <div id="confirm-buttons">
+      <button id="confirm-yes" onclick="confirmLocation()">כן</button>
+      <button id="confirm-no" onclick="cancelLocation()">לא</button>
+    </div>
   </div>
 </div>
 
@@ -5651,6 +5721,22 @@ function startGame() {
   loadTown();
 }
 
+let _pendingClickEvent = null;
+
+function cancelLocation() {
+  document.getElementById('confirm-popup').style.display = 'none';
+  _pendingClickEvent = null;
+}
+
+function confirmLocation() {
+  document.getElementById('confirm-popup').style.display = 'none';
+  if (_pendingClickEvent) {
+    const e = _pendingClickEvent;
+    _pendingClickEvent = null;
+    processMapClick(e);
+  }
+}
+
 function onMapClick(e) {
   // Ignore clicks that follow a touch-drag (pan/scroll). A stationary tap leaves
   // _touchMoved false; a finger that moved to scroll the map sets it true.
@@ -5663,6 +5749,11 @@ function onMapClick(e) {
   if (waiting) return;
   if (isLearningMode) { handleLearningClick(e); return; }
 
+  _pendingClickEvent = e;
+  document.getElementById('confirm-popup').style.display = 'flex';
+}
+
+function processMapClick(e) {
   haptic(30); // subtle tap on pin placement
 
   const town = sequence[currentIdx];
