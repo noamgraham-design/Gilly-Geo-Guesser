@@ -3671,9 +3671,15 @@ function copyAccessibilityEmail() {
   navigator.clipboard.writeText('gillyisraelquiz@gmail.com').then(() => {
     const btn = document.getElementById('accessibility-footer-email');
     if (!btn) return;
-    const prev = btn.textContent;
-    btn.textContent = lang === 'he' ? '✓ הועתק!' : '✓ Copied!';
-    setTimeout(() => { btn.textContent = prev; }, 2000);
+    const prevText = btn.textContent;
+    const prevDir  = btn.dir;
+    if (lang === 'he') {
+      btn.dir = 'rtl';
+      btn.textContent = '✓ הועתק!';
+    } else {
+      btn.textContent = '✓ Copied!';
+    }
+    setTimeout(() => { btn.textContent = prevText; btn.dir = prevDir; }, 2000);
   });
 }
 
