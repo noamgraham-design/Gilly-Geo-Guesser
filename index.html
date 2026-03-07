@@ -268,7 +268,7 @@
   /* Signup email-updates checkbox */
   #signup-email-updates-row {
     display: none; align-items: flex-start; gap: 8px;
-    font-size: 0.82rem; color: var(--text); line-height: 1.4; margin-top: 2px;
+    font-size: 0.78rem; color: var(--muted); line-height: 1.45; margin-top: 2px;
   }
   #signup-email-updates-row.visible { display: flex; }
   #signup-email-updates-row input[type="checkbox"] {
@@ -3422,7 +3422,7 @@
       </div>
       <div id="signup-email-updates-row">
         <input type="checkbox" id="signup-email-updates"/>
-        <label for="signup-email-updates" id="signup-email-updates-lbl">I'd like to receive email updates about new game levels and features.</label>
+        <label for="signup-email-updates" id="signup-email-updates-lbl" dir="ltr">I'd love to get updates on new levels and cool features via email. (Don't worry, we only send game-related stuff and never share your email with anyone else).</label>
       </div>
       <div id="login-error"></div>
       <button class="btn-auth-submit" id="login-submit-btn" onclick="submitEmailAuth()">Sign in</button>
@@ -3880,9 +3880,12 @@ function applyLang() {
     document.getElementById('settings-delete-cancel').textContent     = lang === 'he' ? 'ביטול'  : 'Cancel';
     document.getElementById('settings-delete-yes').textContent        = lang === 'he' ? 'מחיקה'  : 'Delete';
     const euSignupLbl = document.getElementById('signup-email-updates-lbl');
-    if (euSignupLbl) euSignupLbl.textContent = lang === 'he'
-      ? 'אני רוצה לקבל עדכונים במייל על רמות ותכונות חדשות במשחק.'
-      : "I'd like to receive email updates about new game levels and features.";
+    if (euSignupLbl) {
+      euSignupLbl.dir = lang === 'he' ? 'rtl' : 'ltr';
+      euSignupLbl.textContent = lang === 'he'
+        ? 'אשמח לקבל עדכונים על שלבים חדשים ופיצ\'רים מעניינים במייל. (אל דאגה, אנחנו שולחים רק דברים שקשורים למשחק ולא מעבירים את המייל לאף אחד אחר).'
+        : "I'd love to get updates on new levels and cool features via email. (Don't worry, we only send game-related stuff and never share your email with anyone else).";
+    }
   }
   // Update live town name/desc if a game is in progress
   const overlayVisible = document.getElementById('overlay').style.display !== 'none';
