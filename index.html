@@ -3435,8 +3435,6 @@
 
     <div id="google-signup-step" style="display:none;flex-direction:column;gap:12px;">
       <p id="google-signup-desc" style="font-size:0.88rem;color:var(--muted);text-align:center;margin:0;">Almost there! Just a couple of things:</p>
-      <label for="google-signup-name" class="sr-only">Display name</label>
-      <input class="login-input" id="google-signup-name" type="text" placeholder="Display name" aria-label="Display name"/>
       <div style="display:flex;align-items:flex-start;gap:8px;font-size:0.78rem;color:var(--muted);line-height:1.45;">
         <input type="checkbox" id="google-signup-eu" style="margin-top:3px;accent-color:#1a6fd4;cursor:pointer;flex-shrink:0;"/>
         <label for="google-signup-eu" id="google-signup-eu-lbl" dir="ltr" style="cursor:pointer;">I'd love to get updates on new levels and cool features via email. (Don't worry, we only send game-related stuff and never share your email with anyone else).</label>
@@ -3907,8 +3905,6 @@ function applyLang() {
     }
     const googleDesc = document.getElementById('google-signup-desc');
     if (googleDesc) googleDesc.textContent = lang === 'he' ? '!כמעט סיימנו, רק כמה פרטים קטנים' : 'Almost there! Just a couple of things:';
-    const googleNameInput = document.getElementById('google-signup-name');
-    if (googleNameInput) googleNameInput.placeholder = lang === 'he' ? 'שם תצוגה' : 'Display name';
     const googleBtn = document.getElementById('google-signup-btn');
     if (googleBtn) googleBtn.textContent = lang === 'he' ? '!בואו נשחק' : "Let's play!";
   }
@@ -6237,7 +6233,7 @@ function closeLoginModal() {
 function _resetGoogleSignupStep() {
   document.getElementById('google-signup-step').style.display = 'none';
   document.getElementById('login-main-section').style.display = '';
-  document.getElementById('google-signup-name').value = '';
+
   document.getElementById('google-signup-eu').checked = false;
   document.getElementById('google-signup-error').textContent = '';
 }
@@ -6279,22 +6275,14 @@ async function signInGoogle() {
 function _showGoogleSignupStep(user) {
   document.getElementById('login-main-section').style.display = 'none';
   document.getElementById('google-signup-step').style.display = 'flex';
-  const nameInput = document.getElementById('google-signup-name');
-  nameInput.value = user.displayName || '';
-  nameInput.focus();
+  document.getElementById('google-signup-btn').focus();
 }
 async function submitGoogleSignup() {
   const user = window._fbUser;
-  const name = document.getElementById('google-signup-name').value.trim();
   const emailUpdates = document.getElementById('google-signup-eu').checked;
-  const errEl = document.getElementById('google-signup-error');
-  if (!name) { errEl.textContent = document.documentElement.lang === 'he' ? 'נא להזין שם תצוגה.' : 'Please enter a display name.'; return; }
   try {
-    const { setDoc, doc, updateProfile } = await Promise.resolve(window._fbFns);
-    await Promise.all([
-      setDoc(doc(window._fbDb, 'users', user.uid), { nickname: name, emailUpdates }, { merge: true }),
-      updateProfile(user, { displayName: name }),
-    ]);
+    const { setDoc, doc } = await Promise.resolve(window._fbFns);
+    await setDoc(doc(window._fbDb, 'users', user.uid), { emailUpdates }, { merge: true });
     closeLoginModal();
     await _postAuthActions();
   } catch (e) {
