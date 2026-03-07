@@ -275,6 +275,17 @@
     margin-top: 2px; accent-color: #1a6fd4; cursor: pointer; flex-shrink: 0;
   }
   #signup-email-updates-row label { cursor: pointer; }
+  /* Signup terms checkbox */
+  #signup-terms-row {
+    display: none; align-items: flex-start; gap: 8px;
+    font-size: 0.78rem; color: var(--text); line-height: 1.45; margin-top: 2px;
+  }
+  #signup-terms-row.visible { display: flex; }
+  #signup-terms-row input[type="checkbox"] {
+    margin-top: 2px; accent-color: #1a6fd4; cursor: pointer; flex-shrink: 0;
+  }
+  #signup-terms-row label { cursor: pointer; }
+  #signup-terms-row a, .google-terms-row a { color: #1a6fd4; text-decoration: underline; }
   /* Settings email-updates toggle */
   #settings-email-updates-row {
     display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 0;
@@ -3425,6 +3436,10 @@
           <input type="checkbox" id="signup-email-updates"/>
           <label for="signup-email-updates" id="signup-email-updates-lbl" dir="ltr">I'd love to get updates on new levels and cool features via email. (Don't worry, we only send game-related stuff and never share your email with anyone else).</label>
         </div>
+        <div id="signup-terms-row">
+          <input type="checkbox" id="signup-terms"/>
+          <label for="signup-terms" id="signup-terms-lbl" dir="ltr">By signing up, you agree to our <a href="#" id="signup-terms-link" target="_blank">Terms</a> and <a href="#" id="signup-privacy-link" target="_blank">Privacy Notice</a>. Providing your email is voluntary and used to save game progress.</label>
+        </div>
         <div id="login-error"></div>
         <button class="btn-auth-submit" id="login-submit-btn" onclick="submitEmailAuth()">Sign in</button>
         <div id="login-toggle">
@@ -3435,6 +3450,10 @@
 
     <div id="google-signup-step" style="display:none;flex-direction:column;gap:12px;">
       <p id="google-signup-desc" style="font-size:0.88rem;color:var(--muted);text-align:center;margin:0;">Almost there! Just a couple of things:</p>
+      <div class="google-terms-row" style="display:flex;align-items:flex-start;gap:8px;font-size:0.78rem;color:var(--text);line-height:1.45;">
+        <input type="checkbox" id="google-signup-terms" style="margin-top:2px;accent-color:#1a6fd4;cursor:pointer;flex-shrink:0;"/>
+        <label for="google-signup-terms" id="google-signup-terms-lbl" dir="ltr" style="cursor:pointer;">By signing up, you agree to our <a href="#" id="google-terms-link" target="_blank">Terms</a> and <a href="#" id="google-privacy-link" target="_blank">Privacy Notice</a>. Providing your email is voluntary and used to save game progress.</label>
+      </div>
       <div style="display:flex;align-items:flex-start;gap:8px;font-size:0.78rem;color:var(--muted);line-height:1.45;">
         <input type="checkbox" id="google-signup-eu" style="margin-top:3px;accent-color:#1a6fd4;cursor:pointer;flex-shrink:0;"/>
         <label for="google-signup-eu" id="google-signup-eu-lbl" dir="ltr" style="cursor:pointer;">I'd love to get updates on new levels and cool features via email. (Don't worry, we only send game-related stuff and never share your email with anyone else).</label>
@@ -3902,6 +3921,18 @@ function applyLang() {
     if (euGoogleLbl) {
       euGoogleLbl.dir = lang === 'he' ? 'rtl' : 'ltr';
       euGoogleLbl.textContent = lang === 'he' ? EU_TEXT_HE : EU_TEXT_EN;
+    }
+    const TERMS_TEXT_HE = 'בהרשמה, אתה מסכים ל<a href="#" target="_blank">תנאי השימוש</a> ול<a href="#" target="_blank">הודעת הפרטיות</a> שלנו. מסירת האימייל היא וולונטרית ומשמשת לשמירת התקדמות המשחק.';
+    const TERMS_TEXT_EN = 'By signing up, you agree to our <a href="#" target="_blank">Terms</a> and <a href="#" target="_blank">Privacy Notice</a>. Providing your email is voluntary and used to save game progress.';
+    const termsSignupLbl = document.getElementById('signup-terms-lbl');
+    if (termsSignupLbl) {
+      termsSignupLbl.dir = lang === 'he' ? 'rtl' : 'ltr';
+      termsSignupLbl.innerHTML = lang === 'he' ? TERMS_TEXT_HE : TERMS_TEXT_EN;
+    }
+    const termsGoogleLbl = document.getElementById('google-signup-terms-lbl');
+    if (termsGoogleLbl) {
+      termsGoogleLbl.dir = lang === 'he' ? 'rtl' : 'ltr';
+      termsGoogleLbl.innerHTML = lang === 'he' ? TERMS_TEXT_HE : TERMS_TEXT_EN;
     }
     const googleDesc = document.getElementById('google-signup-desc');
     if (googleDesc) googleDesc.textContent = lang === 'he' ? '!כמעט סיימנו, רק כמה פרטים קטנים' : 'Almost there! Just a couple of things:';
@@ -6144,6 +6175,7 @@ function generateRandomNickname() {
 // ── FIREBASE AUTH & SCORING ────────────────────────────────────────────────
 
 let _authMode = 'signin'; // 'signin' | 'signup'
+let _pendingGoogleUser = null; // set while new Google user hasn't yet accepted terms
 
 // Called by the Firebase module once auth state changes
 window._onAuthChange = function(user) {
@@ -6228,13 +6260,24 @@ function closeLoginModal() {
   const modal = document.getElementById('login-modal');
   modal.classList.remove('open');
   releaseFocus(modal);
+  if (_pendingGoogleUser) _cancelGoogleSignup(); // rolls back if terms not yet accepted
   _resetGoogleSignupStep();
+}
+async function _cancelGoogleSignup() {
+  const user = _pendingGoogleUser;
+  _pendingGoogleUser = null;
+  if (!user) return;
+  try {
+    const { deleteDoc, doc } = await Promise.resolve(window._fbFns);
+    await deleteDoc(doc(window._fbDb, 'users', user.uid)).catch(() => {});
+    await user.delete();
+  } catch (e) { /* ignore — account may not have been fully created yet */ }
 }
 function _resetGoogleSignupStep() {
   document.getElementById('google-signup-step').style.display = 'none';
   document.getElementById('login-main-section').style.display = '';
-
   document.getElementById('google-signup-eu').checked = false;
+  document.getElementById('google-signup-terms').checked = false;
   document.getElementById('google-signup-error').textContent = '';
 }
 // Close on backdrop click
@@ -6252,6 +6295,8 @@ function toggleAuthMode() {
     : `Don't have an account? <a onclick="toggleAuthMode()">Sign up</a>`;
   document.getElementById('login-error').textContent = '';
   document.getElementById('signup-email-updates-row').classList.toggle('visible', isSignup);
+  document.getElementById('signup-terms-row').classList.toggle('visible', isSignup);
+  if (!isSignup) document.getElementById('signup-terms').checked = false;
 }
 
 async function signInGoogle() {
@@ -6262,7 +6307,8 @@ async function signInGoogle() {
     const { getDoc, doc } = await Promise.resolve(window._fbFns);
     const snap = await getDoc(doc(window._fbDb, 'users', result.user.uid));
     if (!snap.exists()) {
-      // New user — show profile completion step before closing
+      // New user — show profile completion step; track for rollback if closed without consent
+      _pendingGoogleUser = result.user;
       _showGoogleSignupStep(result.user);
     } else {
       closeLoginModal();
@@ -6278,15 +6324,21 @@ function _showGoogleSignupStep(user) {
   document.getElementById('google-signup-btn').focus();
 }
 async function submitGoogleSignup() {
+  const errEl = document.getElementById('google-signup-error');
+  if (!document.getElementById('google-signup-terms').checked) {
+    errEl.textContent = 'Please agree to the Terms and Privacy Notice to continue.';
+    return;
+  }
   const user = window._fbUser;
   const emailUpdates = document.getElementById('google-signup-eu').checked;
   try {
     const { setDoc, doc } = await Promise.resolve(window._fbFns);
     await setDoc(doc(window._fbDb, 'users', user.uid), { emailUpdates }, { merge: true });
+    _pendingGoogleUser = null;
     closeLoginModal();
     await _postAuthActions();
   } catch (e) {
-    document.getElementById('google-signup-error').textContent = e.message;
+    errEl.textContent = e.message;
   }
 }
 async function _postAuthActions() {
@@ -6311,6 +6363,7 @@ async function submitEmailAuth() {
   try {
     if (_authMode === 'signup') {
       if (!name) { errEl.textContent = 'Please enter a display name.'; return; }
+      if (!document.getElementById('signup-terms').checked) { errEl.textContent = 'Please agree to the Terms and Privacy Notice to continue.'; return; }
       const cred = await createUserWithEmailAndPassword(window._fbAuth, email, password);
       await updateProfile(cred.user, { displayName: name });
       const emailUpdates = document.getElementById('signup-email-updates').checked;
