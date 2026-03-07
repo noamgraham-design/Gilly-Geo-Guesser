@@ -3586,6 +3586,13 @@
 <script src="towns.js"></script>
 
 <script>
+// ── HTML ESCAPE UTILITY (XSS prevention) ───────────────────────────────────
+function esc(s) {
+  const d = document.createElement('div');
+  d.appendChild(document.createTextNode(s));
+  return d.innerHTML;
+}
+
 // ── FOCUS TRAP UTILITY ─────────────────────────────────────────────────────
 const FOCUSABLE_SELECTORS = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 let _focusTrapHandlers = {};
@@ -6345,7 +6352,7 @@ window._onAuthChange = function(user) {
   if (user) {
     label.textContent = user.displayName ? user.displayName.split(' ')[0] : 'Account';
     if (user.photoURL) {
-      avatar.innerHTML = `<img src="${user.photoURL}" alt="avatar"/>`;
+      avatar.innerHTML = `<img src="${esc(user.photoURL)}" alt="avatar"/>`;
     } else {
       avatar.innerHTML = '';
       avatar.textContent = (user.displayName || user.email || '?').charAt(0).toUpperCase();
@@ -6680,10 +6687,10 @@ async function loadHistory() {
         : '—';
       return `<div class="history-row">
         <div>
-          <div style="font-weight:600">${d.hits}/${d.rounds} correct</div>
-          <div class="h-meta">${diffLabel[d.difficulty] || d.difficulty} · ${regionLabel[d.region] || d.region} · ${date}</div>
+          <div style="font-weight:600">${esc(String(d.hits))}/${esc(String(d.rounds))} correct</div>
+          <div class="h-meta">${diffLabel[d.difficulty] || esc(String(d.difficulty))} · ${regionLabel[d.region] || esc(String(d.region))} · ${esc(date)}</div>
         </div>
-        <div class="h-score">${d.score} pts</div>
+        <div class="h-score">${esc(String(d.score))} pts</div>
       </div>`;
     }).join('');
     section.classList.add('show');
@@ -6763,7 +6770,7 @@ function renderPlayerRow(p, globalRank) {
     <div class="sb-row ${p.isMe ? 'sb-me' : ''}">
       ${rankHtml}
       <span class="sb-name">
-        <span class="sb-name-text">${p.isMe ? `<strong>${p.name}</strong>` : p.name}</span>
+        <span class="sb-name-text">${p.isMe ? `<strong>${esc(p.name)}</strong>` : esc(p.name)}</span>
         <span class="sb-level-badge">${lvlText}</span>
       </span>
       <span class="sb-score">${p.score}</span>
@@ -7062,7 +7069,7 @@ async function loadScoreboard(myScore) {
     const summaryHtml = `
       <div class="sb-summary">
         <div class="sb-summary-left">
-          <div class="sb-summary-name">${myName}</div>
+          <div class="sb-summary-name">${esc(myName)}</div>
           <div class="sb-level-badge">${myLvlText}</div>
         </div>
         <div class="sb-summary-right">
