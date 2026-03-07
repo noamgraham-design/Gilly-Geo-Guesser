@@ -23,11 +23,12 @@
            createUserWithEmailAndPassword,
            signInWithEmailAndPassword,
            signInAnonymously,
-           updateProfile }                          from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+           updateProfile, deleteUser }              from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import { getFirestore, collection, addDoc,
            query, where, orderBy, limit,
            getDocs, serverTimestamp,
-           setDoc, getDoc, doc }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+           setDoc, getDoc, doc,
+           deleteDoc, writeBatch }             from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey:            "AIzaSyC9bbLFNqAu5elsiWEmuFC_f4tZiPIRtLA",
@@ -52,7 +53,8 @@
     signInAnonymously,
     updateProfile, collection, addDoc, query, where,
     orderBy, limit, getDocs, serverTimestamp,
-    setDoc, getDoc, doc
+    setDoc, getDoc, doc,
+    deleteDoc, writeBatch, deleteUser
   };
 
   onAuthStateChanged(auth, user => {
@@ -288,6 +290,39 @@
     background: none; border: none; font-size: 1.4rem;
     cursor: pointer; color: var(--muted); line-height: 1;
   }
+  #settings-delete-btn {
+    width: 100%; padding: 11px; margin-top: 4px;
+    border-radius: 10px; border: 1.5px solid #cf2316;
+    background: none; color: #cf2316;
+    font-family: 'Source Serif 4', 'Alef', serif;
+    font-size: 0.92rem; font-weight: 700;
+    cursor: pointer; transition: all 0.15s;
+  }
+  #settings-delete-btn:hover { background: #fef2f2; border-color: #a81a0d; }
+  #settings-delete-confirm {
+    display: none; flex-direction: column; gap: 10px;
+    border: 1.5px solid #cf2316; border-radius: 12px;
+    padding: 14px; background: #fff5f5;
+  }
+  #settings-delete-confirm.visible { display: flex; }
+  #settings-delete-confirm-msg {
+    font-size: 0.85rem; font-weight: 600; color: #cf2316; text-align: center;
+  }
+  .settings-delete-confirm-btns { display: flex; gap: 8px; }
+  .settings-delete-confirm-btns button {
+    flex: 1; padding: 9px 6px; border-radius: 10px;
+    font-family: 'Source Serif 4', 'Alef', serif;
+    font-size: 0.88rem; font-weight: 700; cursor: pointer;
+    transition: all 0.15s;
+  }
+  #settings-delete-cancel {
+    border: 1.5px solid var(--border); background: var(--bg); color: var(--text);
+  }
+  #settings-delete-yes {
+    border: none; background: #cf2316; color: #fff;
+  }
+  #settings-delete-yes:hover { background: #a81a0d; }
+  #settings-delete-yes:disabled { opacity: 0.6; cursor: not-allowed; }
 
   /* ── NICKNAME VALIDATION POPUP ────────────────────────────────────────── */
   #nickname-error-popup {
@@ -3312,6 +3347,15 @@
     </div>
 
     <div id="settings-save-msg"></div>
+
+    <button id="settings-delete-btn" onclick="showDeleteConfirm()">🗑️ Delete my account</button>
+    <div id="settings-delete-confirm">
+      <div id="settings-delete-confirm-msg">This will permanently delete your account and all data. This cannot be undone.</div>
+      <div class="settings-delete-confirm-btns">
+        <button id="settings-delete-cancel" onclick="hideDeleteConfirm()">Cancel</button>
+        <button id="settings-delete-yes"    onclick="deleteAccount()">Delete</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -3787,6 +3831,10 @@ function applyLang() {
     document.getElementById('gender-male').innerHTML   = lang === 'he' ? '👨 זכר'   : '👨 Male';
     document.getElementById('gender-female').innerHTML = lang === 'he' ? '👩 נקבה'  : '👩 Female';
     document.getElementById('gender-other').innerHTML  = lang === 'he' ? '🧑 אחר'   : '🧑 Other';
+    document.getElementById('settings-delete-btn').textContent        = lang === 'he' ? '🗑️ מחיקת חשבון'                                                                           : '🗑️ Delete my account';
+    document.getElementById('settings-delete-confirm-msg').textContent = lang === 'he' ? 'פעולה זו תמחק לצמיתות את חשבונך וכל הנתונים. לא ניתן לבטל.' : 'This will permanently delete your account and all data. This cannot be undone.';
+    document.getElementById('settings-delete-cancel').textContent     = lang === 'he' ? 'ביטול'  : 'Cancel';
+    document.getElementById('settings-delete-yes').textContent        = lang === 'he' ? 'מחיקה'  : 'Delete';
   }
   // Update live town name/desc if a game is in progress
   const overlayVisible = document.getElementById('overlay').style.display !== 'none';
@@ -6190,6 +6238,56 @@ async function signOutUser() {
   await signOut(window._fbAuth);
 }
 
+// ── DELETE ACCOUNT ────────────────────────────────────────────────────────
+function showDeleteConfirm() {
+  document.getElementById('settings-delete-confirm').classList.add('visible');
+}
+function hideDeleteConfirm() {
+  document.getElementById('settings-delete-confirm').classList.remove('visible');
+}
+
+async function deleteAccount() {
+  const user = window._fbUser;
+  if (!user) return;
+
+  const yesBtn = document.getElementById('settings-delete-yes');
+  yesBtn.disabled = true;
+  yesBtn.textContent = '…';
+
+  try {
+    const { deleteDoc, writeBatch, deleteUser, collection, query, where, getDocs, doc } = window._fbFns;
+    const db  = window._fbDb;
+    const uid = user.uid;
+
+    // Delete all docs in 'scores' where uid matches
+    const scoresSnap = await getDocs(query(collection(db, 'scores'), where('uid', '==', uid)));
+    const batch1 = writeBatch(db);
+    scoresSnap.forEach(d => batch1.delete(d.ref));
+    await batch1.commit();
+
+    // Delete all docs in 'daily_scores' where uid matches
+    const dailySnap = await getDocs(query(collection(db, 'daily_scores'), where('uid', '==', uid)));
+    const batch2 = writeBatch(db);
+    dailySnap.forEach(d => batch2.delete(d.ref));
+    await batch2.commit();
+
+    // Delete user profile doc
+    await deleteDoc(doc(db, 'users', uid));
+
+    // Delete Firebase Auth account — triggers onAuthStateChanged → UI resets
+    await deleteUser(user);
+
+    closeSettingsModal();
+  } catch (e) {
+    console.error('deleteAccount failed:', e);
+    const yesBtn = document.getElementById('settings-delete-yes');
+    yesBtn.disabled = false;
+    yesBtn.textContent = lang === 'he' ? 'מחיקה' : 'Delete';
+    document.getElementById('settings-delete-confirm-msg').textContent =
+      lang === 'he' ? 'שגיאה. נסה שוב.' : 'Error. Please try again.';
+  }
+}
+
 // ── SAVE SCORE TO FIRESTORE ───────────────────────────────────────────────
 async function saveScore(scoreData) {
   if (!window._fbUser) return;
@@ -6770,6 +6868,7 @@ function closeSettingsModal() {
   const modal = document.getElementById('settings-modal');
   modal.classList.remove('open');
   releaseFocus(modal);
+  hideDeleteConfirm();
 }
 document.getElementById('settings-modal').addEventListener('click', e => {
   if (e.target === document.getElementById('settings-modal')) closeSettingsModal();
