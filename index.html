@@ -265,6 +265,36 @@
     font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
     letter-spacing: 1.2px; color: var(--muted);
   }
+  /* Signup email-updates checkbox */
+  #signup-email-updates-row {
+    display: none; align-items: flex-start; gap: 8px;
+    font-size: 0.82rem; color: var(--text); line-height: 1.4; margin-top: 2px;
+  }
+  #signup-email-updates-row.visible { display: flex; }
+  #signup-email-updates-row input[type="checkbox"] {
+    margin-top: 2px; accent-color: #1a6fd4; cursor: pointer; flex-shrink: 0;
+  }
+  #signup-email-updates-row label { cursor: pointer; }
+  /* Settings email-updates toggle */
+  #settings-email-updates-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 0;
+  }
+  #settings-email-updates-lbl {
+    font-size: 0.82rem; color: var(--text); line-height: 1.4; flex: 1;
+  }
+  .toggle-switch { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .toggle-track {
+    position: absolute; inset: 0; background: var(--border);
+    border-radius: 22px; cursor: pointer; transition: background 0.2s;
+  }
+  .toggle-switch input:checked + .toggle-track { background: #1a6fd4; }
+  .toggle-track::after {
+    content: ''; position: absolute; top: 3px; left: 3px;
+    width: 16px; height: 16px; background: #fff;
+    border-radius: 50%; transition: transform 0.2s;
+  }
+  .toggle-switch input:checked + .toggle-track::after { transform: translateX(18px); }
   .gender-options {
     display: flex; gap: 8px;
   }
@@ -3349,6 +3379,14 @@
 
     <div id="settings-save-msg"></div>
 
+    <div id="settings-email-updates-row">
+      <span id="settings-email-updates-lbl">Email updates about new game levels and features</span>
+      <label class="toggle-switch" aria-label="Toggle email updates">
+        <input type="checkbox" id="settings-email-updates" onchange="saveEmailUpdatesPref()"/>
+        <span class="toggle-track"></span>
+      </label>
+    </div>
+
     <button id="settings-delete-btn" onclick="showDeleteConfirm()">🗑️ Delete my account</button>
     <div id="settings-delete-confirm">
       <div id="settings-delete-confirm-msg">This will permanently delete your account and all data. This cannot be undone.</div>
@@ -3381,6 +3419,10 @@
         <input class="login-input" id="login-email" type="email" placeholder="Email address" aria-label="Email address"/>
         <label for="login-password" class="sr-only">Password</label>
         <input class="login-input" id="login-password" type="password" placeholder="Password" aria-label="Password"/>
+      </div>
+      <div id="signup-email-updates-row">
+        <input type="checkbox" id="signup-email-updates"/>
+        <label for="signup-email-updates" id="signup-email-updates-lbl">I'd like to receive email updates about new game levels and features.</label>
       </div>
       <div id="login-error"></div>
       <button class="btn-auth-submit" id="login-submit-btn" onclick="submitEmailAuth()">Sign in</button>
@@ -3832,10 +3874,15 @@ function applyLang() {
     document.getElementById('gender-male').innerHTML   = lang === 'he' ? '👨 זכר'   : '👨 Male';
     document.getElementById('gender-female').innerHTML = lang === 'he' ? '👩 נקבה'  : '👩 Female';
     document.getElementById('gender-other').innerHTML  = lang === 'he' ? '🧑 אחר'   : '🧑 Other';
+    document.getElementById('settings-email-updates-lbl').textContent  = lang === 'he' ? 'עדכונים במייל על רמות ותכונות חדשות' : 'Email updates about new game levels and features';
     document.getElementById('settings-delete-btn').textContent        = lang === 'he' ? '🗑️ מחיקת חשבון'                                                                           : '🗑️ Delete my account';
     document.getElementById('settings-delete-confirm-msg').textContent = lang === 'he' ? 'פעולה זו תמחק לצמיתות את חשבונך וכל הנתונים. לא ניתן לבטל.' : 'This will permanently delete your account and all data. This cannot be undone.';
     document.getElementById('settings-delete-cancel').textContent     = lang === 'he' ? 'ביטול'  : 'Cancel';
     document.getElementById('settings-delete-yes').textContent        = lang === 'he' ? 'מחיקה'  : 'Delete';
+    const euSignupLbl = document.getElementById('signup-email-updates-lbl');
+    if (euSignupLbl) euSignupLbl.textContent = lang === 'he'
+      ? 'אני רוצה לקבל עדכונים במייל על רמות ותכונות חדשות במשחק.'
+      : "I'd like to receive email updates about new game levels and features.";
   }
   // Update live town name/desc if a game is in progress
   const overlayVisible = document.getElementById('overlay').style.display !== 'none';
@@ -6172,6 +6219,7 @@ function toggleAuthMode() {
     ? `Already have an account? <a onclick="toggleAuthMode()">Sign in</a>`
     : `Don't have an account? <a onclick="toggleAuthMode()">Sign up</a>`;
   document.getElementById('login-error').textContent = '';
+  document.getElementById('signup-email-updates-row').classList.toggle('visible', isSignup);
 }
 
 async function signInGoogle() {
@@ -6208,6 +6256,9 @@ async function submitEmailAuth() {
       if (!name) { errEl.textContent = 'Please enter a display name.'; return; }
       const cred = await createUserWithEmailAndPassword(window._fbAuth, email, password);
       await updateProfile(cred.user, { displayName: name });
+      const emailUpdates = document.getElementById('signup-email-updates').checked;
+      const { setDoc, doc } = window._fbFns;
+      await setDoc(doc(window._fbDb, 'users', cred.user.uid), { emailUpdates }, { merge: true });
       window._onAuthChange(cred.user);
     } else {
       await signInWithEmailAndPassword(window._fbAuth, email, password);
@@ -6237,6 +6288,13 @@ async function submitEmailAuth() {
 async function signOutUser() {
   const { signOut } = window._fbFns;
   await signOut(window._fbAuth);
+}
+
+async function saveEmailUpdatesPref() {
+  if (!window._fbUser) return;
+  const val = document.getElementById('settings-email-updates').checked;
+  const { setDoc, doc } = window._fbFns;
+  await setDoc(doc(window._fbDb, 'users', window._fbUser.uid), { emailUpdates: val }, { merge: true });
 }
 
 // ── DELETE ACCOUNT ────────────────────────────────────────────────────────
@@ -6843,12 +6901,14 @@ async function openSettingsModal() {
           document.getElementById('settings-nickname').value = nick;
           selectGender(data.gender || 'male');
           selectSettingsLang(data.language || lang);
+          document.getElementById('settings-email-updates').checked = data.emailUpdates === true;
         } else {
           const nick = generateRandomNickname();
           document.getElementById('settings-nickname').value = nick;
           setDoc(doc(window._fbDb, 'users', window._fbUser.uid), { nickname: nick }, { merge: true });
           selectGender('male');
           selectSettingsLang(lang);
+          document.getElementById('settings-email-updates').checked = false;
         }
       } catch(e) {
         // Fall back to current in-memory values
