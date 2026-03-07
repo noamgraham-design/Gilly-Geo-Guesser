@@ -1320,10 +1320,16 @@
     position: fixed; inset: 0;
     background: rgba(244,246,249,0.97);
     z-index: 8000;
+    overflow: hidden;
+  }
+  #overlay-scroll-area {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
     display: flex; align-items: flex-start; justify-content: center;
     padding: 20px;
     padding-top: 80px;
-    overflow-y: auto;
+    z-index: 2;
   }
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 14px 28px 16px; max-width: 440px; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 4px; box-shadow: 0 8px 40px rgba(0,0,0,0.08); }
   .card h2 { font-family: 'Playfair Display', 'Alef', serif; font-size: 1.8rem; font-weight: 900; margin-bottom: 10px; background: linear-gradient(90deg, #1a6fd4, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -1795,7 +1801,7 @@
 
   /* Background clouds (in overlay, not in card) */
   .overlay-bg-clouds {
-    position: fixed;
+    position: absolute;
     inset: 0;
     pointer-events: none;
     overflow: hidden;
@@ -1841,7 +1847,7 @@
 
   /* Background planes layer */
   .planes-layer {
-    position: fixed;
+    position: absolute;
     inset: 0;
     pointer-events: none;
     overflow: hidden;
@@ -1979,7 +1985,7 @@
 
   /* DESKTOP – enlarge menu card & contents */
   @media (min-width: 769px) {
-    #overlay {
+    #overlay-scroll-area {
       padding-top: 48px;
     }
     .card {
@@ -2390,7 +2396,7 @@
     }
 
     /* Overlay on mobile */
-    #overlay {
+    #overlay-scroll-area {
       padding-top: 70px;
       align-items: flex-start;
     }
@@ -3258,6 +3264,9 @@
   <!-- Background planes -->
   <div class="planes-layer" id="planes-layer"></div>
 
+  <!-- Scrollable content area (keeps clouds/planes outside the scroll container) -->
+  <div id="overlay-scroll-area">
+
   <!-- Main menu card -->
   <div class="card" id="menu-card" style="z-index:2;background:transparent;border:none;box-shadow:none;">
     <div class="menu-title-section">
@@ -3476,6 +3485,8 @@
       </div>
     </div>
   </div>
+
+  </div><!-- /#overlay-scroll-area -->
 </div>
 
 <div id="terms-modal" role="dialog" aria-modal="true" aria-labelledby="terms-modal-title" onclick="if(event.target===this)closeTermsModal()">
