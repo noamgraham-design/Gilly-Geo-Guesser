@@ -692,12 +692,12 @@
   #sb-top5-btn.active:hover { opacity: 0.9; }
   #sb-share-btn {
     display: none; align-items: center; gap: 5px;
-    background: var(--bg); border: 1px solid var(--border);
-    color: var(--muted); font-size: 0.75rem; font-weight: 700; cursor: pointer;
-    padding: 4px 8px; border-radius: 8px; line-height: 1; white-space: nowrap;
-    transition: all 0.18s; font-family: inherit;
+    background: #25D366; border: none;
+    color: #fff; font-size: 0.75rem; font-weight: 700; cursor: pointer;
+    padding: 4px 10px; border-radius: 8px; line-height: 1; white-space: nowrap;
+    transition: opacity 0.18s; font-family: inherit;
   }
-  #sb-share-btn:hover { background: rgba(37,211,102,0.08); border-color: rgba(37,211,102,0.4); color: #128C4A; }
+  #sb-share-btn:hover { opacity: 0.88; }
   #sb-close-btn {
     display: none; background: transparent; border: none;
     color: var(--muted); font-size: 1rem; cursor: pointer;
@@ -6824,29 +6824,13 @@ function toggleTop5View() {
 
 function shareLeaderboardScore() {
   if (!_sbShareData) return;
-  const { myScore, rank, totalForRank, topPct, showTopPct, myName, myLvlText } = _sbShareData;
-  const url = window.location.origin + window.location.pathname;
-  const placeStr = showTopPct
-    ? (lang === 'he' ? `Top ${topPct}%` : `Top ${topPct}%`)
-    : (lang === 'he' ? `${rank}/${totalForRank}` : `${rank}/${totalForRank}`);
+  const { myScore, topPct, showTopPct } = _sbShareData;
+  const url = 'https://gilly.co.il';
+  const placeStr = showTopPct ? `Top ${topPct}%` : '';
   const text = lang === 'he'
-    ? `\u200Fשיחקתי חידון ישראל של גילי וקיבלתי ${myScore} נקודות (${placeStr}) 🇮🇱\nשחק/י גם: ${url}`
-    : `I scored ${myScore} pts (${placeStr}) on Gilly's Israel Quiz! 🇮🇱\nPlay now: ${url}`;
-  if (navigator.share) {
-    navigator.share({ text, url }).catch(() => {});
-  } else if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(() => _showSbShareToast()).catch(() => { _shareCopyFallback(text); _showSbShareToast(); });
-  } else {
-    _shareCopyFallback(text);
-    _showSbShareToast();
-  }
-}
-
-function _showSbShareToast() {
-  const toast = document.getElementById('share-copied-toast');
-  toast.textContent = lang === 'he' ? '✅ הועתק!' : '✅ Copied!';
-  toast.classList.remove('show'); void toast.offsetWidth; toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2500);
+    ? `\u200Fשיחקתי חידון ישראל של גילי וקיבלתי ${myScore} נקודות${placeStr ? ` (${placeStr})` : ''} 🇮🇱\nשחק/י גם: ${url}`
+    : `I scored ${myScore} pts${placeStr ? ` (${placeStr})` : ''} on Gilly's Israel Quiz! 🇮🇱\nPlay now: ${url}`;
+  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
 }
 
 // ── Daily Challenge score saving & percentile display ─────────────────────
