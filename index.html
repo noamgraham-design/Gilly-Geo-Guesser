@@ -3429,8 +3429,7 @@
 
       <div id="login-form-section">
         <div style="display:flex;flex-direction:column;gap:8px">
-          <label for="login-name" style="display:none" id="login-name-label">Display name</label>
-          <input class="login-input" id="login-name" type="text" placeholder="Display name" aria-label="Display name" style="display:none"/>
+
           <label for="login-email" class="sr-only">Email address</label>
           <input class="login-input" id="login-email" type="email" placeholder="Email address" aria-label="Email address"/>
           <label for="login-password" class="sr-only">Password</label>
@@ -6292,7 +6291,6 @@ document.getElementById('login-modal').addEventListener('click', e => {
 function toggleAuthMode() {
   _authMode = _authMode === 'signin' ? 'signup' : 'signin';
   const isSignup = _authMode === 'signup';
-  document.getElementById('login-name').style.display     = isSignup ? 'block' : 'none';
   document.getElementById('login-submit-btn').textContent = isSignup ? 'Create account' : 'Sign in';
   document.getElementById('login-toggle').innerHTML = isSignup
     ? `Already have an account? <a onclick="toggleAuthMode()">Sign in</a>`
@@ -6361,19 +6359,16 @@ async function _postAuthActions() {
 }
 
 async function submitEmailAuth() {
-  const { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } = window._fbFns;
+  const { createUserWithEmailAndPassword, signInWithEmailAndPassword } = window._fbFns;
   const email    = document.getElementById('login-email').value.trim();
   const password = document.getElementById('login-password').value;
-  const name     = document.getElementById('login-name').value.trim();
   const errEl    = document.getElementById('login-error');
   errEl.textContent = '';
   if (!email || !password) { errEl.textContent = 'Please fill in all fields.'; return; }
   try {
     if (_authMode === 'signup') {
-      if (!name) { errEl.textContent = 'Please enter a display name.'; return; }
       if (!document.getElementById('signup-terms').checked) { errEl.textContent = 'Please agree to the Terms and Privacy Notice to continue.'; return; }
       const cred = await createUserWithEmailAndPassword(window._fbAuth, email, password);
-      await updateProfile(cred.user, { displayName: name });
       const emailUpdates = document.getElementById('signup-email-updates').checked;
       const { setDoc, doc } = window._fbFns;
       await setDoc(doc(window._fbDb, 'users', cred.user.uid), { emailUpdates }, { merge: true });
