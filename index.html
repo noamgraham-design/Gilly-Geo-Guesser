@@ -5734,6 +5734,9 @@ async function showLearningResults() {
 }
 
 function showLevelUpPopup(newTier) {
+  if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+    window._logEvent('learning_level_up', { new_tier: newTier ?? 'all_mastered' });
+  }
   const overlay = document.getElementById('lr-levelup-overlay');
   const isAllMastered = newTier === null;
   const heDir = lang === 'he' ? 'rtl' : 'ltr';
@@ -6113,6 +6116,9 @@ async function startLearning() {
   }
 
   isLearningMode = true;
+  if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+    window._logEvent('learning_mode_start', { tier });
+  }
   learningIdx = 0;
   learningAttempt = 0;
   learningSessionResults = [];
