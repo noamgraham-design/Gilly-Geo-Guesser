@@ -690,6 +690,14 @@
     color: #fff; border-color: transparent;
   }
   #sb-top5-btn.active:hover { opacity: 0.9; }
+  #sb-share-btn {
+    display: none; align-items: center; gap: 5px;
+    background: var(--bg); border: 1px solid var(--border);
+    color: var(--muted); font-size: 0.75rem; font-weight: 700; cursor: pointer;
+    padding: 4px 8px; border-radius: 8px; line-height: 1; white-space: nowrap;
+    transition: all 0.18s; font-family: inherit;
+  }
+  #sb-share-btn:hover { background: rgba(37,211,102,0.08); border-color: rgba(37,211,102,0.4); color: #128C4A; }
   #sb-close-btn {
     display: none; background: transparent; border: none;
     color: var(--muted); font-size: 1rem; cursor: pointer;
@@ -3319,6 +3327,7 @@
     <div id="sb-header">
       <h3 id="scoreboard-title"><span style="-webkit-text-fill-color:initial;background:none">🏆</span> Leaderboard</h3>
       <div id="sb-header-actions">
+        <button id="sb-share-btn" onclick="shareLeaderboardScore()" aria-label="שתף ניקוד / Share score" style="display:none"></button>
         <button id="sb-top5-btn" onclick="toggleTop5View()">▲ Top 10</button>
         <button id="sb-close-btn" onclick="document.getElementById('scoreboard-panel').classList.remove('show')" aria-label="סגור לוח תוצאות / Close scoreboard">✕</button>
       </div>
