@@ -987,7 +987,7 @@
   }
   .kb-crosshair div::before { width: 2px; height: 100%; left: 50%; transform: translateX(-50%); }
   .kb-crosshair div::after  { height: 2px; width: 100%;  top:  50%; transform: translateY(-50%); }
-  #map:focus { outline: 3px solid #1a6fd4; outline-offset: -3px; }
+  #map:focus-visible { outline: 3px solid #1a6fd4; outline-offset: -3px; }
   .leaflet-control-attribution {
     font-size: 10px !important;
     padding: 1px 5px !important;
@@ -4463,6 +4463,7 @@ map.on('click', onMapClick);
   const mapEl = document.getElementById('map');
 
   mapEl.addEventListener('focus', () => {
+    if (!mapEl.matches(':focus-visible')) return;
     if (waiting) return;
     if (!kbLatLng) kbLatLng = map.getCenter();
     if (!kbMarker) {
