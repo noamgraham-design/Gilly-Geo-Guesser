@@ -3404,31 +3404,45 @@
     <h2 id="login-modal-heading">🇮🇱 התחברות</h2>
     <p class="login-sub">Save your scores and track your progress</p>
 
-    <button class="btn-google" onclick="signInGoogle()">
-      <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
-      Continue with Google
-    </button>
+    <div id="login-main-section">
+      <button class="btn-google" onclick="signInGoogle()">
+        <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
+        Continue with Google
+      </button>
 
-    <div class="login-divider">or</div>
+      <div class="login-divider">or</div>
 
-    <div id="login-form-section">
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <label for="login-name" style="display:none" id="login-name-label">Display name</label>
-        <input class="login-input" id="login-name" type="text" placeholder="Display name" aria-label="Display name" style="display:none"/>
-        <label for="login-email" class="sr-only">Email address</label>
-        <input class="login-input" id="login-email" type="email" placeholder="Email address" aria-label="Email address"/>
-        <label for="login-password" class="sr-only">Password</label>
-        <input class="login-input" id="login-password" type="password" placeholder="Password" aria-label="Password"/>
+      <div id="login-form-section">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <label for="login-name" style="display:none" id="login-name-label">Display name</label>
+          <input class="login-input" id="login-name" type="text" placeholder="Display name" aria-label="Display name" style="display:none"/>
+          <label for="login-email" class="sr-only">Email address</label>
+          <input class="login-input" id="login-email" type="email" placeholder="Email address" aria-label="Email address"/>
+          <label for="login-password" class="sr-only">Password</label>
+          <input class="login-input" id="login-password" type="password" placeholder="Password" aria-label="Password"/>
+        </div>
+        <div id="signup-email-updates-row">
+          <input type="checkbox" id="signup-email-updates"/>
+          <label for="signup-email-updates" id="signup-email-updates-lbl" dir="ltr">I'd love to get updates on new levels and cool features via email. (Don't worry, we only send game-related stuff and never share your email with anyone else).</label>
+        </div>
+        <div id="login-error"></div>
+        <button class="btn-auth-submit" id="login-submit-btn" onclick="submitEmailAuth()">Sign in</button>
+        <div id="login-toggle">
+          Don't have an account? <a onclick="toggleAuthMode()">Sign up</a>
+        </div>
       </div>
-      <div id="signup-email-updates-row">
-        <input type="checkbox" id="signup-email-updates"/>
-        <label for="signup-email-updates" id="signup-email-updates-lbl" dir="ltr">I'd love to get updates on new levels and cool features via email. (Don't worry, we only send game-related stuff and never share your email with anyone else).</label>
+    </div>
+
+    <div id="google-signup-step" style="display:none;flex-direction:column;gap:12px;">
+      <p id="google-signup-desc" style="font-size:0.88rem;color:var(--muted);text-align:center;margin:0;">Almost there! Just a couple of things:</p>
+      <label for="google-signup-name" class="sr-only">Display name</label>
+      <input class="login-input" id="google-signup-name" type="text" placeholder="Display name" aria-label="Display name"/>
+      <div style="display:flex;align-items:flex-start;gap:8px;font-size:0.78rem;color:var(--muted);line-height:1.45;">
+        <input type="checkbox" id="google-signup-eu" style="margin-top:3px;accent-color:#1a6fd4;cursor:pointer;flex-shrink:0;"/>
+        <label for="google-signup-eu" id="google-signup-eu-lbl" dir="ltr" style="cursor:pointer;">I'd love to get updates on new levels and cool features via email. (Don't worry, we only send game-related stuff and never share your email with anyone else).</label>
       </div>
-      <div id="login-error"></div>
-      <button class="btn-auth-submit" id="login-submit-btn" onclick="submitEmailAuth()">Sign in</button>
-      <div id="login-toggle">
-        Don't have an account? <a onclick="toggleAuthMode()">Sign up</a>
-      </div>
+      <div id="google-signup-error" style="color:#c0392b;font-size:0.82rem;min-height:1rem;"></div>
+      <button class="btn-auth-submit" id="google-signup-btn" onclick="submitGoogleSignup()">Let's play!</button>
     </div>
   </div>
 </div>
@@ -3879,13 +3893,24 @@ function applyLang() {
     document.getElementById('settings-delete-confirm-msg').textContent = lang === 'he' ? 'פעולה זו תמחק לצמיתות את חשבונך וכל הנתונים. לא ניתן לבטל.' : 'This will permanently delete your account and all data. This cannot be undone.';
     document.getElementById('settings-delete-cancel').textContent     = lang === 'he' ? 'ביטול'  : 'Cancel';
     document.getElementById('settings-delete-yes').textContent        = lang === 'he' ? 'מחיקה'  : 'Delete';
+    const EU_TEXT_HE = 'אשמח לקבל עדכונים על שלבים חדשים ופיצ\'רים מעניינים במייל. (אל דאגה, אנחנו שולחים רק דברים שקשורים למשחק ולא מעבירים את המייל לאף אחד אחר).';
+    const EU_TEXT_EN = "I'd love to get updates on new levels and cool features via email. (Don't worry, we only send game-related stuff and never share your email with anyone else).";
     const euSignupLbl = document.getElementById('signup-email-updates-lbl');
     if (euSignupLbl) {
       euSignupLbl.dir = lang === 'he' ? 'rtl' : 'ltr';
-      euSignupLbl.textContent = lang === 'he'
-        ? 'אשמח לקבל עדכונים על שלבים חדשים ופיצ\'רים מעניינים במייל. (אל דאגה, אנחנו שולחים רק דברים שקשורים למשחק ולא מעבירים את המייל לאף אחד אחר).'
-        : "I'd love to get updates on new levels and cool features via email. (Don't worry, we only send game-related stuff and never share your email with anyone else).";
+      euSignupLbl.textContent = lang === 'he' ? EU_TEXT_HE : EU_TEXT_EN;
     }
+    const euGoogleLbl = document.getElementById('google-signup-eu-lbl');
+    if (euGoogleLbl) {
+      euGoogleLbl.dir = lang === 'he' ? 'rtl' : 'ltr';
+      euGoogleLbl.textContent = lang === 'he' ? EU_TEXT_HE : EU_TEXT_EN;
+    }
+    const googleDesc = document.getElementById('google-signup-desc');
+    if (googleDesc) googleDesc.textContent = lang === 'he' ? '!כמעט סיימנו, רק כמה פרטים קטנים' : 'Almost there! Just a couple of things:';
+    const googleNameInput = document.getElementById('google-signup-name');
+    if (googleNameInput) googleNameInput.placeholder = lang === 'he' ? 'שם תצוגה' : 'Display name';
+    const googleBtn = document.getElementById('google-signup-btn');
+    if (googleBtn) googleBtn.textContent = lang === 'he' ? '!בואו נשחק' : "Let's play!";
   }
   // Update live town name/desc if a game is in progress
   const overlayVisible = document.getElementById('overlay').style.display !== 'none';
@@ -6207,6 +6232,14 @@ function closeLoginModal() {
   const modal = document.getElementById('login-modal');
   modal.classList.remove('open');
   releaseFocus(modal);
+  _resetGoogleSignupStep();
+}
+function _resetGoogleSignupStep() {
+  document.getElementById('google-signup-step').style.display = 'none';
+  document.getElementById('login-main-section').style.display = '';
+  document.getElementById('google-signup-name').value = '';
+  document.getElementById('google-signup-eu').checked = false;
+  document.getElementById('google-signup-error').textContent = '';
 }
 // Close on backdrop click
 document.getElementById('login-modal').addEventListener('click', e => {
@@ -6229,20 +6262,53 @@ async function signInGoogle() {
   const { GoogleAuthProvider, signInWithPopup } = window._fbFns;
   try {
     const provider = new GoogleAuthProvider();
-    await signInWithPopup(window._fbAuth, provider);
-    closeLoginModal();
-    // If the daily-percentile popup is open, refresh it now that user is logged in
-    if (_dpPendingScore !== null && document.getElementById('daily-percentile-popup').classList.contains('show')) {
-      showDailyPercentile(_dpPendingScore);
-    // If game just ended (scoreboard visible), save score and refresh leaderboard
-    } else if (document.getElementById('scoreboard-panel').classList.contains('show')) {
-      const hits = results.filter(r => r.pts >= 90).length;
-      await saveScore({ score, difficulty, region, rounds: roundCount, hits });
-      loadHistory();
-      loadScoreboard(score);
+    const result = await signInWithPopup(window._fbAuth, provider);
+    const { getDoc, doc } = await Promise.resolve(window._fbFns);
+    const snap = await getDoc(doc(window._fbDb, 'users', result.user.uid));
+    if (!snap.exists()) {
+      // New user — show profile completion step before closing
+      _showGoogleSignupStep(result.user);
+    } else {
+      closeLoginModal();
+      await _postAuthActions();
     }
   } catch (e) {
     document.getElementById('login-error').textContent = e.message;
+  }
+}
+function _showGoogleSignupStep(user) {
+  document.getElementById('login-main-section').style.display = 'none';
+  document.getElementById('google-signup-step').style.display = 'flex';
+  const nameInput = document.getElementById('google-signup-name');
+  nameInput.value = user.displayName || '';
+  nameInput.focus();
+}
+async function submitGoogleSignup() {
+  const user = window._fbUser;
+  const name = document.getElementById('google-signup-name').value.trim();
+  const emailUpdates = document.getElementById('google-signup-eu').checked;
+  const errEl = document.getElementById('google-signup-error');
+  if (!name) { errEl.textContent = document.documentElement.lang === 'he' ? 'נא להזין שם תצוגה.' : 'Please enter a display name.'; return; }
+  try {
+    const { setDoc, doc, updateProfile } = await Promise.resolve(window._fbFns);
+    await Promise.all([
+      setDoc(doc(window._fbDb, 'users', user.uid), { nickname: name, emailUpdates }, { merge: true }),
+      updateProfile(user, { displayName: name }),
+    ]);
+    closeLoginModal();
+    await _postAuthActions();
+  } catch (e) {
+    document.getElementById('google-signup-error').textContent = e.message;
+  }
+}
+async function _postAuthActions() {
+  if (_dpPendingScore !== null && document.getElementById('daily-percentile-popup').classList.contains('show')) {
+    showDailyPercentile(_dpPendingScore);
+  } else if (document.getElementById('scoreboard-panel').classList.contains('show')) {
+    const hits = results.filter(r => r.pts >= 90).length;
+    await saveScore({ score, difficulty, region, rounds: roundCount, hits });
+    loadHistory();
+    loadScoreboard(score);
   }
 }
 
@@ -6267,16 +6333,7 @@ async function submitEmailAuth() {
       await signInWithEmailAndPassword(window._fbAuth, email, password);
     }
     closeLoginModal();
-    // If the daily-percentile popup is open, refresh it now that user is logged in
-    if (_dpPendingScore !== null && document.getElementById('daily-percentile-popup').classList.contains('show')) {
-      showDailyPercentile(_dpPendingScore);
-    // If game just ended (scoreboard visible), save score and refresh leaderboard
-    } else if (document.getElementById('scoreboard-panel').classList.contains('show')) {
-      const hits = results.filter(r => r.pts >= 90).length;
-      await saveScore({ score, difficulty, region, rounds: roundCount, hits });
-      loadHistory();
-      loadScoreboard(score);
-    }
+    await _postAuthActions();
   } catch (e) {
     const msgs = {
       'auth/email-already-in-use': 'Email already in use.',
