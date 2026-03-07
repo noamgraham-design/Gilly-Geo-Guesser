@@ -690,6 +690,14 @@
     color: #fff; border-color: transparent;
   }
   #sb-top5-btn.active:hover { opacity: 0.9; }
+  #sb-share-btn {
+    display: none; align-items: center; gap: 5px;
+    background: var(--bg); border: 1px solid var(--border);
+    color: var(--muted); font-size: 0.75rem; font-weight: 700; cursor: pointer;
+    padding: 4px 8px; border-radius: 8px; line-height: 1; white-space: nowrap;
+    transition: all 0.18s; font-family: inherit;
+  }
+  #sb-share-btn:hover { background: rgba(37,211,102,0.08); border-color: rgba(37,211,102,0.4); color: #128C4A; }
   #sb-close-btn {
     display: none; background: transparent; border: none;
     color: var(--muted); font-size: 1rem; cursor: pointer;
@@ -3319,6 +3327,7 @@
     <div id="sb-header">
       <h3 id="scoreboard-title"><span style="-webkit-text-fill-color:initial;background:none">🏆</span> Leaderboard</h3>
       <div id="sb-header-actions">
+        <button id="sb-share-btn" onclick="shareLeaderboardScore()" aria-label="שתף ניקוד / Share score" style="display:none"></button>
         <button id="sb-top5-btn" onclick="toggleTop5View()">▲ Top 10</button>
         <button id="sb-close-btn" onclick="document.getElementById('scoreboard-panel').classList.remove('show')" aria-label="סגור לוח תוצאות / Close scoreboard">✕</button>
       </div>
@@ -6737,8 +6746,9 @@ function launchConfetti() {
 }
 
 // ── SCOREBOARD ────────────────────────────────────────────────────────────
-let _sbData = null;   // cached scoreboard state for view toggling
-let _sbTop5  = false; // true when Top 5 view is active
+let _sbData      = null;   // cached scoreboard state for view toggling
+let _sbTop5      = false;  // true when Top 5 view is active
+let _sbShareData = null;   // cached data for share button
 
 function renderPlayerRow(p, globalRank) {
   let rankHtml;
@@ -6810,6 +6820,33 @@ function toggleTop5View() {
       }
     });
   }
+}
+
+function shareLeaderboardScore() {
+  if (!_sbShareData) return;
+  const { myScore, rank, totalForRank, topPct, showTopPct, myName, myLvlText } = _sbShareData;
+  const url = window.location.origin + window.location.pathname;
+  const placeStr = showTopPct
+    ? (lang === 'he' ? `Top ${topPct}%` : `Top ${topPct}%`)
+    : (lang === 'he' ? `${rank}/${totalForRank}` : `${rank}/${totalForRank}`);
+  const text = lang === 'he'
+    ? `\u200Fשיחקתי חידון ישראל של גילי וקיבלתי ${myScore} נקודות (${placeStr}) 🇮🇱\nשחק/י גם: ${url}`
+    : `I scored ${myScore} pts (${placeStr}) on Gilly's Israel Quiz! 🇮🇱\nPlay now: ${url}`;
+  if (navigator.share) {
+    navigator.share({ text, url }).catch(() => {});
+  } else if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => _showSbShareToast()).catch(() => { _shareCopyFallback(text); _showSbShareToast(); });
+  } else {
+    _shareCopyFallback(text);
+    _showSbShareToast();
+  }
+}
+
+function _showSbShareToast() {
+  const toast = document.getElementById('share-copied-toast');
+  toast.textContent = lang === 'he' ? '✅ הועתק!' : '✅ Copied!';
+  toast.classList.remove('show'); void toast.offsetWidth; toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
 }
 
 // ── Daily Challenge score saving & percentile display ─────────────────────
@@ -6959,10 +6996,12 @@ async function loadScoreboard(myScore) {
   const top5Btn = document.getElementById('sb-top5-btn');
   section.classList.add('show');
   list.innerHTML = '';
-  _sbData  = null;
-  _sbTop5  = false;
+  _sbData      = null;
+  _sbTop5      = false;
+  _sbShareData = null;
   top5Btn.classList.remove('active');
   top5Btn.innerHTML = '▲ Top 10';
+  document.getElementById('sb-share-btn').style.display = 'none';
 
   // Update lang labels
   document.getElementById('scoreboard-title').innerHTML = '<span style="-webkit-text-fill-color:initial;background:none">🏆</span> ' + (lang === 'he' ? 'לוח תוצאות' : 'Leaderboard');
@@ -7054,8 +7093,14 @@ async function loadScoreboard(myScore) {
     // Store data for view toggling
     _sbData = { players, summaryHtml, insertIdx };
 
-    // Show Top 5 button now that data is loaded
+    // Store data for sharing
+    _sbShareData = { myScore, rank: currentScoreRank, totalForRank, topPct, showTopPct, myName, myLvlText };
+
+    // Show Top 5 button and share button now that data is loaded
     top5Btn.style.display = 'inline-block';
+    const shareBtnEl = document.getElementById('sb-share-btn');
+    shareBtnEl.style.display = 'inline-flex';
+    shareBtnEl.innerHTML = lang === 'he' ? '📤 שתף' : '📤 Share';
 
     // Render scrollable 100-score view
     list.innerHTML = renderScrollableView();
