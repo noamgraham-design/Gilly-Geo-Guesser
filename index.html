@@ -6828,6 +6828,9 @@ function toggleTop5View() {
 
 function shareLeaderboardScore() {
   if (!_sbShareData) return;
+  if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+    window._logEvent('leaderboard_share', {});
+  }
   const { myScore, topPct, showTopPct } = _sbShareData;
   const url = 'https://gilly.co.il';
   const placeStr = showTopPct ? `Top ${topPct}%` : '';
@@ -6879,7 +6882,12 @@ async function showDailyPercentile(myScore) {
     const msg = lang === 'he'
       ? `🗺️ גילי – אתגר יומי\nניקוד: ${Math.floor(myScore)} נקודות${extra ? ' | ' + extra : ''}\nשחקו גם: ${_gameUrl}`
       : `🗺️ Gilly's Israel Quiz – Daily Challenge\nScore: ${Math.floor(myScore)} pts${extra ? ' | ' + extra : ''}\nPlay now: ${_gameUrl}`;
-    shareBtnEl.onclick = () => window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+    shareBtnEl.onclick = () => {
+      if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+        window._logEvent('daily_challenge_share', {});
+      }
+      window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+    };
   }
   _setShare(null); // initial: score only, updated per branch below
 
