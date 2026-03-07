@@ -7420,6 +7420,9 @@ function _getChallengeUrl(town) {
 
 function shareChallengeCreate(method) {
   if (!challengePickedTown) return;
+  if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+    window._logEvent('challenge_share_create', { method });
+  }
   const url = _getChallengeUrl(challengePickedTown);
   const townName = lang === 'he' ? challengePickedTown.nameHe : challengePickedTown.name;
   if (method === 'wa') {
@@ -7553,6 +7556,9 @@ function showChallengeResult() {
 
 function shareChallengeResult(method) {
   if (!_challengeResult || !_challengeTown) return;
+  if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+    window._logEvent('challenge_share_result', { method });
+  }
   const { distKm, perfect } = _challengeResult;
   const url = _getChallengeUrl(_challengeTown);
   const townName = lang === 'he' ? _challengeTown.nameHe : _challengeTown.name;
