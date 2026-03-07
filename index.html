@@ -6880,7 +6880,7 @@ function shareLeaderboardScore() {
   const url = 'https://gilly.co.il';
   const placeStr = showTopPct ? `Top ${topPct}%` : '';
   const text = lang === 'he'
-    ? `\u200Fשיחקתי חידון ישראל של גילי וקיבלתי ${myScore} נקודות${placeStr ? ` (${placeStr})` : ''} 🇮🇱\nשחק/י גם: ${url}`
+    ? `\u200Fשיחקתי בחידון ישראל של גילי וקיבלתי ${myScore} נקודות${placeStr ? ` (${placeStr})` : ''} 🇮🇱\nשחק/י גם: ${url}`
     : `I scored ${myScore} pts${placeStr ? ` (${placeStr})` : ''} on Gilly's Israel Quiz! 🇮🇱\nPlay now: ${url}`;
   window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
 }
