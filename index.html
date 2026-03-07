@@ -5932,6 +5932,9 @@ function cancelDailyChallengeIntro() {
 }
 
 function startDailyChallengeGame() {
+  if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+    window._logEvent('daily_challenge_start', {});
+  }
   closeDailyChallengeIntro();
 
   // Reuse the town and nearby point preloaded during the intro popup (to avoid
@@ -6138,6 +6141,9 @@ async function startLearning() {
 }
 
 function startGame() {
+  if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+    window._logEvent('quiz_game_start', { difficulty, region: region || 'all' });
+  }
   const tierFilter = TOWNS.filter(t => t.tier <= DIFF[difficulty].maxTier);
   const regionFilter = REGION_GROUPS[region];
   const pool = regionFilter
