@@ -2789,6 +2789,19 @@
     white-space: nowrap;
     border: 0;
   }
+  #accessibility-footer-link {
+    position: fixed;
+    bottom: 12px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: #000;
+    text-decoration: underline;
+    font-size: 0.82rem;
+    z-index: 8001;
+    pointer-events: auto;
+  }
+
   .skip-link {
     position: absolute;
     top: -100%;
@@ -3025,7 +3038,6 @@
     <div class="overlay-topbar-left">
       <span class="overlay-topbar-title" id="overlay-title-text">Gilly's Israel Quiz</span>
       <button class="overlay-lang-btn" id="lang-toggle" onclick="toggleLang()" aria-label="שינוי שפה / Change language">🌐 English</button>
-      <a href="accessibility.html" id="accessibility-link" class="overlay-lang-btn" style="text-decoration:none;font-size:0.78rem;">♿ נגישות</a>
     </div>
     <div class="overlay-topbar-right">
       <button id="share-btn" onclick="openSharePopup()">
@@ -3112,6 +3124,7 @@
     <button id="learn-btn" class="btn btn-learn" onclick="startLearning()">🗺️ מצב למידה</button>
   </div>
 
+  <a href="accessibility.html" id="accessibility-footer-link">הצהרת נגישות</a>
 </div>
 
 <div id="results-panel">
@@ -3662,9 +3675,9 @@ function applyLang() {
   document.getElementById('mobile-tools-layer').innerHTML = currentLayer === 'satellite' ? t('layer_street') : t('layer_satellite');
   // Update single lang toggle button — shows the OTHER language to switch to
   document.getElementById('lang-toggle').textContent = lang === 'he' ? '🌐 English' : '🌐 עברית';
-  // Update accessibility statement link text
-  const accLink = document.getElementById('accessibility-link');
-  if (accLink) accLink.textContent = lang === 'he' ? '♿ נגישות' : '♿ Accessibility';
+  // Update accessibility statement footer link text
+  const accFooter = document.getElementById('accessibility-footer-link');
+  if (accFooter) accFooter.textContent = lang === 'he' ? 'הצהרת נגישות' : 'Accessibility Statement';
   // Share button & popup
   const shareBtnLabel = document.getElementById('share-btn-label');
   if (shareBtnLabel) shareBtnLabel.textContent = lang === 'he' ? 'שתף' : 'Share';
