@@ -183,6 +183,10 @@
     from { opacity:0; transform: scale(0.88) translateY(16px); }
     to   { opacity:1; transform: scale(1)    translateY(0); }
   }
+  #login-card.google-pending #login-main-section {
+    filter: blur(3px); opacity: 0.45; pointer-events: none;
+    transition: filter 0.2s, opacity 0.2s;
+  }
   #login-card h2 {
     font-family: 'Playfair Display', 'Alef', serif; font-size: 1.7rem;
     font-weight: 900; text-align: center; margin-bottom: 2px;
@@ -3425,8 +3429,7 @@
 
       <div id="login-form-section">
         <div style="display:flex;flex-direction:column;gap:8px">
-          <label for="login-name" style="display:none" id="login-name-label">Display name</label>
-          <input class="login-input" id="login-name" type="text" placeholder="Display name" aria-label="Display name" style="display:none"/>
+
           <label for="login-email" class="sr-only">Email address</label>
           <input class="login-input" id="login-email" type="email" placeholder="Email address" aria-label="Email address"/>
           <label for="login-password" class="sr-only">Password</label>
@@ -3438,7 +3441,7 @@
         </div>
         <div id="signup-terms-row">
           <input type="checkbox" id="signup-terms"/>
-          <label for="signup-terms" id="signup-terms-lbl" dir="ltr">By signing up, you agree to our <a href="#" id="signup-terms-link" target="_blank">Terms</a> and <a href="#" id="signup-privacy-link" target="_blank">Privacy Notice</a>. Providing your email is voluntary and used to save game progress.</label>
+          <label for="signup-terms" id="signup-terms-lbl" dir="ltr">By signing up, you agree to our <a href="#" id="signup-terms-link" target="_blank" onclick="event.stopPropagation()">Terms</a> and <a href="#" id="signup-privacy-link" target="_blank" onclick="event.stopPropagation()">Privacy Notice</a>. Providing your email is voluntary and used to save game progress. המשחק משתמש ב-Google Analytics לצורך שיפור חווית המשתמש.</label>
         </div>
         <div id="login-error"></div>
         <button class="btn-auth-submit" id="login-submit-btn" onclick="submitEmailAuth()">Sign in</button>
@@ -3452,7 +3455,7 @@
       <p id="google-signup-desc" style="font-size:0.88rem;color:var(--muted);text-align:center;margin:0;">Almost there! Just a couple of things:</p>
       <div class="google-terms-row" style="display:flex;align-items:flex-start;gap:8px;font-size:0.78rem;color:var(--text);line-height:1.45;">
         <input type="checkbox" id="google-signup-terms" style="margin-top:2px;accent-color:#1a6fd4;cursor:pointer;flex-shrink:0;"/>
-        <label for="google-signup-terms" id="google-signup-terms-lbl" dir="ltr" style="cursor:pointer;">By signing up, you agree to our <a href="#" id="google-terms-link" target="_blank">Terms</a> and <a href="#" id="google-privacy-link" target="_blank">Privacy Notice</a>. Providing your email is voluntary and used to save game progress.</label>
+        <label for="google-signup-terms" id="google-signup-terms-lbl" dir="ltr" style="cursor:pointer;">By signing up, you agree to our <a href="#" id="google-terms-link" target="_blank" onclick="event.stopPropagation()">Terms</a> and <a href="#" id="google-privacy-link" target="_blank" onclick="event.stopPropagation()">Privacy Notice</a>. Providing your email is voluntary and used to save game progress. המשחק משתמש ב-Google Analytics לצורך שיפור חווית המשתמש.</label>
       </div>
       <div style="display:flex;align-items:flex-start;gap:8px;font-size:0.78rem;color:var(--muted);line-height:1.45;">
         <input type="checkbox" id="google-signup-eu" style="margin-top:3px;accent-color:#1a6fd4;cursor:pointer;flex-shrink:0;"/>
@@ -3922,8 +3925,8 @@ function applyLang() {
       euGoogleLbl.dir = lang === 'he' ? 'rtl' : 'ltr';
       euGoogleLbl.textContent = lang === 'he' ? EU_TEXT_HE : EU_TEXT_EN;
     }
-    const TERMS_TEXT_HE = 'בהרשמה, אתה מסכים ל<a href="#" target="_blank">תנאי השימוש</a> ול<a href="#" target="_blank">הודעת הפרטיות</a> שלנו. מסירת האימייל היא וולונטרית ומשמשת לשמירת התקדמות המשחק.';
-    const TERMS_TEXT_EN = 'By signing up, you agree to our <a href="#" target="_blank">Terms</a> and <a href="#" target="_blank">Privacy Notice</a>. Providing your email is voluntary and used to save game progress.';
+    const TERMS_TEXT_HE = 'בהרשמה, אתה מסכים ל<a href="#" target="_blank" onclick="event.stopPropagation()">תנאי השימוש</a> ול<a href="#" target="_blank" onclick="event.stopPropagation()">הודעת הפרטיות</a> שלנו. מסירת האימייל היא וולונטרית ומשמשת לשמירת התקדמות המשחק. המשחק משתמש ב-Google Analytics לצורך שיפור חווית המשתמש.';
+    const TERMS_TEXT_EN = 'By signing up, you agree to our <a href="#" target="_blank" onclick="event.stopPropagation()">Terms</a> and <a href="#" target="_blank" onclick="event.stopPropagation()">Privacy Notice</a>. Providing your email is voluntary and used to save game progress. המשחק משתמש ב-Google Analytics לצורך שיפור חווית המשתמש.';
     const termsSignupLbl = document.getElementById('signup-terms-lbl');
     if (termsSignupLbl) {
       termsSignupLbl.dir = lang === 'he' ? 'rtl' : 'ltr';
@@ -6288,7 +6291,6 @@ document.getElementById('login-modal').addEventListener('click', e => {
 function toggleAuthMode() {
   _authMode = _authMode === 'signin' ? 'signup' : 'signin';
   const isSignup = _authMode === 'signup';
-  document.getElementById('login-name').style.display     = isSignup ? 'block' : 'none';
   document.getElementById('login-submit-btn').textContent = isSignup ? 'Create account' : 'Sign in';
   document.getElementById('login-toggle').innerHTML = isSignup
     ? `Already have an account? <a onclick="toggleAuthMode()">Sign in</a>`
@@ -6301,9 +6303,12 @@ function toggleAuthMode() {
 
 async function signInGoogle() {
   const { GoogleAuthProvider, signInWithPopup } = window._fbFns;
+  const card = document.getElementById('login-card');
+  card.classList.add('google-pending');
   try {
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(window._fbAuth, provider);
+    card.classList.remove('google-pending');
     const { getDoc, doc } = await Promise.resolve(window._fbFns);
     const snap = await getDoc(doc(window._fbDb, 'users', result.user.uid));
     if (!snap.exists()) {
@@ -6315,6 +6320,7 @@ async function signInGoogle() {
       await _postAuthActions();
     }
   } catch (e) {
+    card.classList.remove('google-pending');
     document.getElementById('login-error').textContent = e.message;
   }
 }
@@ -6353,19 +6359,16 @@ async function _postAuthActions() {
 }
 
 async function submitEmailAuth() {
-  const { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } = window._fbFns;
+  const { createUserWithEmailAndPassword, signInWithEmailAndPassword } = window._fbFns;
   const email    = document.getElementById('login-email').value.trim();
   const password = document.getElementById('login-password').value;
-  const name     = document.getElementById('login-name').value.trim();
   const errEl    = document.getElementById('login-error');
   errEl.textContent = '';
   if (!email || !password) { errEl.textContent = 'Please fill in all fields.'; return; }
   try {
     if (_authMode === 'signup') {
-      if (!name) { errEl.textContent = 'Please enter a display name.'; return; }
       if (!document.getElementById('signup-terms').checked) { errEl.textContent = 'Please agree to the Terms and Privacy Notice to continue.'; return; }
       const cred = await createUserWithEmailAndPassword(window._fbAuth, email, password);
-      await updateProfile(cred.user, { displayName: name });
       const emailUpdates = document.getElementById('signup-email-updates').checked;
       const { setDoc, doc } = window._fbFns;
       await setDoc(doc(window._fbDb, 'users', cred.user.uid), { emailUpdates }, { merge: true });
