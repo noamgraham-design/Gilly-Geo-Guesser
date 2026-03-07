@@ -2789,18 +2789,36 @@
     white-space: nowrap;
     border: 0;
   }
+  #accessibility-footer-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 18px;
+    font-size: 0.95rem;
+    color: #000;
+  }
   #accessibility-footer-link {
-    position: fixed;
-    bottom: 12px;
-    left: 0;
-    right: 0;
-    text-align: center;
     color: #000;
     text-decoration: underline;
-    font-size: 0.82rem;
-    z-index: 8001;
-    pointer-events: auto;
+    font-size: inherit;
   }
+  #accessibility-contact-label {
+    color: #000;
+    text-decoration: none;
+  }
+  #accessibility-footer-email {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: #1a6fd4;
+    text-decoration: none;
+    font-size: inherit;
+    font-family: inherit;
+  }
+  #accessibility-footer-email:hover { text-decoration: underline; }
 
   .skip-link {
     position: absolute;
@@ -3122,9 +3140,13 @@
     </div>
     <button id="start-btn" class="btn btn-start-gold" onclick="startGame()">← התחל משחק</button>
     <button id="learn-btn" class="btn btn-learn" onclick="startLearning()">🗺️ מצב למידה</button>
+    <div id="accessibility-footer-bar">
+      <a href="accessibility.html" id="accessibility-footer-link">הצהרת נגישות</a>
+      <span id="accessibility-contact-label">צור קשר:</span>
+      <button id="accessibility-footer-email" onclick="copyAccessibilityEmail()">gillyisraelquiz@gmail.com</button>
+    </div>
   </div>
 
-  <a href="accessibility.html" id="accessibility-footer-link">הצהרת נגישות</a>
 </div>
 
 <div id="results-panel">
@@ -3645,6 +3667,21 @@ function setLang(l) {
 function toggleLang() {
   setLang(lang === 'he' ? 'en' : 'he');
 }
+function copyAccessibilityEmail() {
+  navigator.clipboard.writeText('gillyisraelquiz@gmail.com').then(() => {
+    const btn = document.getElementById('accessibility-footer-email');
+    if (!btn) return;
+    const prevText = btn.textContent;
+    const prevDir  = btn.dir;
+    if (lang === 'he') {
+      btn.dir = 'rtl';
+      btn.textContent = '✓ הועתק!';
+    } else {
+      btn.textContent = '✓ Copied!';
+    }
+    setTimeout(() => { btn.textContent = prevText; btn.dir = prevDir; }, 2000);
+  });
+}
 
 function applyLang() {
   document.body.dir = 'ltr';
@@ -3675,9 +3712,11 @@ function applyLang() {
   document.getElementById('mobile-tools-layer').innerHTML = currentLayer === 'satellite' ? t('layer_street') : t('layer_satellite');
   // Update single lang toggle button — shows the OTHER language to switch to
   document.getElementById('lang-toggle').textContent = lang === 'he' ? '🌐 English' : '🌐 עברית';
-  // Update accessibility statement footer link text
+  // Update accessibility statement footer link and contact label
   const accFooter = document.getElementById('accessibility-footer-link');
   if (accFooter) accFooter.textContent = lang === 'he' ? 'הצהרת נגישות' : 'Accessibility Statement';
+  const accContact = document.getElementById('accessibility-contact-label');
+  if (accContact) accContact.textContent = lang === 'he' ? 'צור קשר:' : 'Contact:';
   // Share button & popup
   const shareBtnLabel = document.getElementById('share-btn-label');
   if (shareBtnLabel) shareBtnLabel.textContent = lang === 'he' ? 'שתף' : 'Share';
