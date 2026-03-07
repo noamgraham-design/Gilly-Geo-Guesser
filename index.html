@@ -3995,10 +3995,12 @@ function applyLang() {
   if (!window._fbUser) {
     document.getElementById('auth-label').textContent = lang === 'he' ? 'התחברות' : 'Log in';
   }
-  if (document.getElementById('auth-dd-switch')) {
-    document.getElementById('auth-dd-switch').textContent   = lang === 'he' ? 'החלף חשבון'  : 'Switch account';
+  if (document.getElementById('auth-dd-settings')) {
     document.getElementById('auth-dd-signout').textContent  = lang === 'he' ? 'התנתקות'     : 'Sign out';
     document.getElementById('auth-dd-settings').textContent = lang === 'he' ? 'הגדרות'      : 'Settings';
+  }
+  if (document.getElementById('auth-dd-switch')) {
+    document.getElementById('auth-dd-switch').textContent   = lang === 'he' ? 'החלף חשבון'  : 'Switch account';
   }
   const pmHe = document.getElementById('privacy-modal-he');
   const pmEn = document.getElementById('privacy-modal-en');
