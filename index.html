@@ -977,6 +977,17 @@
 
   #map { width:100%; height:100%; cursor: crosshair !important; }
   #map .leaflet-container { cursor: crosshair !important; }
+  /* Keyboard crosshair marker */
+  .kb-crosshair { background: none !important; border: none !important; }
+  .kb-crosshair div { width: 40px; height: 40px; position: relative; }
+  .kb-crosshair div::before,
+  .kb-crosshair div::after {
+    content: ''; position: absolute; background: #1a6fd4;
+    box-shadow: 0 0 4px #fff;
+  }
+  .kb-crosshair div::before { width: 2px; height: 100%; left: 50%; transform: translateX(-50%); }
+  .kb-crosshair div::after  { height: 2px; width: 100%;  top:  50%; transform: translateY(-50%); }
+  #map:focus { outline: 3px solid #1a6fd4; outline-offset: -3px; }
   .leaflet-control-attribution {
     font-size: 10px !important;
     padding: 1px 5px !important;
@@ -2932,7 +2943,7 @@
   <div id="easy-mode-banner"></div>
   <div id="pts-popup" aria-live="assertive" aria-atomic="true"></div>
   <span id="main-content" aria-hidden="true" style="position:absolute;top:0;left:0;"></span>
-  <div id="map" role="application" aria-label="מפת ישראל האינטראקטיבית / Interactive map of Israel" style="position:absolute;inset:0;"></div>
+  <div id="map" tabindex="0" role="application" aria-label="מפת ישראל האינטראקטיבית / Interactive map of Israel" style="position:absolute;inset:0;"></div>
 </div>
 <div id="feedback"></div>
 
@@ -4437,6 +4448,64 @@ fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/coun
   .catch(err => console.warn('Border fetch failed:', err));
 
 map.on('click', onMapClick);
+
+// ── KEYBOARD MAP NAVIGATION ────────────────────────────────────────────────
+(function () {
+  const kbIcon = L.divIcon({
+    className: 'kb-crosshair',
+    html: '<div></div>',
+    iconSize: [40, 40],
+    iconAnchor: [20, 20],
+  });
+  let kbMarker = null;
+  let kbLatLng = null;
+
+  const mapEl = document.getElementById('map');
+
+  mapEl.addEventListener('focus', () => {
+    if (waiting) return;
+    if (!kbLatLng) kbLatLng = map.getCenter();
+    if (!kbMarker) {
+      kbMarker = L.marker(kbLatLng, { icon: kbIcon, interactive: false, keyboard: false }).addTo(map);
+    } else {
+      kbMarker.setLatLng(kbLatLng);
+      map.addLayer(kbMarker);
+    }
+  });
+
+  mapEl.addEventListener('blur', () => {
+    if (kbMarker) map.removeLayer(kbMarker);
+  });
+
+  mapEl.addEventListener('keydown', (e) => {
+    if (waiting) return;
+    const ARROW_KEYS = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+    if (!ARROW_KEYS.includes(e.key) && e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+
+    if (ARROW_KEYS.includes(e.key)) {
+      // Step shrinks as zoom increases (0.05° at zoom 7, halves each level)
+      const step = 0.05 / Math.pow(2, map.getZoom() - 7);
+      if (!kbLatLng) kbLatLng = map.getCenter();
+      let { lat, lng } = kbLatLng;
+      if (e.key === 'ArrowUp')    lat = Math.min(ISRAEL_BOUNDS.getNorth(), lat + step);
+      if (e.key === 'ArrowDown')  lat = Math.max(ISRAEL_BOUNDS.getSouth(), lat - step);
+      if (e.key === 'ArrowRight') lng = Math.min(ISRAEL_BOUNDS.getEast(),  lng + step);
+      if (e.key === 'ArrowLeft')  lng = Math.max(ISRAEL_BOUNDS.getWest(),  lng - step);
+      kbLatLng = L.latLng(lat, lng);
+      if (!kbMarker) {
+        kbMarker = L.marker(kbLatLng, { icon: kbIcon, interactive: false, keyboard: false }).addTo(map);
+      } else {
+        kbMarker.setLatLng(kbLatLng);
+      }
+      map.panInside(kbLatLng, { padding: [60, 60] });
+
+    } else if (kbLatLng) {
+      onMapClick({ latlng: kbLatLng });
+      if (kbMarker) { map.removeLayer(kbMarker); kbMarker = null; }
+    }
+  });
+})();
 
 // ── TOUCH-DRAG GUARD: block the click that fires after a map pan/scroll ────────
 // Leaflet fires 'click' after touchend even when the finger moved (panned the map).
