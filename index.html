@@ -5326,6 +5326,9 @@ function handleRegionKey(e, region) {
 
 function useHint() {
   if (hintUsed || waiting || hintsLeft <= 0) return;
+  if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+    window._logEvent('hint_used', { difficulty });
+  }
   closeMobileTools();
   hintUsed = true;
   hintsLeft--;
@@ -5661,6 +5664,9 @@ async function showLearningResults() {
   const leveledUp = prevTier !== null && newTier !== prevTier;
   const mastered = learningSessionResults.filter(r => r.mastered).length;
   const total = learningSessionResults.length;
+  if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+    window._logEvent('learning_session_complete', { mastered, total, tier: prevTier });
+  }
 
   const heDir = lang === 'he' ? 'rtl' : 'ltr';
   const nickname = document.getElementById('settings-nickname').value.trim() || '';
@@ -6227,6 +6233,9 @@ function onMapClick(e) {
   score += scorePts + (newStreak >= 3 && perfect ? 10 : 0);
   results.push({ town, hit: perfect, distKm: distKm.toFixed(1), pts });
   if (newStreak >= 3 && perfect) {
+    if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+      window._logEvent('streak_milestone', { streak: newStreak });
+    }
     showStreakBanner(newStreak);
   } else if (!perfect) {
     // Hide banner with fade-out animation on a non-close guess
@@ -6296,6 +6305,12 @@ function onMapClick(e) {
 function showResults() {
   const pct = (score / (roundCount * DIFF[difficulty].maxPts)) * 100;
   const hits = results.filter(r => r.hit).length;
+  if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+    window._logEvent('quiz_game_complete', {
+      score: Math.floor(score), difficulty, region: region || 'all',
+      hits, rounds: roundCount
+    });
+  }
   document.getElementById('result-emoji').textContent = pct >= 80 ? '🏆' : pct >= 50 ? '🌟' : '📚';
   document.getElementById('result-title').textContent =
     pct >= 80 ? t('result_excellent') : pct >= 50 ? t('result_good') : t('result_practice');
@@ -7140,6 +7155,9 @@ showResults = async function() {
   // ── Daily Challenge: save score anonymously and show percentile popup ──
   if (isDailyChallenge) {
     document.getElementById('history-section').classList.remove('show');
+    if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+      window._logEvent('daily_challenge_complete', { score: Math.floor(score) });
+    }
     showDailyPercentile(score);
     return;
   }
@@ -7154,6 +7172,9 @@ showResults = async function() {
     const result = await saveScore({ score, difficulty, region, rounds: roundCount, hits });
     if (result?.ok) {
       if (result.isNewRecord) {
+        if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+          window._logEvent('new_high_score', { score: Math.floor(score), difficulty, region: region || 'all' });
+        }
         recScore.textContent = `${score} ${lang === 'he' ? 'נקודות' : 'pts'}`;
         recSub.textContent = lang === 'he'
           ? `השגת שיא חדש של ${score} נקודות!`
@@ -7495,6 +7516,9 @@ function showChallengeIntro() {
 }
 
 function startChallengeGame() {
+  if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+    window._logEvent('challenge_accepted', {});
+  }
   document.getElementById('challenge-intro').classList.remove('open');
   difficulty = 'medium';
   region = 'all';
