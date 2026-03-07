@@ -32,6 +32,7 @@
            getDocs, serverTimestamp,
            setDoc, getDoc, doc,
            deleteDoc, writeBatch }             from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getAnalytics, logEvent }            from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
 
   const firebaseConfig = {
     apiKey:            "AIzaSyC9bbLFNqAu5elsiWEmuFC_f4tZiPIRtLA",
@@ -43,17 +44,20 @@
     measurementId:     "G-QVGCFLQE9W"
   };
 
-  const app  = initializeApp(firebaseConfig);
+  const app       = initializeApp(firebaseConfig);
   initializeAppCheck(app, {
     provider: new ReCaptchaV3Provider('6Lda1oIsAAAAADHAztu6yP3k4Pe81Q_u0yujccMY'),
     isTokenAutoRefreshEnabled: true,
   });
-  const auth = getAuth(app);
-  const db   = getFirestore(app);
+  const auth      = getAuth(app);
+  const db        = getFirestore(app);
+  const analytics = getAnalytics(app);
 
   // ── Expose to window so the rest of the (non-module) script can call these ──
-  window._fbAuth = auth;
-  window._fbDb   = db;
+  window._fbAuth      = auth;
+  window._fbDb        = db;
+  window._fbAnalytics = analytics;
+  window._logEvent    = (eventName, params) => logEvent(analytics, eventName, params);
   window._fbFns  = {
     signOut, GoogleAuthProvider, signInWithPopup,
     createUserWithEmailAndPassword, signInWithEmailAndPassword,
@@ -5328,6 +5332,9 @@ function handleRegionKey(e, region) {
 
 function useHint() {
   if (hintUsed || waiting || hintsLeft <= 0) return;
+  if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+    window._logEvent('hint_used', { difficulty });
+  }
   closeMobileTools();
   hintUsed = true;
   hintsLeft--;
@@ -5663,6 +5670,9 @@ async function showLearningResults() {
   const leveledUp = prevTier !== null && newTier !== prevTier;
   const mastered = learningSessionResults.filter(r => r.mastered).length;
   const total = learningSessionResults.length;
+  if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+    window._logEvent('learning_session_complete', { mastered, total, tier: prevTier });
+  }
 
   const heDir = lang === 'he' ? 'rtl' : 'ltr';
   const nickname = document.getElementById('settings-nickname').value.trim() || '';
@@ -5736,6 +5746,9 @@ async function showLearningResults() {
 }
 
 function showLevelUpPopup(newTier) {
+  if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+    window._logEvent('learning_level_up', { new_tier: newTier ?? 'all_mastered' });
+  }
   const overlay = document.getElementById('lr-levelup-overlay');
   const isAllMastered = newTier === null;
   const heDir = lang === 'he' ? 'rtl' : 'ltr';
@@ -5934,6 +5947,9 @@ function cancelDailyChallengeIntro() {
 }
 
 function startDailyChallengeGame() {
+  if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+    window._logEvent('daily_challenge_start', {});
+  }
   closeDailyChallengeIntro();
 
   // Reuse the town and nearby point preloaded during the intro popup (to avoid
@@ -6112,6 +6128,9 @@ async function startLearning() {
   }
 
   isLearningMode = true;
+  if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+    window._logEvent('learning_mode_start', { tier });
+  }
   learningIdx = 0;
   learningAttempt = 0;
   learningSessionResults = [];
@@ -6140,6 +6159,9 @@ async function startLearning() {
 }
 
 function startGame() {
+  if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+    window._logEvent('quiz_game_start', { difficulty, region: region || 'all' });
+  }
   const tierFilter = TOWNS.filter(t => t.tier <= DIFF[difficulty].maxTier);
   const regionFilter = REGION_GROUPS[region];
   const pool = regionFilter
@@ -6217,6 +6239,9 @@ function onMapClick(e) {
   score += scorePts + (newStreak >= 3 && perfect ? 10 : 0);
   results.push({ town, hit: perfect, distKm: distKm.toFixed(1), pts });
   if (newStreak >= 3 && perfect) {
+    if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+      window._logEvent('streak_milestone', { streak: newStreak });
+    }
     showStreakBanner(newStreak);
   } else if (!perfect) {
     // Hide banner with fade-out animation on a non-close guess
@@ -6286,6 +6311,12 @@ function onMapClick(e) {
 function showResults() {
   const pct = (score / (roundCount * DIFF[difficulty].maxPts)) * 100;
   const hits = results.filter(r => r.hit).length;
+  if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+    window._logEvent('quiz_game_complete', {
+      score: Math.floor(score), difficulty, region: region || 'all',
+      hits, rounds: roundCount
+    });
+  }
   document.getElementById('result-emoji').textContent = pct >= 80 ? '🏆' : pct >= 50 ? '🌟' : '📚';
   document.getElementById('result-title').textContent =
     pct >= 80 ? t('result_excellent') : pct >= 50 ? t('result_good') : t('result_practice');
@@ -6830,6 +6861,9 @@ function toggleTop5View() {
 
 function shareLeaderboardScore() {
   if (!_sbShareData) return;
+  if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+    window._logEvent('leaderboard_share', {});
+  }
   const { myScore, topPct, showTopPct } = _sbShareData;
   const url = 'https://gilly.co.il';
   const placeStr = showTopPct ? `Top ${topPct}%` : '';
@@ -6881,7 +6915,12 @@ async function showDailyPercentile(myScore) {
     const msg = lang === 'he'
       ? `🗺️ גילי – אתגר יומי\nניקוד: ${Math.floor(myScore)} נקודות${extra ? ' | ' + extra : ''}\nשחקו גם: ${_gameUrl}`
       : `🗺️ Gilly's Israel Quiz – Daily Challenge\nScore: ${Math.floor(myScore)} pts${extra ? ' | ' + extra : ''}\nPlay now: ${_gameUrl}`;
-    shareBtnEl.onclick = () => window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+    shareBtnEl.onclick = () => {
+      if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+        window._logEvent('daily_challenge_share', {});
+      }
+      window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+    };
   }
   _setShare(null); // initial: score only, updated per branch below
 
@@ -6980,6 +7019,9 @@ async function showDailyPercentile(myScore) {
 }
 
 async function loadScoreboard(myScore) {
+  if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+    window._logEvent('leaderboard_reached', {});
+  }
   const section = document.getElementById('scoreboard-panel');
   const list    = document.getElementById('scoreboard-list');
   const guest   = document.getElementById('scoreboard-guest');
@@ -7119,6 +7161,9 @@ showResults = async function() {
   // ── Daily Challenge: save score anonymously and show percentile popup ──
   if (isDailyChallenge) {
     document.getElementById('history-section').classList.remove('show');
+    if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+      window._logEvent('daily_challenge_complete', { score: Math.floor(score) });
+    }
     showDailyPercentile(score);
     return;
   }
@@ -7133,6 +7178,9 @@ showResults = async function() {
     const result = await saveScore({ score, difficulty, region, rounds: roundCount, hits });
     if (result?.ok) {
       if (result.isNewRecord) {
+        if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+          window._logEvent('new_high_score', { score: Math.floor(score), difficulty, region: region || 'all' });
+        }
         recScore.textContent = `${score} ${lang === 'he' ? 'נקודות' : 'pts'}`;
         recSub.textContent = lang === 'he'
           ? `השגת שיא חדש של ${score} נקודות!`
@@ -7320,6 +7368,11 @@ function openSharePopup() {
   document.getElementById('challenge-link-area').style.display = 'none';
   document.getElementById('challenge-search-input').value = '';
   _hideChallengeDropdown();
+
+  // Analytics: track share button usage — logged-in (non-anonymous) users only
+  if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+    window._logEvent('share_menu_open', { source: 'main_menu' });
+  }
 }
 
 function closeSharePopup() {
@@ -7417,6 +7470,9 @@ function _getChallengeUrl(town) {
 
 function shareChallengeCreate(method) {
   if (!challengePickedTown) return;
+  if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+    window._logEvent('challenge_share_create', { method });
+  }
   const url = _getChallengeUrl(challengePickedTown);
   const townName = lang === 'he' ? challengePickedTown.nameHe : challengePickedTown.name;
   if (method === 'wa') {
@@ -7466,6 +7522,9 @@ function showChallengeIntro() {
 }
 
 function startChallengeGame() {
+  if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+    window._logEvent('challenge_accepted', {});
+  }
   document.getElementById('challenge-intro').classList.remove('open');
   difficulty = 'medium';
   region = 'all';
@@ -7550,6 +7609,9 @@ function showChallengeResult() {
 
 function shareChallengeResult(method) {
   if (!_challengeResult || !_challengeTown) return;
+  if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+    window._logEvent('challenge_share_result', { method });
+  }
   const { distKm, perfect } = _challengeResult;
   const url = _getChallengeUrl(_challengeTown);
   const townName = lang === 'he' ? _challengeTown.nameHe : _challengeTown.name;
