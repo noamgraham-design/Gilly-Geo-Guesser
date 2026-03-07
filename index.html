@@ -3181,6 +3181,7 @@
   <div id="fact-modal-card">
     <div id="fact-modal-title"></div>
     <div id="fact-modal-body"></div>
+    <div id="fact-login-prompt" style="display:none;font-size:1rem;color:var(--text)"><a id="fact-login-link" style="cursor:pointer;color:#1a6fd4;text-decoration:underline" onclick="openLoginModalForFact()">Log in</a><span id="fact-login-text"> for fun facts</span></div>
     <button id="fact-modal-close" onclick="closeFactModal()">סגור</button>
   </div>
 </div>
@@ -3813,6 +3814,8 @@ const STRINGS = {
     layer_street:     "🗺️ Street map",
     layer_satellite:  "🛰️ Satellite",
     fact_close:       "Close",
+    fact_login_link:  "Log in",
+    fact_login_text:  " for fun facts",
     menu_desc:        "Pin the location on the map.",
     diff_easy:        "Easy",
     diff_medium:      "Medium",
@@ -3851,6 +3854,8 @@ const STRINGS = {
     layer_street:     "🗺️ מפת רחוב",
     layer_satellite:  "🛰️ לוויין",
     fact_close:       "סגור",
+    fact_login_link:  "התחבר",
+    fact_login_text:  " לעובדות מעניינות",
     menu_desc:        "מצא/י את המיקום על המפה",
     diff_easy:        "קל",
     diff_medium:      "בינוני",
@@ -3916,6 +3921,8 @@ function applyLang() {
   document.getElementById('lbl-score').textContent = t('score');
   document.getElementById('lbl-round').textContent = t('round');
   document.getElementById('fact-modal-close').textContent = t('fact_close');
+  document.getElementById('fact-login-link').textContent  = t('fact_login_link');
+  document.getElementById('fact-login-text').textContent  = t('fact_login_text');
   document.getElementById('menu-desc').innerHTML = t('menu_desc');
   document.getElementById('menu-mode-title').textContent = t('game_mode');
   document.getElementById('d-easy').textContent   = t('diff_easy');
@@ -4795,17 +4802,43 @@ let factModalOpen = false;
 
 function openFactModal(townName) {
   const town = TOWNS.find(t => t.name === townName);
+  const titleEl = document.getElementById('fact-modal-title');
+  const bodyEl  = document.getElementById('fact-modal-body');
+  const loginPromptEl = document.getElementById('fact-login-prompt');
+  const factModal = document.getElementById('fact-modal');
+
+  titleEl.textContent = lang === 'he' ? (town?.nameHe || townName) : townName;
+  titleEl.dir = lang === 'he' ? 'rtl' : 'ltr';
+
+  if (!window._fbUser) {
+    window._pendingFactTown = townName;
+    bodyEl.style.display = 'none';
+    loginPromptEl.style.display = '';
+    loginPromptEl.dir = lang === 'he' ? 'rtl' : 'ltr';
+    document.getElementById('fact-login-link').textContent = t('fact_login_link');
+    document.getElementById('fact-login-text').textContent = t('fact_login_text');
+    factModal.style.display = 'flex';
+    factModalOpen = true;
+    trapFocus(factModal);
+    return;
+  }
+
+  window._pendingFactTown = null;
+  bodyEl.style.display = '';
+  loginPromptEl.style.display = 'none';
   const fact = lang === 'he'
     ? (town?.factHe || town?.fact || 'אין עובדה זמינה.')
     : (town?.fact  || 'No fact available.');
-  document.getElementById('fact-modal-title').textContent = lang === 'he' ? (town?.nameHe || townName) : townName;
-  document.getElementById('fact-modal-body').textContent = fact;
-  document.getElementById('fact-modal-body').dir = lang === 'he' ? 'rtl' : 'ltr';
-  document.getElementById('fact-modal-title').dir = lang === 'he' ? 'rtl' : 'ltr';
-  const factModal = document.getElementById('fact-modal');
+  bodyEl.textContent = fact;
+  bodyEl.dir = lang === 'he' ? 'rtl' : 'ltr';
   factModal.style.display = 'flex';
   factModalOpen = true;
   trapFocus(factModal);
+}
+
+function openLoginModalForFact() {
+  closeFactModal();
+  openLoginModal();
 }
 
 function closeFactModal() {
@@ -6450,6 +6483,12 @@ async function submitGoogleSignup() {
   }
 }
 async function _postAuthActions() {
+  if (window._pendingFactTown) {
+    const town = window._pendingFactTown;
+    window._pendingFactTown = null;
+    openFactModal(town);
+    return;
+  }
   if (_dpPendingScore !== null && document.getElementById('daily-percentile-popup').classList.contains('show')) {
     showDailyPercentile(_dpPendingScore);
   } else if (document.getElementById('scoreboard-panel').classList.contains('show')) {
