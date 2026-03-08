@@ -6997,7 +6997,7 @@ async function showDailyPercentile(myScore) {
     pctLbl.textContent  = '';
     const dpIsHe   = lang === 'he';
     const hookText = dpIsHe ? 'איפה אתה בדירוג?' : 'Where do you rank?';
-    const loginWord = dpIsHe ? '← התחבר' : 'Log in →';
+    const loginWord = dpIsHe ? 'התחבר ←' : 'Log in →';
     const hookDir  = dpIsHe ? 'rtl' : 'ltr';
     msgEl.innerHTML = `<div dir="${hookDir}" style="font-weight:800;font-size:1.05rem;color:var(--text);margin-bottom:6px">${hookText}</div><button id="dp-login-link" class="sb-guest-cta" dir="${hookDir}">${loginWord}</button>`;
     document.getElementById('dp-login-link').onclick = openLoginModal;
@@ -7097,7 +7097,7 @@ async function loadScoreboard(myScore) {
   // Update lang labels
   document.getElementById('scoreboard-title').innerHTML = '<span style="-webkit-text-fill-color:initial;background:none">🏆</span> ' + (lang === 'he' ? 'לוח תוצאות' : 'Leaderboard');
   const isHe = lang === 'he';
-  document.getElementById('sb-signin-link').textContent = isHe ? '← התחבר' : 'Sign in →';
+  document.getElementById('sb-signin-link').textContent = isHe ? 'התחבר ←' : 'Sign in →';
   document.getElementById('sb-signin-link').dir         = isHe ? 'rtl' : 'ltr';
   document.getElementById('sb-guest-hook').textContent  = isHe ? 'איפה אתה בדירוג?' : 'Where do you rank?';
   document.getElementById('sb-guest-hook').dir          = isHe ? 'rtl' : 'ltr';
