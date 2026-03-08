@@ -659,7 +659,7 @@
     padding: 20px 18px 18px;
     height: auto;
     max-height: 75vh;
-    overflow-y: auto;
+    overflow: hidden;
   }
   #scoreboard-list {
     overflow-y: auto;
@@ -2123,7 +2123,7 @@
       box-shadow: 0 8px 28px rgba(0,0,0,0.18) !important;
       height: auto !important;
       max-height: 55vh !important;
-      overflow-y: auto !important;
+      overflow: hidden !important;
       padding: 14px 16px !important;
     }
     #sb-close-btn { display: block !important; }
@@ -7112,10 +7112,10 @@ async function loadScoreboard(myScore) {
     const blurEl = document.getElementById('sb-guest-blur');
     blurEl.dir = isHe ? 'rtl' : 'ltr';
     const fakeNames = isHe
-      ? ['שחקן מסתורי', 'גיאוגרף מומחה', 'נווט אלוף', 'חוקר עולם', 'מגלה ארצות']
-      : ['Mystery Player', 'Geo Expert', 'Top Navigator', 'World Explorer', 'Land Scout'];
-    const fakeScores = [4850, 4620, 4510, 4300, 4180];
-    const medals = ['🥇', '🥈', '🥉', '', ''];
+      ? ['שחקן מסתורי', 'גיאוגרף מומחה', 'נווט אלוף']
+      : ['Mystery Player', 'Geo Expert', 'Top Navigator'];
+    const fakeScores = [4850, 4620, 4510];
+    const medals = ['🥇', '🥈', '🥉'];
     blurEl.innerHTML = fakeNames.map((n, i) => `<div class="sb-row"><span class="sb-rank ${i===0?'gold':i===1?'silver':i===2?'bronze':''}">${medals[i] || (i+1)}</span><div class="sb-name"><span class="sb-name-text">${n}</span></div><span class="sb-score">${fakeScores[i]}</span></div>`).join('');
     return;
   }
