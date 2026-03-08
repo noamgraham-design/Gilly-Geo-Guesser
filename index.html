@@ -3391,7 +3391,7 @@
       <div class="sb-guest-overlay">
         <div class="sb-guest-lock">🔮</div>
         <div class="sb-guest-hook" id="sb-guest-hook">Where do you rank?</div>
-        <div class="sb-guest-sub" id="sb-guest-sub">Players are competing right now. Sign in to reveal your place.</div>
+        <div class="sb-guest-sub" id="sb-guest-sub">Sign in to reveal your place.</div>
         <button class="sb-guest-cta" onclick="openLoginModal()" id="sb-signin-link">Sign in →</button>
       </div>
     </div>
@@ -7101,7 +7101,7 @@ async function loadScoreboard(myScore) {
   document.getElementById('sb-signin-link').dir         = isHe ? 'rtl' : 'ltr';
   document.getElementById('sb-guest-hook').textContent  = isHe ? 'איפה אתה בדירוג?' : 'Where do you rank?';
   document.getElementById('sb-guest-hook').dir          = isHe ? 'rtl' : 'ltr';
-  document.getElementById('sb-guest-sub').textContent   = isHe ? 'שחקנים מתחרים עכשיו. התחבר כדי לגלות את המיקום שלך.' : 'Players are competing right now. Sign in to reveal your place.';
+  document.getElementById('sb-guest-sub').textContent   = isHe ? 'התחבר כדי לגלות את המיקום שלך.' : 'Sign in to reveal your place.';
   document.getElementById('sb-guest-sub').dir           = isHe ? 'rtl' : 'ltr';
 
   if (!window._fbUser) {
@@ -7112,10 +7112,10 @@ async function loadScoreboard(myScore) {
     const blurEl = document.getElementById('sb-guest-blur');
     blurEl.dir = isHe ? 'rtl' : 'ltr';
     const fakeNames = isHe
-      ? ['שחקן מסתורי', 'גיאוגרף מומחה', 'נווט אלוף', 'חוקר עולם', 'מגלה ארצות']
-      : ['Mystery Player', 'Geo Expert', 'Top Navigator', 'World Explorer', 'Land Scout'];
-    const fakeScores = [4850, 4620, 4510, 4300, 4180];
-    const medals = ['🥇', '🥈', '🥉', '', ''];
+      ? ['שחקן מסתורי', 'גיאוגרף מומחה', 'נווט אלוף']
+      : ['Mystery Player', 'Geo Expert', 'Top Navigator'];
+    const fakeScores = [4850, 4620, 4510];
+    const medals = ['🥇', '🥈', '🥉'];
     blurEl.innerHTML = fakeNames.map((n, i) => `<div class="sb-row"><span class="sb-rank ${i===0?'gold':i===1?'silver':i===2?'bronze':''}">${medals[i] || (i+1)}</span><div class="sb-name"><span class="sb-name-text">${n}</span></div><span class="sb-score">${fakeScores[i]}</span></div>`).join('');
     return;
   }
