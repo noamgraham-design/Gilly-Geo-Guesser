@@ -3646,6 +3646,9 @@
 <script src="towns.js"></script>
 
 <script>
+// ── Feature flags ──────────────────────────────────────────────────────────
+const ENABLE_PLANE_ANIMATION = false; // Set to true to re-enable animated F-16 formations
+
 // ── HTML ESCAPE UTILITY (XSS prevention) ───────────────────────────────────
 function esc(s) {
   const d = document.createElement('div');
@@ -5444,6 +5447,7 @@ function useHint() {
 }
 
 function initPlaneAnimation() {
+  if (!ENABLE_PLANE_ANIMATION) return;
   const layer = document.getElementById('planes-layer');
   if (!layer || layer.dataset.initialized) return;
   layer.dataset.initialized = 'true';
