@@ -659,7 +659,7 @@
     padding: 20px 18px 18px;
     height: auto;
     max-height: 75vh;
-    overflow: hidden;
+    overflow-y: auto;
   }
   #scoreboard-list {
     overflow-y: auto;
@@ -2123,7 +2123,7 @@
       box-shadow: 0 8px 28px rgba(0,0,0,0.18) !important;
       height: auto !important;
       max-height: 55vh !important;
-      overflow: hidden !important;
+      overflow-y: auto !important;
       padding: 14px 16px !important;
     }
     #sb-close-btn { display: block !important; }
@@ -3391,7 +3391,7 @@
       <div class="sb-guest-overlay">
         <div class="sb-guest-lock">🔮</div>
         <div class="sb-guest-hook" id="sb-guest-hook">Where do you rank?</div>
-        <div class="sb-guest-sub" id="sb-guest-sub">Players are competing right now. Sign in to reveal your place.</div>
+        <div class="sb-guest-sub" id="sb-guest-sub">Sign in to reveal your place.</div>
         <button class="sb-guest-cta" onclick="openLoginModal()" id="sb-signin-link">Sign in →</button>
       </div>
     </div>
@@ -7101,7 +7101,7 @@ async function loadScoreboard(myScore) {
   document.getElementById('sb-signin-link').dir         = isHe ? 'rtl' : 'ltr';
   document.getElementById('sb-guest-hook').textContent  = isHe ? 'איפה אתה בדירוג?' : 'Where do you rank?';
   document.getElementById('sb-guest-hook').dir          = isHe ? 'rtl' : 'ltr';
-  document.getElementById('sb-guest-sub').textContent   = isHe ? 'שחקנים מתחרים עכשיו. התחבר כדי לגלות את המיקום שלך.' : 'Players are competing right now. Sign in to reveal your place.';
+  document.getElementById('sb-guest-sub').textContent   = isHe ? 'התחבר כדי לגלות את המיקום שלך.' : 'Sign in to reveal your place.';
   document.getElementById('sb-guest-sub').dir           = isHe ? 'rtl' : 'ltr';
 
   if (!window._fbUser) {
