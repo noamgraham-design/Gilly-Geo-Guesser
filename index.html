@@ -3345,7 +3345,7 @@
     </div>
     <button id="start-btn" class="btn btn-start-gold" onclick="startGame()">← התחל משחק</button>
     <button id="learn-btn" class="btn btn-learn" onclick="startLearning()">🗺️ מצב למידה</button>
-    <div id="accessibility-footer-bar">
+    <div id="accessibility-footer-bar" dir="rtl">
       <a href="accessibility.html" id="accessibility-footer-link">הצהרת נגישות</a>
       <span id="accessibility-contact-label" dir="rtl">צור קשר:</span>
       <button id="accessibility-footer-email" onclick="copyAccessibilityEmail()">gillyisraelquiz@gmail.com</button>
@@ -4041,6 +4041,8 @@ function applyLang() {
   if (accFooter) accFooter.textContent = lang === 'he' ? 'הצהרת נגישות' : 'Accessibility Statement';
   const accContact = document.getElementById('accessibility-contact-label');
   if (accContact) { accContact.textContent = lang === 'he' ? 'צור קשר:' : 'Contact:'; accContact.dir = lang === 'he' ? 'rtl' : 'ltr'; }
+  const accFooterBar = document.getElementById('accessibility-footer-bar');
+  if (accFooterBar) accFooterBar.dir = lang === 'he' ? 'rtl' : 'ltr';
   // Share button & popup
   const shareBtnLabel = document.getElementById('share-btn-label');
   if (shareBtnLabel) shareBtnLabel.textContent = lang === 'he' ? 'שתף' : 'Share';
