@@ -763,8 +763,48 @@
     letter-spacing: 2px; padding: 2px 0; opacity: 0.5;
   }
   #scoreboard-guest {
-    text-align: center; font-size: 0.85rem; color: var(--muted);
-    padding: 10px 0;
+    text-align: center; color: var(--muted);
+    padding: 0;
+  }
+  .sb-guest-blurred {
+    position: relative; overflow: hidden; pointer-events: none; user-select: none;
+    filter: blur(5px); opacity: 0.45; margin-bottom: -10px;
+  }
+  .sb-guest-blurred .sb-row { pointer-events: none; }
+  .sb-guest-overlay {
+    position: relative; z-index: 2;
+    background: linear-gradient(135deg, rgba(26,111,212,0.07), rgba(124,58,237,0.07));
+    border: 1.5px solid rgba(26,111,212,0.18);
+    border-radius: 14px; padding: 22px 16px 18px; margin-top: 6px;
+  }
+  .sb-guest-lock {
+    font-size: 2.2rem; line-height: 1; margin-bottom: 8px;
+    animation: sbGuestPulse 2.5s ease-in-out infinite;
+  }
+  @keyframes sbGuestPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.12); }
+  }
+  .sb-guest-hook {
+    font-size: 1.05rem; font-weight: 800; color: var(--text);
+    margin-bottom: 4px; line-height: 1.35;
+  }
+  .sb-guest-sub {
+    font-size: 0.82rem; color: var(--muted); margin-bottom: 14px;
+    line-height: 1.4;
+  }
+  .sb-guest-cta {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: linear-gradient(135deg, #1a6fd4, #7c3aed);
+    color: #fff; border: none; border-radius: 10px;
+    padding: 10px 22px; font-size: 0.95rem; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    box-shadow: 0 4px 16px rgba(26,111,212,0.25);
+    transition: transform 0.18s, box-shadow 0.18s;
+  }
+  .sb-guest-cta:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px rgba(26,111,212,0.35);
   }
 
   /* TOP BAR */
@@ -3347,8 +3387,13 @@
     </div>
     <div id="scoreboard-list"></div>
     <div id="scoreboard-guest" style="display:none">
-      <a style="cursor:pointer;color:#1a6fd4;text-decoration:underline" onclick="openLoginModal()" id="sb-signin-link">Sign in</a>
-      <span id="sb-signin-text"> to see the leaderboard</span>
+      <div class="sb-guest-blurred" id="sb-guest-blur"></div>
+      <div class="sb-guest-overlay">
+        <div class="sb-guest-lock">🔮</div>
+        <div class="sb-guest-hook" id="sb-guest-hook">Where do you rank?</div>
+        <div class="sb-guest-sub" id="sb-guest-sub">Players are competing right now. Sign in to reveal your place.</div>
+        <button class="sb-guest-cta" onclick="openLoginModal()" id="sb-signin-link">Sign in →</button>
+      </div>
     </div>
   </div>
 </div>
@@ -6950,9 +6995,11 @@ async function showDailyPercentile(myScore) {
     _dpPendingScore = myScore;
     pctVal.textContent  = '🔒';
     pctLbl.textContent  = '';
-    const loginWord = lang === 'he' ? 'התחבר' : 'Log in';
-    const restOfMsg = lang === 'he' ? ' כדי לראות את הדירוג שלך' : ' to see how you rank';
-    msgEl.innerHTML = `<a id="dp-login-link" style="cursor:pointer;color:#1a6fd4;text-decoration:underline">${loginWord}</a>${restOfMsg}`;
+    const dpIsHe   = lang === 'he';
+    const hookText = dpIsHe ? 'איפה אתה בדירוג?' : 'Where do you rank?';
+    const loginWord = dpIsHe ? '← התחבר' : 'Log in →';
+    const hookDir  = dpIsHe ? 'rtl' : 'ltr';
+    msgEl.innerHTML = `<div dir="${hookDir}" style="font-weight:800;font-size:1.05rem;color:var(--text);margin-bottom:6px">${hookText}</div><button id="dp-login-link" class="sb-guest-cta" dir="${hookDir}">${loginWord}</button>`;
     document.getElementById('dp-login-link').onclick = openLoginModal;
     countEl.textContent = '';
     ring.style.background = 'conic-gradient(#e8eaed 360deg, #e8eaed 0deg)';
@@ -7049,13 +7096,27 @@ async function loadScoreboard(myScore) {
 
   // Update lang labels
   document.getElementById('scoreboard-title').innerHTML = '<span style="-webkit-text-fill-color:initial;background:none">🏆</span> ' + (lang === 'he' ? 'לוח תוצאות' : 'Leaderboard');
-  document.getElementById('sb-signin-link').textContent      = lang === 'he' ? 'התחבר' : 'Sign in';
-  document.getElementById('sb-signin-text').textContent      = lang === 'he' ? ' כדי לראות את הדירוג שלך' : ' to see the leaderboard';
+  const isHe = lang === 'he';
+  document.getElementById('sb-signin-link').textContent = isHe ? '← התחבר' : 'Sign in →';
+  document.getElementById('sb-signin-link').dir         = isHe ? 'rtl' : 'ltr';
+  document.getElementById('sb-guest-hook').textContent  = isHe ? 'איפה אתה בדירוג?' : 'Where do you rank?';
+  document.getElementById('sb-guest-hook').dir          = isHe ? 'rtl' : 'ltr';
+  document.getElementById('sb-guest-sub').textContent   = isHe ? 'שחקנים מתחרים עכשיו. התחבר כדי לגלות את המיקום שלך.' : 'Players are competing right now. Sign in to reveal your place.';
+  document.getElementById('sb-guest-sub').dir           = isHe ? 'rtl' : 'ltr';
 
   if (!window._fbUser) {
     list.style.display  = 'none';
     guest.style.display = 'block';
     top5Btn.style.display = 'none';
+    // Generate blurred fake rows to tease leaderboard
+    const blurEl = document.getElementById('sb-guest-blur');
+    blurEl.dir = isHe ? 'rtl' : 'ltr';
+    const fakeNames = isHe
+      ? ['שחקן מסתורי', 'גיאוגרף מומחה', 'נווט אלוף', 'חוקר עולם', 'מגלה ארצות']
+      : ['Mystery Player', 'Geo Expert', 'Top Navigator', 'World Explorer', 'Land Scout'];
+    const fakeScores = [4850, 4620, 4510, 4300, 4180];
+    const medals = ['🥇', '🥈', '🥉', '', ''];
+    blurEl.innerHTML = fakeNames.map((n, i) => `<div class="sb-row"><span class="sb-rank ${i===0?'gold':i===1?'silver':i===2?'bronze':''}">${medals[i] || (i+1)}</span><div class="sb-name"><span class="sb-name-text">${n}</span></div><span class="sb-score">${fakeScores[i]}</span></div>`).join('');
     return;
   }
   guest.style.display = 'none';
