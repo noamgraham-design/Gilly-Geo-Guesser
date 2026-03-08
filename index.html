@@ -6995,9 +6995,11 @@ async function showDailyPercentile(myScore) {
     _dpPendingScore = myScore;
     pctVal.textContent  = '🔒';
     pctLbl.textContent  = '';
-    const hookText = lang === 'he' ? 'איפה אתה בדירוג?' : 'Where do you rank?';
-    const loginWord = lang === 'he' ? 'התחבר →' : 'Log in →';
-    msgEl.innerHTML = `<div style="font-weight:800;font-size:1.05rem;color:var(--text);margin-bottom:6px">${hookText}</div><button id="dp-login-link" class="sb-guest-cta">${loginWord}</button>`;
+    const dpIsHe   = lang === 'he';
+    const hookText = dpIsHe ? 'איפה אתה בדירוג?' : 'Where do you rank?';
+    const loginWord = dpIsHe ? '← התחבר' : 'Log in →';
+    const hookDir  = dpIsHe ? 'rtl' : 'ltr';
+    msgEl.innerHTML = `<div dir="${hookDir}" style="font-weight:800;font-size:1.05rem;color:var(--text);margin-bottom:6px">${hookText}</div><button id="dp-login-link" class="sb-guest-cta" dir="${hookDir}">${loginWord}</button>`;
     document.getElementById('dp-login-link').onclick = openLoginModal;
     countEl.textContent = '';
     ring.style.background = 'conic-gradient(#e8eaed 360deg, #e8eaed 0deg)';
@@ -7094,9 +7096,13 @@ async function loadScoreboard(myScore) {
 
   // Update lang labels
   document.getElementById('scoreboard-title').innerHTML = '<span style="-webkit-text-fill-color:initial;background:none">🏆</span> ' + (lang === 'he' ? 'לוח תוצאות' : 'Leaderboard');
-  document.getElementById('sb-signin-link').textContent = lang === 'he' ? 'התחבר →' : 'Sign in →';
-  document.getElementById('sb-guest-hook').textContent  = lang === 'he' ? 'איפה אתה בדירוג?' : 'Where do you rank?';
-  document.getElementById('sb-guest-sub').textContent   = lang === 'he' ? 'שחקנים מתחרים עכשיו. התחבר כדי לגלות את המיקום שלך.' : 'Players are competing right now. Sign in to reveal your place.';
+  const isHe = lang === 'he';
+  document.getElementById('sb-signin-link').textContent = isHe ? '← התחבר' : 'Sign in →';
+  document.getElementById('sb-signin-link').dir         = isHe ? 'rtl' : 'ltr';
+  document.getElementById('sb-guest-hook').textContent  = isHe ? 'איפה אתה בדירוג?' : 'Where do you rank?';
+  document.getElementById('sb-guest-hook').dir          = isHe ? 'rtl' : 'ltr';
+  document.getElementById('sb-guest-sub').textContent   = isHe ? 'שחקנים מתחרים עכשיו. התחבר כדי לגלות את המיקום שלך.' : 'Players are competing right now. Sign in to reveal your place.';
+  document.getElementById('sb-guest-sub').dir           = isHe ? 'rtl' : 'ltr';
 
   if (!window._fbUser) {
     list.style.display  = 'none';
@@ -7104,7 +7110,8 @@ async function loadScoreboard(myScore) {
     top5Btn.style.display = 'none';
     // Generate blurred fake rows to tease leaderboard
     const blurEl = document.getElementById('sb-guest-blur');
-    const fakeNames = lang === 'he'
+    blurEl.dir = isHe ? 'rtl' : 'ltr';
+    const fakeNames = isHe
       ? ['שחקן מסתורי', 'גיאוגרף מומחה', 'נווט אלוף', 'חוקר עולם', 'מגלה ארצות']
       : ['Mystery Player', 'Geo Expert', 'Top Navigator', 'World Explorer', 'Land Scout'];
     const fakeScores = [4850, 4620, 4510, 4300, 4180];
