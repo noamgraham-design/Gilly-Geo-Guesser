@@ -7476,7 +7476,7 @@ function showQuizProgress(pendingScore) {
   document.getElementById('qp-guest').style.display = isLoggedIn ? 'none' : 'flex';
 
   if (isLoggedIn) {
-    const nick = document.getElementById('settings-nickname').value.trim() || window._fbUser.displayName || (window._fbUser.email || '').split('@')[0];
+    const nick = window._userNickname || document.getElementById('settings-nickname').value.trim() || generateRandomNickname();
     document.getElementById('qp-nickname').textContent = nick;
 
     const lvl      = getFamiliarityLevel() ?? 4;
@@ -7631,12 +7631,14 @@ async function openSettingsModal() {
             nick = generateRandomNickname();
             setDoc(doc(window._fbDb, 'users', window._fbUser.uid), { nickname: nick }, { merge: true });
           }
+          window._userNickname = nick;
           document.getElementById('settings-nickname').value = nick;
           selectGender(data.gender || 'male');
           selectSettingsLang(data.language || lang);
           document.getElementById('settings-email-updates').checked = data.emailUpdates === true;
         } else {
           const nick = generateRandomNickname();
+          window._userNickname = nick;
           document.getElementById('settings-nickname').value = nick;
           setDoc(doc(window._fbDb, 'users', window._fbUser.uid), { nickname: nick }, { merge: true });
           selectGender('male');
@@ -7727,6 +7729,7 @@ async function saveSettings() {
 
   try {
     const { setDoc, doc } = window._fbFns;
+    window._userNickname = nickname;
     await setDoc(doc(window._fbDb, 'users', window._fbUser.uid), {
       nickname:    nickname,
       gender:      _selectedGender || null,
