@@ -2867,10 +2867,7 @@
   }
   .qp-fam-dot.dot-yellow { background: #f59e0b; border-color: #f59e0b; }
   .qp-fam-dot.dot-green  { background: #16a34a; border-color: #16a34a; }
-  .qp-fam-label { font-size: 0.72rem; font-weight: 700; }
-  .qp-fam-label.fam-new      { color: var(--muted); }
-  .qp-fam-label.fam-learning { color: #b45309; }
-  .qp-fam-label.fam-familiar { color: #16a34a; }
+  .qp-region { font-size: 0.72rem; font-weight: 600; color: var(--muted); flex-shrink: 0; }
   /* guest state */
   #qp-guest {
     width: 100%; display: none; flex-direction: column;
@@ -7488,25 +7485,23 @@ function showQuizProgress(pendingScore) {
 
     document.getElementById('qp-emoji').textContent = pct >= 80 ? '🏆' : pct >= 30 ? '🗺️' : '📍';
 
-    const FAM_LABELS = {
-      en: ['New', 'Learning', 'Familiar'],
-      he: ['חדש', 'מכיר קצת', 'מוכר'],
+    const REGION_LABELS = {
+      en: { North: 'North', Center: 'Center', South: 'South', Jerusalem: 'Jerusalem' },
+      he: { North: 'צפון', Center: 'מרכז', South: 'דרום', Jerusalem: 'ירושלים' },
     };
-    const labels = FAM_LABELS[isHe ? 'he' : 'en'];
+    const regionMap = REGION_LABELS[isHe ? 'he' : 'en'];
     document.getElementById('qp-list').innerHTML = results.map(r => {
-      const name = isHe ? (r.town.nameHe || r.town.name) : r.town.name;
-      const fam  = locationFamiliarity[r.town.name] ?? 0;
-      const d1   = fam >= 1 ? (fam === 1 ? 'dot-yellow' : 'dot-green') : '';
-      const d2   = fam >= 2 ? 'dot-green' : '';
-      const lCls = fam === 0 ? 'fam-new' : fam === 1 ? 'fam-learning' : 'fam-familiar';
+      const name       = isHe ? (r.town.nameHe || r.town.name) : r.town.name;
+      const fam        = locationFamiliarity[r.town.name] ?? 0;
+      const d1         = fam >= 1 ? (fam === 1 ? 'dot-yellow' : 'dot-green') : '';
+      const d2         = fam >= 2 ? 'dot-green' : '';
+      const regionLabel = regionMap[r.town.region] || r.town.region || '';
       return `<div class="qp-row">
-        <span class="qp-town-name">${r.hit ? '✅' : '❌'} ${name}</span>
-        <span class="qp-fam-wrap">
-          <span class="qp-fam-dots">
-            <span class="qp-fam-dot ${d1}"></span>
-            <span class="qp-fam-dot ${d2}"></span>
-          </span>
-          <span class="qp-fam-label ${lCls}">${labels[fam]}</span>
+        <span class="qp-town-name">${name}</span>
+        <span class="qp-region">${regionLabel}</span>
+        <span class="qp-fam-dots">
+          <span class="qp-fam-dot ${d1}"></span>
+          <span class="qp-fam-dot ${d2}"></span>
         </span>
       </div>`;
     }).join('');
