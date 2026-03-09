@@ -4176,6 +4176,7 @@ function applyLang() {
 let lang = "he";
 let difficulty = "medium", region = "all", sequence = [], currentIdx = 0, score = 0, roundCount = 8;
 let streak = 0, hintUsed = false, streetUsedThisRound = false, results = [], waiting = false;
+let locationFamiliarity = {}; // { [townName]: 0 | 1 | 2 } — 0=unfamiliar, 1=partly, 2=familiar
 let correctMarkers = [], clickMarker = null, circle = null, hintCircle = null, guessLine = null;
 
 // ── Challenge mode state ──────────────────────────────────────────────────────
@@ -6221,7 +6222,7 @@ async function startLearning() {
   loadLearningTown();
 }
 
-function startGame() {
+async function startGame() {
   if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
     window._logEvent('quiz_game_start', { difficulty, region: region || 'all' });
   }
@@ -6248,6 +6249,16 @@ function startGame() {
   document.getElementById('btn-back').style.display = 'inline-block';
   const v = REGION_VIEWS[region];
   map.setView(v.center, v.zoom);
+  // Load locationFamiliarity from Firebase so mid-game saves increment correctly
+  if (window._fbUser && !window._fbUser.isAnonymous && window._fbFns && window._fbDb) {
+    try {
+      const { getDoc, doc } = window._fbFns;
+      const snap = await getDoc(doc(window._fbDb, 'users', window._fbUser.uid));
+      if (snap.exists() && snap.data().locationFamiliarity) {
+        locationFamiliarity = { ...snap.data().locationFamiliarity };
+      }
+    } catch (e) { console.error('Failed to load locationFamiliarity:', e); }
+  }
   loadTown();
 }
 
@@ -6301,6 +6312,22 @@ function onMapClick(e) {
   streak = newStreak;
   score += scorePts + (newStreak >= 3 && perfect ? 10 : 0);
   results.push({ town, hit: perfect, distKm: distKm.toFixed(1), pts });
+  // Track locationFamiliarity for quiz mode (not daily/challenge)
+  if (!isDailyChallenge && !isLearningMode) {
+    const nearPerfect = perfect || (pts / DIFF[difficulty].maxPts >= 0.9);
+    if (nearPerfect) {
+      const cur = locationFamiliarity[town.name] ?? 0;
+      if (cur < 2) {
+        locationFamiliarity[town.name] = cur + 1;
+        // Mid-game save — fire and forget to preserve progress on exit
+        if (window._fbUser && !window._fbUser.isAnonymous && window._fbFns && window._fbDb) {
+          const { setDoc, doc } = window._fbFns;
+          setDoc(doc(window._fbDb, 'users', window._fbUser.uid),
+            { locationFamiliarity }, { merge: true }).catch(console.error);
+        }
+      }
+    }
+  }
   if (newStreak >= 3 && perfect) {
     if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
       window._logEvent('streak_milestone', { streak: newStreak });
@@ -6744,9 +6771,9 @@ async function saveScore(scoreData) {
     }
     const tier = getLearningTier() || 4;
     if (isNewRecord) {
-      await setDoc(userRef, { highest_score: scoreData.score, level: tier }, { merge: true });
+      await setDoc(userRef, { highest_score: scoreData.score, level: tier, locationFamiliarity }, { merge: true });
     } else {
-      await setDoc(userRef, { level: tier }, { merge: true });
+      await setDoc(userRef, { level: tier, locationFamiliarity }, { merge: true });
     }
 
     return { ok: true, isNewRecord };
