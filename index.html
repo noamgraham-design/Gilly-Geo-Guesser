@@ -7458,7 +7458,7 @@ async function loadScoreboard(myScore) {
     const myLvlText = lang === 'he' ? myLvl.he : myLvl.en;
 
     // Player's nickname
-    const myName = myNickname || window._fbUser?.displayName?.split(' ')[0] || (lang === 'he' ? 'שחקן אנונימי' : 'Anonymous');
+    const myName = myNickname || window._userNickname || (lang === 'he' ? 'שחקן אנונימי' : 'Anonymous');
 
     // Place label: percentage if enough players, otherwise M/N
     const placeLabel = showTopPct
