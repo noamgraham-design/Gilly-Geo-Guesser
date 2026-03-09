@@ -5922,19 +5922,8 @@ function advanceLearning() {
 }
 
 async function showLearningResults() {
-  // Update locationFamiliarity for mastered towns (cap at 2) and save
+  // Familiarity is only updated in quiz game mode, not in learning mode
   const prevTier = getFamiliarityLevel();
-  learningSessionResults.forEach(r => {
-    if (r.mastered) {
-      locationFamiliarity[r.town.name] = Math.min(2, (locationFamiliarity[r.town.name] ?? 0) + 1);
-    }
-  });
-  if (window._fbUser && !window._fbUser.isAnonymous) {
-    try {
-      const { setDoc, doc } = window._fbFns;
-      await setDoc(doc(window._fbDb, 'users', window._fbUser.uid), { locationFamiliarity }, { merge: true });
-    } catch (e) { console.error('Failed to save locationFamiliarity:', e); }
-  }
 
   const newTier = getFamiliarityLevel();
   const leveledUp = prevTier !== null && newTier !== prevTier;
