@@ -5583,6 +5583,14 @@ function getLearningTier() {
   return null; // all tiers complete
 }
 
+function getFamiliarityLevel() {
+  for (let tier = 1; tier <= 4; tier++) {
+    const allInTier = TOWNS.filter(t => t.tier === tier);
+    if (!allInTier.every(t => (locationFamiliarity[t.name] ?? 0) >= 2)) return tier;
+  }
+  return null; // all tiers complete
+}
+
 function showKnownPins() {
   clearLearningPins();
   const known = new Set(knownLocations);
@@ -6336,7 +6344,7 @@ function onMapClick(e) {
   // Track locationFamiliarity for quiz mode (not daily/challenge)
   if (!isDailyChallenge && !isLearningMode) {
     const nearPerfect = perfect || (pts / DIFF[difficulty].maxPts >= 0.9);
-    if (nearPerfect) {
+    if (nearPerfect && town.tier === (getFamiliarityLevel() ?? 4)) {
       const cur = locationFamiliarity[town.name] ?? 0;
       if (cur < 2) {
         locationFamiliarity[town.name] = cur + 1;
@@ -6786,11 +6794,7 @@ async function saveScore(scoreData) {
     const userSnap = await getDoc(userRef);
     const current  = userSnap.exists() ? (userSnap.data().highest_score || 0) : 0;
     const isNewRecord = scoreData.score > current;
-    // Ensure knownLocations is loaded so getLearningTier() returns the correct level
-    if (userSnap.exists() && userSnap.data().knownLocations) {
-      knownLocations = userSnap.data().knownLocations;
-    }
-    const tier = getLearningTier() || 4;
+    const tier = getFamiliarityLevel() || 4;
     if (isNewRecord) {
       await setDoc(userRef, { highest_score: scoreData.score, level: tier, locationFamiliarity }, { merge: true });
     } else {
@@ -7221,7 +7225,7 @@ async function loadScoreboard(myScore) {
     const topPct           = showTopPct ? Math.max(1, Math.ceil((currentScoreRank / totalForRank) * 100)) : null;
 
     // Player's current level
-    const myLevel = myIdx !== -1 ? players[myIdx].level : (getLearningTier() || 4);
+    const myLevel = myIdx !== -1 ? players[myIdx].level : (getFamiliarityLevel() || 4);
     const myLvl   = PLAYER_LEVEL_NAMES[myLevel] || PLAYER_LEVEL_NAMES[1];
     const myLvlText = lang === 'he' ? myLvl.he : myLvl.en;
 
