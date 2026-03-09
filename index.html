@@ -5970,7 +5970,7 @@ async function showLearningResults() {
   }
 
   const heDir = lang === 'he' ? 'rtl' : 'ltr';
-  const nickname = document.getElementById('settings-nickname').value.trim() || '';
+  const nickname = window._userNickname || document.getElementById('settings-nickname').value.trim() || '';
 
   document.getElementById('lr-nickname').textContent = nickname;
   document.getElementById('lr-emoji').textContent = mastered === total ? '🏆' : mastered > 0 ? '🌟' : '📚';
@@ -6048,7 +6048,7 @@ function showLevelUpPopup(newTier) {
   const isAllMastered = newTier === null;
   const heDir = lang === 'he' ? 'rtl' : 'ltr';
 
-  const nickname = document.getElementById('settings-nickname').value.trim() || '';
+  const nickname = window._userNickname || document.getElementById('settings-nickname').value.trim() || '';
   document.getElementById('lr-levelup-nickname').textContent = nickname;
 
   const titleEl = document.getElementById('lr-levelup-title');
