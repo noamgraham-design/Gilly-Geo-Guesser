@@ -3534,7 +3534,7 @@
     <!-- Logged-in view -->
     <div id="qp-auth">
       <div id="qp-emoji" style="font-size:2.2rem;margin-bottom:2px">🗺️</div>
-      <div id="qp-nickname" style="font-size:0.92rem;font-weight:800;text-align:center;letter-spacing:0.3px;color:var(--muted);margin-bottom:2px"></div>
+      <div id="qp-nickname" style="font-size:1rem;font-weight:800;text-align:center;letter-spacing:0.3px;color:var(--text);margin-bottom:2px"></div>
       <div id="qp-level-section">
         <div id="qp-level-title"></div>
         <div id="qp-level-name"></div>
@@ -7512,7 +7512,7 @@ function showQuizProgress(pendingScore) {
     }).join('');
 
     document.getElementById('qp-scores-btn').textContent = isHe ? '🏆 לוח תוצאות' : '🏆 View Scores';
-    document.getElementById('qp-menu-btn').textContent   = isHe ? '← תפריט' : '← Menu';
+    document.getElementById('qp-menu-btn').textContent   = isHe ? 'תפריט ←' : '← Menu';
   } else {
     const gTitle = document.getElementById('qp-guest-title');
     gTitle.textContent = isHe ? 'התחבר כדי לעקוב אחר ההתקדמות במשחק' : 'Login to track game progress';
