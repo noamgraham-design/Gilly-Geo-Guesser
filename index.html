@@ -3897,6 +3897,13 @@ const DIFF = {
   hard:   { maxPts:100, maxKm:20,  maxTier:4, color:"#cf2316" },
 };
 
+// Tier preference multipliers per difficulty: higher tiers get more weight on harder difficulties
+const TIER_DIFF_WEIGHT = {
+  easy:   { 1: 1,   2: 0,   3: 0,   4: 0   },
+  medium: { 1: 1,   2: 3,   3: 0,   4: 0   },
+  hard:   { 1: 0.3, 2: 0.7, 3: 2,   4: 3   },
+};
+
 // Perfect radius by tier: bigger places are easier to hit for full points
 const PERFECT_RADIUS_KM = { 1: 5, 2: 3, 3: 2, 4: 1 };
 
@@ -5170,10 +5177,11 @@ function shuffle(arr) {
 
 // Weighted random sampling without replacement using locationFamiliarity.
 // Weights: unfamiliar(0)=5, partly familiar(1)=2, fully familiar(2)=1.
-function weightedSample(pool, n) {
+// Optional weights Map (name → number) overrides familiarity-based weights.
+function weightedSample(pool, n, weights) {
   const W = { 0: 5, 1: 2, 2: 1 };
   const count = Math.min(n, pool.length);
-  const entries = pool.map(t => ({ town: t, w: W[locationFamiliarity[t.name] ?? 0] }));
+  const entries = pool.map(t => ({ town: t, w: weights ? (weights.get(t.name) ?? 1) : W[locationFamiliarity[t.name] ?? 0] }));
   const selected = [];
   for (let i = 0; i < count; i++) {
     const total = entries.reduce((s, e) => s + e.w, 0);
@@ -6464,8 +6472,22 @@ async function startGame() {
   const pool = regionFilter
     ? tierFilter.filter(t => regionFilter.includes(t.region))
     : tierFilter;
-  // Weighted selection favors unfamiliar towns; outer shuffle randomises round order
-  sequence = shuffle(weightedSample(pool, 8));
+  // Phase 1: guarantee minimum from player's current level for progress
+  const F = { 0: 5, 1: 2, 2: 1 };
+  const playerTier = getFamiliarityLevel() ?? 4;
+  const effectiveTier = Math.min(playerTier, DIFF[difficulty].maxTier);
+  const tierPool = pool.filter(t => t.tier === effectiveTier);
+  const minGuaranteed = Math.min(2, tierPool.length);
+  const tierSelected = weightedSample(tierPool, minGuaranteed);
+  // Phase 2: fill remaining slots skewed toward difficulty-appropriate tiers
+  const tierSelectedSet = new Set(tierSelected.map(t => t.name));
+  const restPool = pool.filter(t => !tierSelectedSet.has(t.name));
+  const diffWeights = new Map(restPool.map(t => [
+    t.name, (F[locationFamiliarity[t.name] ?? 0]) * (TIER_DIFF_WEIGHT[difficulty][t.tier] ?? 1)
+  ]));
+  const remaining = weightedSample(restPool, 8 - tierSelected.length, diffWeights);
+  // Outer shuffle randomises round order
+  sequence = shuffle([...tierSelected, ...remaining]);
   roundCount = sequence.length;
   currentIdx = score = streak = 0;
   results = [];
