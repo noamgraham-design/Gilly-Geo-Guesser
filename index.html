@@ -6726,10 +6726,21 @@ window._onAuthChange = function(user) {
             const defaultNick = generateRandomNickname();
             await setDoc(doc(window._fbDb, 'users', user.uid), { nickname: defaultNick }, { merge: true });
           }
+          // Set default difficulty based on player level (only when on the menu)
+          const onMenu = document.getElementById('menu-card')?.style.display !== 'none';
+          if (data.locationFamiliarity && onMenu) {
+            locationFamiliarity = { ...data.locationFamiliarity };
+            const lvl = getFamiliarityLevel() ?? 4;
+            const defaultDiff = lvl <= 1 ? 'easy' : lvl === 2 ? 'medium' : 'hard';
+            setDiff(defaultDiff);
+          }
         } else {
           // New user with no doc yet — create one with a default nickname
           const defaultNick = generateRandomNickname();
           await setDoc(doc(window._fbDb, 'users', user.uid), { nickname: defaultNick }, { merge: true });
+          // New user starts at level 1 → default to easy
+          const onMenu2 = document.getElementById('menu-card')?.style.display !== 'none';
+          if (onMenu2) setDiff('easy');
         }
       });
     });
