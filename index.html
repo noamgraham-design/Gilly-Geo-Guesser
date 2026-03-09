@@ -5184,10 +5184,10 @@ function shuffle(arr) {
 }
 
 // Weighted random sampling without replacement using locationFamiliarity.
-// Weights: unfamiliar(0)=5, partly familiar(1)=2, fully familiar(2)=1.
+// Weights: unfamiliar(0)=20, partly familiar(1)=10, fully familiar(2)=1.
 // Optional weights Map (name → number) overrides familiarity-based weights.
 function weightedSample(pool, n, weights) {
-  const W = { 0: 5, 1: 2, 2: 1 };
+  const W = { 0: 20, 1: 10, 2: 1 };
   const count = Math.min(n, pool.length);
   const entries = pool.map(t => ({ town: t, w: weights ? (weights.get(t.name) ?? 1) : W[locationFamiliarity[t.name] ?? 0] }));
   const selected = [];
@@ -6481,7 +6481,7 @@ async function startGame() {
     ? tierFilter.filter(t => regionFilter.includes(t.region))
     : tierFilter;
   // Phase 1: guarantee minimum from player's current level for progress
-  const F = { 0: 5, 1: 2, 2: 1 };
+  const F = { 0: 20, 1: 10, 2: 1 };
   const playerTier = getFamiliarityLevel() ?? 4;
   const effectiveTier = Math.min(playerTier, DIFF[difficulty].maxTier);
   const tierPool = pool.filter(t => t.tier === effectiveTier);
