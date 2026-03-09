@@ -2864,6 +2864,13 @@
     min-width: 0;
     box-shadow: 0 0 18px rgba(34,197,94,0.55), 0 0 6px rgba(74,222,128,0.35), inset 0 1px 2px rgba(255,255,255,0.35);
   }
+  #qp-diff-tip {
+    display: none; width: 100%; font-size: 0.8rem; text-align: center;
+    padding: 6px 10px; margin-top: 8px; border-radius: 8px;
+    background: rgba(154,103,0,0.1); color: #7a5500;
+    border: 1px solid rgba(154,103,0,0.25);
+  }
+  #qp-diff-tip.show { display: block; }
   #qp-list {
     width: 100%; max-height: 200px; overflow-y: auto;
     margin-top: 10px; border-radius: 10px; border: 1px solid var(--border);
@@ -3572,6 +3579,7 @@
           </div>
         </div>
       </div>
+      <div id="qp-diff-tip"></div>
       <div id="qp-list"></div>
       <div style="display:flex;flex-direction:column;gap:8px;width:100%;margin-top:12px">
         <button class="btn btn-primary" id="qp-scores-btn" onclick="closeQuizProgress()" style="width:100%">🏆 View Scores</button>
@@ -7579,6 +7587,24 @@ function showQuizProgress(pendingScore) {
         </span>
       </div>`;
     }).join('');
+
+    // Recommended difficulty tip
+    const recDiff = lvl === 1 ? 'easy' : lvl === 2 ? 'medium' : 'hard';
+    const diffTipEl = document.getElementById('qp-diff-tip');
+    if (difficulty !== recDiff) {
+      const DIFF_LABELS = { easy: { en: 'Easy', he: 'קל' }, medium: { en: 'Medium', he: 'בינוני' }, hard: { en: 'Hard', he: 'קשה' } };
+      const lbl = DIFF_LABELS[recDiff];
+      if (isHe) {
+        diffTipEl.textContent = `רמת משחק מומלצת: ${lbl.he}`;
+        diffTipEl.dir = 'rtl';
+      } else {
+        diffTipEl.textContent = `Recommended game difficulty: ${lbl.en}`;
+        diffTipEl.dir = 'ltr';
+      }
+      diffTipEl.classList.add('show');
+    } else {
+      diffTipEl.classList.remove('show');
+    }
 
     document.getElementById('qp-scores-btn').textContent = isHe ? '🏆 לוח תוצאות' : '🏆 View Scores';
     document.getElementById('qp-menu-btn').textContent   = isHe ? 'תפריט ←' : '← Menu';
