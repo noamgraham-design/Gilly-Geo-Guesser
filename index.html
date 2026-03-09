@@ -7469,7 +7469,7 @@ function showQuizProgress(pendingScore) {
   document.getElementById('qp-guest').style.display = isLoggedIn ? 'none' : 'flex';
 
   if (isLoggedIn) {
-    const nick = window._fbUser.displayName || (window._fbUser.email || '').split('@')[0];
+    const nick = document.getElementById('settings-nickname').value.trim() || window._fbUser.displayName || (window._fbUser.email || '').split('@')[0];
     document.getElementById('qp-nickname').textContent = nick;
 
     const lvl      = getFamiliarityLevel() ?? 4;
