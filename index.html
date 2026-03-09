@@ -4384,7 +4384,7 @@ let hintsLeft = 3, hintAnimFrame = null;
 // ── Learning Mode State ───────────────────────────────────────────────────────
 let isLearningMode = false;
 let learningSequence = [], learningIdx = 0, learningAttempt = 0;
-let knownLocations = [], learningSessionResults = [], learningPins = [];
+let learningSessionResults = [], learningPins = [];
 let learningPreviewActive = false, learningPreviewTimer = null, learningPreviewInterval = null;
 
 // ── Daily Challenge State ─────────────────────────────────────────────────────
@@ -5771,14 +5771,6 @@ function showMenu() {
 
 // ── Learning Mode ─────────────────────────────────────────────────────────────
 
-function getLearningTier() {
-  for (let tier = 1; tier <= 4; tier++) {
-    const allInTier = TOWNS.filter(t => t.tier === tier);
-    if (!allInTier.every(t => knownLocations.includes(t.name))) return tier;
-  }
-  return null; // all tiers complete
-}
-
 function getFamiliarityLevel() {
   for (let tier = 1; tier <= 4; tier++) {
     const allInTier = TOWNS.filter(t => t.tier === tier);
@@ -5787,18 +5779,6 @@ function getFamiliarityLevel() {
   return null; // all tiers complete
 }
 
-function showKnownPins() {
-  clearLearningPins();
-  const known = new Set(knownLocations);
-  TOWNS.forEach(t => {
-    if (!known.has(t.name)) return;
-    const pin = L.circleMarker([t.lat, t.lng], {
-      radius: 5, color: '#1a7f37', weight: 1.5,
-      fillColor: '#1a7f37', fillOpacity: 0.7,
-    }).addTo(map);
-    learningPins.push(pin);
-  });
-}
 
 function clearLearningPins() {
   learningPins.forEach(p => map.removeLayer(p));
@@ -5942,20 +5922,21 @@ function advanceLearning() {
 }
 
 async function showLearningResults() {
-  const masteredNames = learningSessionResults.filter(r => r.mastered).map(r => r.town.name);
-  const prevKnownSet = new Set(knownLocations);
-  const newKnown = [...knownLocations, ...masteredNames.filter(n => !prevKnownSet.has(n))];
-  const prevTier = getLearningTier();
-
-  knownLocations = newKnown;
-  if (window._fbUser && masteredNames.length > 0) {
+  // Update locationFamiliarity for mastered towns (cap at 2) and save
+  const prevTier = getFamiliarityLevel();
+  learningSessionResults.forEach(r => {
+    if (r.mastered) {
+      locationFamiliarity[r.town.name] = Math.min(2, (locationFamiliarity[r.town.name] ?? 0) + 1);
+    }
+  });
+  if (window._fbUser && !window._fbUser.isAnonymous) {
     try {
       const { setDoc, doc } = window._fbFns;
-      await setDoc(doc(window._fbDb, 'users', window._fbUser.uid), { knownLocations: newKnown }, { merge: true });
-    } catch (e) { console.error('Failed to save known locations:', e); }
+      await setDoc(doc(window._fbDb, 'users', window._fbUser.uid), { locationFamiliarity }, { merge: true });
+    } catch (e) { console.error('Failed to save locationFamiliarity:', e); }
   }
 
-  const newTier = getLearningTier();
+  const newTier = getFamiliarityLevel();
   const leveledUp = prevTier !== null && newTier !== prevTier;
   const mastered = learningSessionResults.filter(r => r.mastered).length;
   const total = learningSessionResults.length;
@@ -5976,9 +5957,10 @@ async function showLearningResults() {
 
   // Progress bar — show progress within the current (or just-completed) tier
   const tierForDisplay = newTier ?? prevTier ?? 4;
-  const tierKnown = TOWNS.filter(t => t.tier === tierForDisplay && knownLocations.includes(t.name)).length;
-  const tierTotal = TOWNS.filter(t => t.tier === tierForDisplay).length;
-  const pct = tierTotal > 0 ? Math.round((tierKnown / tierTotal) * 100) : 100;
+  const allInTierDisplay = TOWNS.filter(t => t.tier === tierForDisplay);
+  const tierTotal = allInTierDisplay.length;
+  const progressPts = allInTierDisplay.reduce((sum, t) => sum + (locationFamiliarity[t.name] ?? 0) / 2, 0);
+  const pct = tierTotal > 0 ? Math.round((progressPts / tierTotal) * 100) : 100;
   const levelNameForDisplay = PLAYER_LEVEL_NAMES[tierForDisplay];
 
   const lrLevelTitle = document.getElementById('lr-level-title');
@@ -5993,7 +5975,8 @@ async function showLearningResults() {
     ? (lang === 'he' ? levelNameForDisplay.he : levelNameForDisplay.en)
     : '';
 
-  document.getElementById('lr-progress-text').textContent = `${tierKnown} / ${tierTotal}`;
+  const famPts = allInTierDisplay.reduce((sum, t) => sum + (locationFamiliarity[t.name] ?? 0), 0);
+  document.getElementById('lr-progress-text').textContent = `${famPts} / ${tierTotal * 2}`;
   // Animate the bar from 0
   const fillEl = document.getElementById('lr-progress-fill');
   fillEl.style.width = '0%';
@@ -6006,11 +5989,25 @@ async function showLearningResults() {
     setTimeout(() => showLevelUpPopup(newTier), 600);
   }
 
-  document.getElementById('lr-list').innerHTML = learningSessionResults.map(r => {
-    const name = lang === 'he' ? r.town.nameHe : r.town.name;
-    return `<div class="lr-row" dir="${heDir}">
-      <span>${r.mastered ? '✅' : '❌'} ${name}</span>
-      <span class="${r.mastered ? 'lr-badge-mastered' : 'lr-badge-next'}">${r.mastered ? (lang === 'he' ? 'שולט!' : 'Mastered!') : (lang === 'he' ? 'בפעם הבאה' : 'Next Time')}</span>
+  // Familiarity list — same format as the Progress popup
+  const REGION_LABELS = {
+    en: { North: 'North', Center: 'Center', South: 'South', Jerusalem: 'Center', 'West Bank': 'Center' },
+    he: { North: 'צפון', Center: 'מרכז', South: 'דרום', Jerusalem: 'מרכז', 'West Bank': 'מרכז' },
+  };
+  const regionMap = REGION_LABELS[lang === 'he' ? 'he' : 'en'];
+  document.getElementById('lr-list').innerHTML = allInTierDisplay.map(t => {
+    const name        = lang === 'he' ? (t.nameHe || t.name) : t.name;
+    const fam         = locationFamiliarity[t.name] ?? 0;
+    const d1          = fam >= 1 ? (fam === 1 ? 'dot-yellow' : 'dot-green') : '';
+    const d2          = fam >= 2 ? 'dot-green' : '';
+    const regionLabel = regionMap[t.region] || t.region || '';
+    return `<div class="qp-row">
+      <span class="qp-town-name">${name}</span>
+      <span class="qp-region">${regionLabel}</span>
+      <span class="qp-fam-dots">
+        <span class="qp-fam-dot ${d1}"></span>
+        <span class="qp-fam-dot ${d2}"></span>
+      </span>
     </div>`;
   }).join('');
 
@@ -6408,22 +6405,23 @@ async function startLearning() {
   try {
     const { getDoc, doc } = window._fbFns;
     const userSnap = await getDoc(doc(window._fbDb, 'users', window._fbUser.uid));
-    knownLocations = userSnap.exists() ? (userSnap.data().knownLocations || []) : [];
+    if (userSnap.exists() && userSnap.data().locationFamiliarity) {
+      locationFamiliarity = { ...userSnap.data().locationFamiliarity };
+    }
   } catch (e) {
-    knownLocations = [];
-    console.error('Failed to load known locations:', e);
+    console.error('Failed to load locationFamiliarity:', e);
   }
 
-  const tier = getLearningTier();
+  const tier = getFamiliarityLevel();
   if (tier === null) {
     showFeedback(lang === 'he' ? '🏆 שלטת בכל המיקומים!' : '🏆 All locations mastered!', '#1a7f37');
     return;
   }
 
   const allInTier = TOWNS.filter(t => t.tier === tier);
-  learningSequence = allInTier.filter(t => !knownLocations.includes(t.name)).slice(0, LEARNING_SESSION_SIZE);
+  learningSequence = allInTier.filter(t => (locationFamiliarity[t.name] ?? 0) < 2).slice(0, LEARNING_SESSION_SIZE);
   if (learningSequence.length === 0) {
-    showFeedback(lang === 'he' ? '🎉 כל המיקומים ברמה זו ידועים!' : '🎉 All locations in this level known!', '#1a7f37');
+    showFeedback(lang === 'he' ? '🎉 כל המיקומים ברמה זו נלמדו!' : '🎉 All locations in this level fully learned!', '#1a7f37');
     return;
   }
 
