@@ -4973,6 +4973,27 @@ function shuffle(arr) {
   return a;
 }
 
+// Weighted random sampling without replacement using locationFamiliarity.
+// Weights: unfamiliar(0)=5, partly familiar(1)=2, fully familiar(2)=1.
+function weightedSample(pool, n) {
+  const W = { 0: 5, 1: 2, 2: 1 };
+  const count = Math.min(n, pool.length);
+  const entries = pool.map(t => ({ town: t, w: W[locationFamiliarity[t.name] ?? 0] }));
+  const selected = [];
+  for (let i = 0; i < count; i++) {
+    const total = entries.reduce((s, e) => s + e.w, 0);
+    let r = Math.random() * total;
+    let idx = 0;
+    for (; idx < entries.length - 1; idx++) {
+      r -= entries[idx].w;
+      if (r <= 0) break;
+    }
+    selected.push(entries[idx].town);
+    entries.splice(idx, 1);
+  }
+  return selected;
+}
+
 function haversineKm(lat1, lng1, lat2, lng2) {
   const R = 6371, toR = Math.PI / 180;
   const dLat = (lat2 - lat1) * toR, dLng = (lng2 - lng1) * toR;
@@ -6226,13 +6247,23 @@ async function startGame() {
   if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
     window._logEvent('quiz_game_start', { difficulty, region: region || 'all' });
   }
+  // Load locationFamiliarity FIRST so weighted selection uses fresh data
+  if (window._fbUser && !window._fbUser.isAnonymous && window._fbFns && window._fbDb) {
+    try {
+      const { getDoc, doc } = window._fbFns;
+      const snap = await getDoc(doc(window._fbDb, 'users', window._fbUser.uid));
+      if (snap.exists() && snap.data().locationFamiliarity) {
+        locationFamiliarity = { ...snap.data().locationFamiliarity };
+      }
+    } catch (e) { console.error('Failed to load locationFamiliarity:', e); }
+  }
   const tierFilter = TOWNS.filter(t => t.tier <= DIFF[difficulty].maxTier);
   const regionFilter = REGION_GROUPS[region];
   const pool = regionFilter
     ? tierFilter.filter(t => regionFilter.includes(t.region))
     : tierFilter;
-  // If somehow fewer than 8 towns in pool, take all of them
-  sequence = shuffle(pool).slice(0, Math.min(8, pool.length));
+  // Weighted selection favors unfamiliar towns; outer shuffle randomises round order
+  sequence = shuffle(weightedSample(pool, 8));
   roundCount = sequence.length;
   currentIdx = score = streak = 0;
   results = [];
@@ -6249,16 +6280,6 @@ async function startGame() {
   document.getElementById('btn-back').style.display = 'inline-block';
   const v = REGION_VIEWS[region];
   map.setView(v.center, v.zoom);
-  // Load locationFamiliarity from Firebase so mid-game saves increment correctly
-  if (window._fbUser && !window._fbUser.isAnonymous && window._fbFns && window._fbDb) {
-    try {
-      const { getDoc, doc } = window._fbFns;
-      const snap = await getDoc(doc(window._fbDb, 'users', window._fbUser.uid));
-      if (snap.exists() && snap.data().locationFamiliarity) {
-        locationFamiliarity = { ...snap.data().locationFamiliarity };
-      }
-    } catch (e) { console.error('Failed to load locationFamiliarity:', e); }
-  }
   loadTown();
 }
 
