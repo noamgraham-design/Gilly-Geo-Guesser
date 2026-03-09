@@ -3627,7 +3627,7 @@
     <div class="record-title-en">New Personal Best!</div>
     <div class="record-score-display" id="new-record-score"></div>
     <div class="record-sub-he" id="new-record-sub"></div>
-    <button id="new-record-close" onclick="document.getElementById('new-record-popup').classList.remove('show')">&#128170; Nice!</button>
+    <button id="new-record-close" onclick="closeRecordPopup()">&#128170; Nice!</button>
   </div>
 </div>
 
@@ -6096,6 +6096,17 @@ function closeLevelUpPopup() {
   document.getElementById('lr-levelup-overlay').classList.remove('show');
 }
 
+let _pendingLevelUp = null; // { newLevel } — set after quiz game if level-up occurred
+
+function closeRecordPopup() {
+  document.getElementById('new-record-popup').classList.remove('show');
+  if (_pendingLevelUp !== null) {
+    const lvl = _pendingLevelUp;
+    _pendingLevelUp = null;
+    setTimeout(() => showLevelUpPopup(lvl), 300);
+  }
+}
+
 async function continueLearning() {
   document.getElementById('learning-results-panel').className = '';
   await startLearning();
@@ -7006,16 +7017,19 @@ async function saveScore(scoreData) {
     const { getDoc, setDoc, doc } = window._fbFns;
     const userRef  = doc(window._fbDb, 'users', window._fbUser.uid);
     const userSnap = await getDoc(userRef);
-    const current  = userSnap.exists() ? (userSnap.data().highest_score || 0) : 0;
+    const userData = userSnap.exists() ? userSnap.data() : {};
+    const current  = userData.highest_score || 0;
     const isNewRecord = scoreData.score > current;
+    const oldLevel = userData.level || getFamiliarityLevel() || 4;
     const tier = getFamiliarityLevel() || 4;
+    const isLevelUp = tier > oldLevel;
     if (isNewRecord) {
       await setDoc(userRef, { highest_score: scoreData.score, level: tier, locationFamiliarity }, { merge: true });
     } else {
       await setDoc(userRef, { level: tier, locationFamiliarity }, { merge: true });
     }
 
-    return { ok: true, isNewRecord };
+    return { ok: true, isNewRecord, isLevelUp, newLevel: isLevelUp ? tier : null };
   } catch (e) { console.error('Save score failed:', e); return { ok: false, isNewRecord: false }; }
 }
 
@@ -7610,8 +7624,11 @@ showResults = async function() {
         recSub.textContent = lang === 'he'
           ? `השגת שיא חדש של ${score} נקודות!`
           : `You beat your best with ${score} pts!`;
+        if (result.isLevelUp) _pendingLevelUp = result.newLevel;
         recPopup.classList.add('show');
         launchConfetti();
+      } else if (result.isLevelUp) {
+        setTimeout(() => showLevelUpPopup(result.newLevel), 300);
       }
     }
     loadHistory();
