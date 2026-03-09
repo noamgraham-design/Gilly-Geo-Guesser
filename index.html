@@ -7486,8 +7486,8 @@ function showQuizProgress(pendingScore) {
     document.getElementById('qp-emoji').textContent = pct >= 80 ? '🏆' : pct >= 30 ? '🗺️' : '📍';
 
     const REGION_LABELS = {
-      en: { North: 'North', Center: 'Center', South: 'South', Jerusalem: 'Jerusalem' },
-      he: { North: 'צפון', Center: 'מרכז', South: 'דרום', Jerusalem: 'ירושלים' },
+      en: { North: 'North', Center: 'Center', South: 'South', Jerusalem: 'Center', 'West Bank': 'Center' },
+      he: { North: 'צפון', Center: 'מרכז', South: 'דרום', Jerusalem: 'מרכז', 'West Bank': 'מרכז' },
     };
     const regionMap = REGION_LABELS[isHe ? 'he' : 'en'];
     document.getElementById('qp-list').innerHTML = results.map(r => {
