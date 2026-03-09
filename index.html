@@ -7503,12 +7503,12 @@ function showQuizProgress(pendingScore) {
       he: { North: 'צפון', Center: 'מרכז', South: 'דרום', Jerusalem: 'מרכז', 'West Bank': 'מרכז' },
     };
     const regionMap = REGION_LABELS[isHe ? 'he' : 'en'];
-    document.getElementById('qp-list').innerHTML = results.map(r => {
-      const name       = isHe ? (r.town.nameHe || r.town.name) : r.town.name;
-      const fam        = locationFamiliarity[r.town.name] ?? 0;
-      const d1         = fam >= 1 ? (fam === 1 ? 'dot-yellow' : 'dot-green') : '';
-      const d2         = fam >= 2 ? 'dot-green' : '';
-      const regionLabel = regionMap[r.town.region] || r.town.region || '';
+    document.getElementById('qp-list').innerHTML = allInTier.map(t => {
+      const name        = isHe ? (t.nameHe || t.name) : t.name;
+      const fam         = locationFamiliarity[t.name] ?? 0;
+      const d1          = fam >= 1 ? (fam === 1 ? 'dot-yellow' : 'dot-green') : '';
+      const d2          = fam >= 2 ? 'dot-green' : '';
+      const regionLabel = regionMap[t.region] || t.region || '';
       return `<div class="qp-row">
         <span class="qp-town-name">${name}</span>
         <span class="qp-region">${regionLabel}</span>
