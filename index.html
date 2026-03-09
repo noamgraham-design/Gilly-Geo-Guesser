@@ -6736,6 +6736,9 @@ window._onAuthChange = function(user) {
           if (!data.nickname) {
             const defaultNick = generateRandomNickname();
             await setDoc(doc(window._fbDb, 'users', user.uid), { nickname: defaultNick }, { merge: true });
+            window._userNickname = defaultNick;
+          } else {
+            window._userNickname = data.nickname;
           }
           // Set default difficulty based on player level (only when on the menu)
           const onMenu = document.getElementById('menu-card')?.style.display !== 'none';
@@ -6748,6 +6751,7 @@ window._onAuthChange = function(user) {
         } else {
           // New user with no doc yet — create one with a default nickname
           const defaultNick = generateRandomNickname();
+          window._userNickname = defaultNick;
           await setDoc(doc(window._fbDb, 'users', user.uid), { nickname: defaultNick }, { merge: true });
           // New user starts at level 1 → default to easy
           const onMenu2 = document.getElementById('menu-card')?.style.display !== 'none';
