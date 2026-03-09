@@ -2807,25 +2807,52 @@
     flex-shrink: 0;
   }
   #qp-auth { width: 100%; display: flex; flex-direction: column; align-items: center; }
-  #qp-level-section { width: 100%; text-align: center; margin: 6px 0 8px; }
+  #qp-level-section {
+    width: 100%; text-align: center; margin: 8px 0 12px;
+    background: linear-gradient(135deg, #1a6fd4 0%, #7c3aed 65%, #a855f7 100%);
+    border-radius: 18px;
+    padding: 18px 18px 16px;
+    box-shadow: 0 6px 28px rgba(124,58,237,0.32), 0 1px 4px rgba(0,0,0,0.1);
+    position: relative; overflow: hidden;
+  }
+  #qp-level-section::before {
+    content: ''; position: absolute;
+    top: -35px; right: -28px;
+    width: 110px; height: 110px; border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+  }
+  #qp-level-section::after {
+    content: ''; position: absolute;
+    bottom: -25px; left: -22px;
+    width: 90px; height: 90px; border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+  }
   #qp-level-title {
     font-family: 'Playfair Display','Alef',serif;
-    font-size: 1.15rem;
-    font-weight: 900;
-    background: linear-gradient(90deg, #1a6fd4, #7c3aed);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 2px;
+    color: white; -webkit-text-fill-color: white; background: none;
+    margin-bottom: 4px; line-height: 1; position: relative; z-index: 1;
   }
-  #qp-level-name { font-size: 0.82rem; font-weight: 700; color: #16a34a; margin-bottom: 6px; }
-  #qp-progress-wrap { width: 100%; }
+  .qp-level-word {
+    display: block; font-size: 0.68rem; font-weight: 800;
+    letter-spacing: 4px; text-transform: uppercase;
+    color: rgba(255,255,255,0.75); margin-bottom: 2px;
+  }
+  .qp-level-num {
+    display: block; font-size: 3.6rem; font-weight: 900; line-height: 1;
+    text-shadow: 0 3px 16px rgba(0,0,0,0.22);
+  }
+  #qp-level-name {
+    font-size: 1.05rem; font-weight: 700; letter-spacing: 1.5px;
+    text-transform: uppercase; color: rgba(255,255,255,0.92);
+    margin-bottom: 14px; position: relative; z-index: 1;
+  }
+  #qp-progress-wrap { width: 100%; position: relative; z-index: 1; }
   #qp-progress-track {
     width: 100%; height: 22px;
-    background: var(--border);
+    background: rgba(255,255,255,0.18);
     border-radius: 14px; overflow: hidden; position: relative;
-    box-shadow: inset 0 2px 5px rgba(0,0,0,0.1), 0 0 10px rgba(34,197,94,0.12);
-    border: 1.5px solid rgba(22,163,74,0.2);
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.18);
+    border: 1.5px solid rgba(255,255,255,0.28);
   }
   #qp-progress-fill {
     height: 100%; border-radius: 14px;
@@ -7476,12 +7503,14 @@ function showQuizProgress(pendingScore) {
   document.getElementById('qp-guest').style.display = isLoggedIn ? 'none' : 'flex';
 
   if (isLoggedIn) {
-    const nick = document.getElementById('settings-nickname').value.trim() || window._fbUser.displayName || (window._fbUser.email || '').split('@')[0];
+    const nick = window._userNickname || document.getElementById('settings-nickname').value.trim() || generateRandomNickname();
     document.getElementById('qp-nickname').textContent = nick;
 
     const lvl      = getFamiliarityLevel() ?? 4;
     const lvlNames = PLAYER_LEVEL_NAMES[lvl];
-    document.getElementById('qp-level-title').textContent = isHe ? `רמה ${lvl}` : `Level ${lvl}`;
+    document.getElementById('qp-level-title').innerHTML = isHe
+      ? `<span class="qp-level-word">רמה</span><span class="qp-level-num">${lvl}</span>`
+      : `<span class="qp-level-word">LEVEL</span><span class="qp-level-num">${lvl}</span>`;
     document.getElementById('qp-level-name').textContent  = lvlNames ? (isHe ? lvlNames.he : lvlNames.en) : '';
 
     const allInTier    = TOWNS.filter(t => t.tier === lvl);
@@ -7503,12 +7532,12 @@ function showQuizProgress(pendingScore) {
       he: { North: 'צפון', Center: 'מרכז', South: 'דרום', Jerusalem: 'מרכז', 'West Bank': 'מרכז' },
     };
     const regionMap = REGION_LABELS[isHe ? 'he' : 'en'];
-    document.getElementById('qp-list').innerHTML = results.map(r => {
-      const name       = isHe ? (r.town.nameHe || r.town.name) : r.town.name;
-      const fam        = locationFamiliarity[r.town.name] ?? 0;
-      const d1         = fam >= 1 ? (fam === 1 ? 'dot-yellow' : 'dot-green') : '';
-      const d2         = fam >= 2 ? 'dot-green' : '';
-      const regionLabel = regionMap[r.town.region] || r.town.region || '';
+    document.getElementById('qp-list').innerHTML = allInTier.map(t => {
+      const name        = isHe ? (t.nameHe || t.name) : t.name;
+      const fam         = locationFamiliarity[t.name] ?? 0;
+      const d1          = fam >= 1 ? (fam === 1 ? 'dot-yellow' : 'dot-green') : '';
+      const d2          = fam >= 2 ? 'dot-green' : '';
+      const regionLabel = regionMap[t.region] || t.region || '';
       return `<div class="qp-row">
         <span class="qp-town-name">${name}</span>
         <span class="qp-region">${regionLabel}</span>
@@ -7631,12 +7660,14 @@ async function openSettingsModal() {
             nick = generateRandomNickname();
             setDoc(doc(window._fbDb, 'users', window._fbUser.uid), { nickname: nick }, { merge: true });
           }
+          window._userNickname = nick;
           document.getElementById('settings-nickname').value = nick;
           selectGender(data.gender || 'male');
           selectSettingsLang(data.language || lang);
           document.getElementById('settings-email-updates').checked = data.emailUpdates === true;
         } else {
           const nick = generateRandomNickname();
+          window._userNickname = nick;
           document.getElementById('settings-nickname').value = nick;
           setDoc(doc(window._fbDb, 'users', window._fbUser.uid), { nickname: nick }, { merge: true });
           selectGender('male');
@@ -7727,6 +7758,7 @@ async function saveSettings() {
 
   try {
     const { setDoc, doc } = window._fbFns;
+    window._userNickname = nickname;
     await setDoc(doc(window._fbDb, 'users', window._fbUser.uid), {
       nickname:    nickname,
       gender:      _selectedGender || null,
