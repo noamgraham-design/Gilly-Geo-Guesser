@@ -873,7 +873,7 @@
     pointer-events: none;
   }
   #town-name { font-family: 'Playfair Display', 'Alef', serif; font-size: 2.4rem; font-weight: 900; line-height: 1; background: linear-gradient(90deg, #1a6fd4, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  #town-desc { font-size: 0.95rem; color: var(--muted); font-style: italic; margin-top: 4px; }
+  #town-desc { display: none; }
   /* Blurred location name shown during street-view preview phase */
   .blurred-location { filter: blur(8px); user-select: none; pointer-events: none; transition: filter 0.4s ease; }
   #town-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
@@ -2339,9 +2339,6 @@
     #town-name {
       font-size: 1.3rem;
     }
-    #town-desc {
-      font-size: 0.85rem;
-    }
     #town-actions {
       gap: 6px;
     }
@@ -2604,10 +2601,6 @@
     #town-name {
       font-size: 1.1rem;
     }
-    #town-desc {
-      font-size: 0.8rem;
-    }
-    
     .card h2 {
       font-size: 1.3rem;
     }
@@ -3287,7 +3280,7 @@
   </div>
   <div id="town-center">
     <div id="town-name">—</div>
-    <div id="town-desc">בחר/י רמת קושי והתחל/י את המשחק</div>
+    <div id="town-desc"></div>
   </div>
   <div id="town-actions">
     <button class="btn btn-hint" id="btn-hint" onclick="useHint()">💡 Hint · 3 left</button>
@@ -4360,9 +4353,7 @@ function applyLang() {
   const overlayVisible = document.getElementById('overlay').style.display !== 'none';
   if (!overlayVisible && sequence.length > 0 && currentIdx < sequence.length) {
     document.getElementById('town-name').textContent = lang === 'he' ? sequence[currentIdx].nameHe : sequence[currentIdx].name;
-    document.getElementById('town-desc').textContent = lang === 'he' ? sequence[currentIdx].descHe : sequence[currentIdx].desc;
   } else if (overlayVisible || sequence.length === 0) {
-    document.getElementById('town-desc').textContent = t('placeholder_desc');
   }
   // Swap street tile layer to match the new language
   if (currentLayer === 'street') {
@@ -5561,14 +5552,12 @@ function adjustMobileTownFontSize(name) {
 function loadTown() {
   const t = sequence[currentIdx];
   const townName = lang === 'he' ? t.nameHe : t.name;
-  const townDesc = lang === 'he' ? t.descHe : t.desc;
 
   // Prefetch polygon for this town (and the next one) so it's ready by the time user clicks
   fetchCityPolygon(t.name);
   if (currentIdx + 1 < sequence.length) fetchCityPolygon(sequence[currentIdx + 1].name);
   
   document.getElementById('town-name').textContent = townName;
-  document.getElementById('town-desc').textContent = townDesc;
   // Also update mobile versions
   document.querySelector('#mobile-topbar-town .mob-town-text').textContent = townName;
   adjustMobileTownFontSize(townName);
@@ -5851,10 +5840,8 @@ function clearLearningPreview() {
 function loadLearningTown() {
   const t = learningSequence[learningIdx];
   const townName = lang === 'he' ? t.nameHe : t.name;
-  const townDesc = lang === 'he' ? t.descHe : t.desc;
 
   document.getElementById('town-name').textContent = townName;
-  document.getElementById('town-desc').textContent = townDesc;
   document.querySelector('#mobile-topbar-town .mob-town-text').textContent = townName;
   adjustMobileTownFontSize(townName);
 
@@ -6029,7 +6016,6 @@ async function showLearningResults() {
   menuBtn.textContent = lang === 'he' ? 'תפריט ←' : '← Menu';
 
   document.getElementById('town-name').textContent = '';
-  document.getElementById('town-desc').textContent = '';
 
   document.getElementById('learning-results-panel').classList.add('show');
   document.getElementById('learning-hud').classList.remove('active');
@@ -6204,7 +6190,6 @@ function startDailyChallenge() {
   const previewName = isHe ? _dcPreloadTown.nameHe : _dcPreloadTown.name;
   document.getElementById('town-name').textContent = previewName;
   document.getElementById('town-name').classList.add('blurred-location');
-  document.getElementById('town-desc').textContent = '';
   const mobEl = document.querySelector('#mobile-topbar-town .mob-town-text');
   mobEl.textContent = previewName;
   mobEl.classList.add('blurred-location');
@@ -6312,7 +6297,6 @@ function startDailyChallengeGame() {
   const previewTownName = lang === 'he' ? town.nameHe : town.name;
   document.getElementById('town-name').textContent = previewTownName;
   document.getElementById('town-name').classList.add('blurred-location');
-  document.getElementById('town-desc').textContent = '';
   const mobPreviewEl = document.querySelector('#mobile-topbar-town .mob-town-text');
   mobPreviewEl.textContent = previewTownName;
   mobPreviewEl.classList.add('blurred-location');
@@ -6374,10 +6358,8 @@ function endDailyChallengePreview(town) {
 
   // Reveal the location name by removing the blur (step 3d)
   const townName = lang === 'he' ? town.nameHe : town.name;
-  const townDesc = lang === 'he' ? town.descHe : town.desc;
   document.getElementById('town-name').textContent = townName;
   document.getElementById('town-name').classList.remove('blurred-location');
-  document.getElementById('town-desc').textContent = townDesc;
   const mobRevealEl = document.querySelector('#mobile-topbar-town .mob-town-text');
   mobRevealEl.textContent = townName;
   mobRevealEl.classList.remove('blurred-location');
