@@ -7164,12 +7164,18 @@ async function saveScore(scoreData) {
     const current  = userData.highest_score || 0;
     const isNewRecord = scoreData.score > current;
     const oldLevel = getPlayerLevel();
+    const prevCumulative = cumulativePoints;
     cumulativePoints += scoreData.score;
     const newLevel = getPlayerLevel();
     const isLevelUp = newLevel > oldLevel;
     const updates = { level: newLevel, cumulativePoints, locationFamiliarity };
     if (isNewRecord) updates.highest_score = scoreData.score;
-    await setDoc(userRef, updates, { merge: true });
+    try {
+      await setDoc(userRef, updates, { merge: true });
+    } catch (saveErr) {
+      cumulativePoints = prevCumulative; // rollback on save failure
+      throw saveErr;
+    }
 
     return { ok: true, isNewRecord, isLevelUp, newLevel: isLevelUp ? newLevel : null };
   } catch (e) { console.error('Save score failed:', e); return { ok: false, isNewRecord: false }; }
