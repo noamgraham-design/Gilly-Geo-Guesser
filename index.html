@@ -7295,12 +7295,14 @@ function renderPlayerRow(p, globalRank) {
 
   const lvl = PLAYER_LEVEL_NAMES[p.level] || PLAYER_LEVEL_NAMES[1];
   const lvlText = lang === 'he' ? lvl.he : lvl.en;
+  const SB_LEVEL_EMOJIS = { 1: '🗺️', 2: '🦊', 3: '🛰️', 4: '👑', 5: '🧔' };
+  const lvlEmoji = SB_LEVEL_EMOJIS[p.level] || '🗺️';
   return `
     <div class="sb-row ${p.isMe ? 'sb-me' : ''}">
       ${rankHtml}
       <span class="sb-name">
         <span class="sb-name-text">${p.isMe ? `<strong>${esc(p.name)}</strong>` : esc(p.name)}</span>
-        <span class="sb-level-badge">${lvlText}</span>
+        <span class="sb-level-badge">${lvlEmoji} ${lvlText}</span>
       </span>
       <span class="sb-score">${p.score}</span>
     </div>`;
@@ -7611,7 +7613,9 @@ async function loadScoreboard(myScore) {
     // Player's current level
     const myLevel = myIdx !== -1 ? players[myIdx].level : getPlayerLevel();
     const myLvl   = PLAYER_LEVEL_NAMES[myLevel] || PLAYER_LEVEL_NAMES[1];
-    const myLvlText = lang === 'he' ? myLvl.he : myLvl.en;
+    const SB_MY_EMOJIS = { 1: '🗺️', 2: '🦊', 3: '🛰️', 4: '👑', 5: '🧔' };
+    const myLvlEmoji = SB_MY_EMOJIS[myLevel] || '🗺️';
+    const myLvlText = (myLvlEmoji + ' ') + (lang === 'he' ? myLvl.he : myLvl.en);
 
     // Player's nickname
     const myName = myNickname || window._userNickname || (lang === 'he' ? 'שחקן אנונימי' : 'Anonymous');
@@ -7697,11 +7701,8 @@ function showQuizProgress(pendingScore) {
     fillEl.style.width = '0%';
     requestAnimationFrame(() => { requestAnimationFrame(() => { fillEl.style.width = pct + '%'; }); });
 
-    const qpEmoji = document.getElementById('qp-emoji');
-    if (lvl >= 5) { qpEmoji.textContent = '🧔'; }
-    else if (pct >= 80) { qpEmoji.textContent = '🏆'; }
-    else if (pct >= 30) { qpEmoji.textContent = '🗺️'; }
-    else { qpEmoji.innerHTML = '<svg class="qp-cool-pin" viewBox="0 0 40 52" width="52" height="64" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="qpPinG2" cx="38%" cy="30%" r="65%"><stop offset="0%" stop-color="#ff8080"/><stop offset="60%" stop-color="#e53935"/><stop offset="100%" stop-color="#b71c1c"/></radialGradient></defs><path d="M20 1C9.5 1 1 9.5 1 20c0 14.5 19 38 19 38s19-23.5 19-38C39 9.5 30.5 1 20 1z" fill="url(#qpPinG2)"/><circle cx="20" cy="20" r="7.5" fill="white" opacity="0.9"/></svg>'; }
+    const qpLevelEmojis = { 1: '🗺️', 2: '🦊', 3: '🛰️', 4: '👑', 5: '🧔' };
+    document.getElementById('qp-emoji').textContent = qpLevelEmojis[lvl] || '🗺️';
 
     // Show points progress instead of known places table
     const ptsDisplay = lvl >= 5
