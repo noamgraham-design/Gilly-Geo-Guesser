@@ -2023,6 +2023,11 @@
     display: block;
   }
 
+  /* DESKTOP – hide quiz title in topbar during post-game results panel */
+  @media (min-width: 769px) {
+    body.postgame #topbar h1 { display: none !important; }
+  }
+
   /* DESKTOP – enlarge menu card & contents */
   @media (min-width: 769px) {
     #overlay-scroll-area {
@@ -5759,6 +5764,7 @@ function showMenu() {
   // Clear any formations that accumulated while the menu was hidden
   document.querySelectorAll('#planes-layer .formation').forEach(f => f.remove());
   document.getElementById('results-panel').className = '';
+  document.body.classList.remove('postgame');
   document.getElementById('scoreboard-panel').className = '';
   document.getElementById('quiz-progress-popup').classList.remove('show');
   document.getElementById('btn-back').style.display = 'none';
@@ -6280,6 +6286,7 @@ function startDailyChallengeGame() {
   // Hide overlay and results panels
   document.getElementById('overlay').style.display = 'none';
   document.getElementById('results-panel').className = '';
+  document.body.classList.remove('postgame');
   document.getElementById('scoreboard-panel').className = '';
   document.getElementById('btn-back').style.display = 'inline-block';
 
@@ -6425,6 +6432,7 @@ async function startLearning() {
 
   document.getElementById('overlay').style.display = 'none';
   document.getElementById('results-panel').className = '';
+  document.body.classList.remove('postgame');
   document.getElementById('learning-results-panel').className = '';
   document.getElementById('scoreboard-panel').className = '';
   document.getElementById('btn-back').style.display = 'inline-block';
@@ -6490,6 +6498,7 @@ async function startGame() {
   }
   document.getElementById('overlay').style.display = 'none';
   document.getElementById('results-panel').className = '';
+  document.body.classList.remove('postgame');
   document.getElementById('scoreboard-panel').className = '';
   document.getElementById('btn-back').style.display = 'inline-block';
   const v = REGION_VIEWS[region];
@@ -6670,6 +6679,7 @@ function showResults() {
   document.getElementById('overlay').style.display = 'none';
   document.getElementById('results-card').dir = lang === 'he' ? 'rtl' : 'ltr';
   document.getElementById('results-panel').className = 'show';
+  document.body.classList.add('postgame');
   // Switch to street view so player can review mistakes with labels
   if (currentLayer === 'satellite') {
     toggleMapLayer(true); // suppress banner - this is for review, not cheating
@@ -8012,6 +8022,7 @@ function startChallengeGame() {
 
   if (currentLayer === 'street') toggleMapLayer(true);
   document.getElementById('results-panel').className = '';
+  document.body.classList.remove('postgame');
   document.getElementById('scoreboard-panel').className = '';
 
   const v = REGION_VIEWS['all'];
