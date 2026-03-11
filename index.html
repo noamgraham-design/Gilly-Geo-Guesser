@@ -3987,11 +3987,15 @@ const LEARNING_TIER_NAMES = {
 };
 
 const PLAYER_LEVEL_NAMES = {
-  1: { en: 'Waze Dependent',    he: 'תלוי בווייז'   },
-  2: { en: 'Periphery Fox',     he: 'שועל פריפריה'  },
-  3: { en: 'Satellite Brain',   he: 'מוח לווייני'   },
-  4: { en: 'King of the Trails', he: 'מלך השבילים'  },
+  1: { en: 'Waze Dependent',     he: 'תלוי בווייז'   },
+  2: { en: 'Periphery Fox',      he: 'שועל פריפריה'  },
+  3: { en: 'Satellite Brain',    he: 'מוח לווייני'   },
+  4: { en: 'King of the Trails', he: 'מלך השבילים'   },
+  5: { en: 'Legend of the Land',  he: 'אגדת הארץ'    },
 };
+
+// Cumulative points required for each level (index = level number)
+const LEVEL_POINTS = [0, 0, 3000, 10000, 30000, 100000];
 
 // Time bonus: up to +30 pts, decays to 0 over TIME_BONUS_SECS seconds
 const TIME_BONUS_MAX  = 30;
@@ -4443,6 +4447,7 @@ let lang = "he";
 let difficulty = "easy", region = "all", sequence = [], currentIdx = 0, score = 0, roundCount = 8;
 let streak = 0, hintUsed = false, streetUsedThisRound = false, results = [], waiting = false;
 let locationFamiliarity = {}; // { [townName]: 0 | 1 | 2 } — 0=unfamiliar, 1=partly, 2=familiar
+let cumulativePoints = 0;    // total points earned across all regular quiz games (for leveling)
 let correctMarkers = [], clickMarker = null, circle = null, hintCircle = null, guessLine = null;
 
 // ── Challenge mode state ──────────────────────────────────────────────────────
@@ -5850,6 +5855,13 @@ function getFamiliarityLevel() {
   return null; // all tiers complete
 }
 
+function getPlayerLevel() {
+  for (let lvl = 5; lvl >= 2; lvl--) {
+    if (cumulativePoints >= LEVEL_POINTS[lvl]) return lvl;
+  }
+  return 1;
+}
+
 
 function clearLearningPins() {
   learningPins.forEach(p => map.removeLayer(p));
@@ -6121,7 +6133,7 @@ function showLevelUpPopup(newTier) {
     window._levelUpShareTier = null;
   } else {
     const levelName = PLAYER_LEVEL_NAMES[newTier];
-    const levelEmojis = { 2: '🦊🏘️', 3: '🛰️🧠', 4: '🗺️👑' };
+    const levelEmojis = { 2: '🦊🏘️', 3: '🛰️🧠', 4: '🗺️👑', 5: '🧔🦯' };
     titleEl.textContent = lang === 'he' ? 'עלית רמה!' : 'Level Up!';
     document.querySelector('.lr-levelup-icon').textContent = levelEmojis[newTier] || '🚀';
     levelEl.textContent = lang === 'he'
@@ -6162,7 +6174,7 @@ function closeLevelUpPopup() {
 
 function shareLevelUpWhatsApp() {
   const level = window._levelUpShareTier;
-  if (!level || level < 2 || level > 4) return;
+  if (!level || level < 2 || level > 5) return;
   const url = window.location.origin + window.location.pathname;
   const messages = {
     2: {
@@ -6176,6 +6188,10 @@ function shareLevelUpWhatsApp() {
     4: {
       he: '\u200F🚀 עליתי לרמה 4 בחידון ישראל של גילי!\n\u200Fאני עכשיו: מלך השבילים 🗺️👑\n\u200Fבואו לשחק: ' + url,
       en: '🚀 I leveled up to Level 4 on Gilly\'s Israel Quiz!\nI\'m now: King of the Trails 🗺️👑\nPlay now: ' + url
+    },
+    5: {
+      he: '\u200F🚀 עליתי לרמה 5 בחידון ישראל של גילי!\n\u200Fאני עכשיו: אגדת הארץ 🧔🦯\n\u200Fבואו לשחק: ' + url,
+      en: '🚀 I leveled up to Level 5 on Gilly\'s Israel Quiz!\nI\'m now: Legend of the Land 🧔🦯\nPlay now: ' + url
     }
   };
   const msg = messages[level];
@@ -6845,11 +6861,27 @@ window._onAuthChange = function(user) {
           } else {
             window._userNickname = data.nickname;
           }
+          // Load cumulative points (or migrate from familiarity-based level)
+          if (data.locationFamiliarity) {
+            locationFamiliarity = { ...data.locationFamiliarity };
+          }
+          if (typeof data.cumulativePoints === 'number') {
+            cumulativePoints = data.cumulativePoints;
+          } else {
+            // Migrate existing player: interpolate from familiarity level
+            const oldLvl = getFamiliarityLevel() ?? 4;
+            const tierTowns = TOWNS.filter(t => t.tier === oldLvl);
+            const knownInTier = tierTowns.filter(t => (locationFamiliarity[t.name] ?? 0) >= 2).length;
+            const tierProgress = tierTowns.length > 0 ? knownInTier / tierTowns.length : 0;
+            const basePts = LEVEL_POINTS[oldLvl] || 0;
+            const nextPts = LEVEL_POINTS[Math.min(oldLvl + 1, 5)] || basePts;
+            cumulativePoints = Math.round(basePts + tierProgress * (nextPts - basePts));
+            await setDoc(doc(window._fbDb, 'users', user.uid), { cumulativePoints, level: getPlayerLevel() }, { merge: true });
+          }
           // Set default difficulty based on player level (only when on the menu)
           const onMenu = document.getElementById('menu-card')?.style.display !== 'none';
-          if (data.locationFamiliarity && onMenu) {
-            locationFamiliarity = { ...data.locationFamiliarity };
-            const lvl = getFamiliarityLevel() ?? 4;
+          if (onMenu) {
+            const lvl = getPlayerLevel();
             const defaultDiff = lvl <= 1 ? 'easy' : lvl === 2 ? 'medium' : 'hard';
             setDiff(defaultDiff);
           }
@@ -6857,7 +6889,8 @@ window._onAuthChange = function(user) {
           // New user with no doc yet — create one with a default nickname
           const defaultNick = generateRandomNickname();
           window._userNickname = defaultNick;
-          await setDoc(doc(window._fbDb, 'users', user.uid), { nickname: defaultNick }, { merge: true });
+          cumulativePoints = 0;
+          await setDoc(doc(window._fbDb, 'users', user.uid), { nickname: defaultNick, cumulativePoints: 0, level: 1 }, { merge: true });
           // New user starts at level 1 → default to easy
           const onMenu2 = document.getElementById('menu-card')?.style.display !== 'none';
           if (onMenu2) setDiff('easy');
@@ -6867,6 +6900,7 @@ window._onAuthChange = function(user) {
   } else {
     avatar.innerHTML = ''; avatar.textContent = '👤';
     label.textContent = lang === 'he' ? 'התחברות' : 'Log in';
+    cumulativePoints = 0;
     closeAuthDropdown();
   }
 };
@@ -7122,23 +7156,28 @@ async function saveScore(scoreData) {
       timestamp:   serverTimestamp(),
     });
 
-    // Update highest_score in users doc if this score beats it
+    // Update highest_score and cumulative points in users doc
     const { getDoc, setDoc, doc } = window._fbFns;
     const userRef  = doc(window._fbDb, 'users', window._fbUser.uid);
     const userSnap = await getDoc(userRef);
     const userData = userSnap.exists() ? userSnap.data() : {};
     const current  = userData.highest_score || 0;
     const isNewRecord = scoreData.score > current;
-    const oldLevel = userData.level || getFamiliarityLevel() || 4;
-    const tier = getFamiliarityLevel() || 4;
-    const isLevelUp = tier > oldLevel;
-    if (isNewRecord) {
-      await setDoc(userRef, { highest_score: scoreData.score, level: tier, locationFamiliarity }, { merge: true });
-    } else {
-      await setDoc(userRef, { level: tier, locationFamiliarity }, { merge: true });
+    const oldLevel = getPlayerLevel();
+    const prevCumulative = cumulativePoints;
+    cumulativePoints += scoreData.score;
+    const newLevel = getPlayerLevel();
+    const isLevelUp = newLevel > oldLevel;
+    const updates = { level: newLevel, cumulativePoints, locationFamiliarity };
+    if (isNewRecord) updates.highest_score = scoreData.score;
+    try {
+      await setDoc(userRef, updates, { merge: true });
+    } catch (saveErr) {
+      cumulativePoints = prevCumulative; // rollback on save failure
+      throw saveErr;
     }
 
-    return { ok: true, isNewRecord, isLevelUp, newLevel: isLevelUp ? tier : null };
+    return { ok: true, isNewRecord, isLevelUp, newLevel: isLevelUp ? newLevel : null };
   } catch (e) { console.error('Save score failed:', e); return { ok: false, isNewRecord: false }; }
 }
 
@@ -7562,7 +7601,7 @@ async function loadScoreboard(myScore) {
     const topPct           = showTopPct ? Math.max(1, Math.ceil((currentScoreRank / totalForRank) * 100)) : null;
 
     // Player's current level
-    const myLevel = myIdx !== -1 ? players[myIdx].level : (getFamiliarityLevel() || 4);
+    const myLevel = myIdx !== -1 ? players[myIdx].level : getPlayerLevel();
     const myLvl   = PLAYER_LEVEL_NAMES[myLevel] || PLAYER_LEVEL_NAMES[1];
     const myLvlText = lang === 'he' ? myLvl.he : myLvl.en;
 
@@ -7634,47 +7673,33 @@ function showQuizProgress(pendingScore) {
     const nick = window._userNickname || document.getElementById('settings-nickname').value.trim() || generateRandomNickname();
     document.getElementById('qp-nickname').textContent = nick;
 
-    const lvl      = getFamiliarityLevel() ?? 4;
+    const lvl      = getPlayerLevel();
     const lvlNames = PLAYER_LEVEL_NAMES[lvl];
     document.getElementById('qp-level-title').innerHTML = isHe
       ? `<span class="qp-level-word">רמה</span><span class="qp-level-num">${lvl}</span>`
       : `<span class="qp-level-word">LEVEL</span><span class="qp-level-num">${lvl}</span>`;
     document.getElementById('qp-level-name').textContent  = lvlNames ? (isHe ? lvlNames.he : lvlNames.en) : '';
 
-    const allInTier    = TOWNS.filter(t => t.tier === lvl);
-    const totalCount   = allInTier.length;
-    const progressPts  = allInTier.reduce((sum, t) => sum + (locationFamiliarity[t.name] ?? 0) / 2, 0);
-    const pct          = totalCount > 0 ? Math.round(progressPts / totalCount * 100) : 0;
+    const currentThreshold = LEVEL_POINTS[lvl] || 0;
+    const nextThreshold    = LEVEL_POINTS[Math.min(lvl + 1, 5)] || currentThreshold;
+    const range            = nextThreshold - currentThreshold;
+    const pct              = lvl >= 5 ? 100 : (range > 0 ? Math.min(100, Math.round((cumulativePoints - currentThreshold) / range * 100)) : 100);
 
     const fillEl = document.getElementById('qp-progress-fill');
     fillEl.style.width = '0%';
     requestAnimationFrame(() => { requestAnimationFrame(() => { fillEl.style.width = pct + '%'; }); });
 
     const qpEmoji = document.getElementById('qp-emoji');
-    if (pct >= 80) { qpEmoji.textContent = '🏆'; }
+    if (lvl >= 5) { qpEmoji.textContent = '🧔'; }
+    else if (pct >= 80) { qpEmoji.textContent = '🏆'; }
     else if (pct >= 30) { qpEmoji.textContent = '🗺️'; }
     else { qpEmoji.innerHTML = '<svg class="qp-cool-pin" viewBox="0 0 40 52" width="52" height="64" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="qpPinG2" cx="38%" cy="30%" r="65%"><stop offset="0%" stop-color="#ff8080"/><stop offset="60%" stop-color="#e53935"/><stop offset="100%" stop-color="#b71c1c"/></radialGradient></defs><path d="M20 1C9.5 1 1 9.5 1 20c0 14.5 19 38 19 38s19-23.5 19-38C39 9.5 30.5 1 20 1z" fill="url(#qpPinG2)"/><circle cx="20" cy="20" r="7.5" fill="white" opacity="0.9"/></svg>'; }
 
-    const REGION_LABELS = {
-      en: { North: 'North', Center: 'Center', South: 'South', Jerusalem: 'Center', 'West Bank': 'Center' },
-      he: { North: 'צפון', Center: 'מרכז', South: 'דרום', Jerusalem: 'מרכז', 'West Bank': 'מרכז' },
-    };
-    const regionMap = REGION_LABELS[isHe ? 'he' : 'en'];
-    document.getElementById('qp-list').innerHTML = allInTier.map(t => {
-      const name        = isHe ? (t.nameHe || t.name) : t.name;
-      const fam         = locationFamiliarity[t.name] ?? 0;
-      const d1          = fam >= 1 ? (fam === 1 ? 'dot-yellow' : 'dot-green') : '';
-      const d2          = fam >= 2 ? 'dot-green' : '';
-      const regionLabel = regionMap[t.region] || t.region || '';
-      return `<div class="qp-row">
-        <span class="qp-town-name">${name}</span>
-        <span class="qp-region">${regionLabel}</span>
-        <span class="qp-fam-dots">
-          <span class="qp-fam-dot ${d1}"></span>
-          <span class="qp-fam-dot ${d2}"></span>
-        </span>
-      </div>`;
-    }).join('');
+    // Show points progress instead of known places table
+    const ptsDisplay = lvl >= 5
+      ? (isHe ? `${cumulativePoints.toLocaleString()} נקודות` : `${cumulativePoints.toLocaleString()} pts`)
+      : (isHe ? `${cumulativePoints.toLocaleString()} / ${nextThreshold.toLocaleString()}` : `${cumulativePoints.toLocaleString()} / ${nextThreshold.toLocaleString()}`);
+    document.getElementById('qp-list').innerHTML = `<div style="text-align:center;padding:12px 0;font-size:0.95rem;color:var(--muted)">${ptsDisplay}</div>`;
 
     // Recommended difficulty tip
     const recDiff = lvl === 1 ? 'easy' : lvl === 2 ? 'medium' : 'hard';
