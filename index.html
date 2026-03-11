@@ -6162,7 +6162,7 @@ function shareLevelUpWhatsApp() {
     }
   };
   const msg = messages[level];
-  const text = msg.he + '\n\n' + msg.en;
+  const text = lang === 'he' ? msg.he : msg.en;
   window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
   if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
     window._logEvent('levelup_share_wa', { level: level });
