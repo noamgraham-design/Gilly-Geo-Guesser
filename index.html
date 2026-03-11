@@ -2987,9 +2987,12 @@
     100% { opacity: 1; transform: scale(1) rotate(0deg); }
   }
   .lr-levelup-icon {
-    font-size: 4rem;
+    font-size: 3.5rem;
     margin-bottom: 8px;
     animation: lrLevelIconBounce 1s ease infinite;
+    white-space: nowrap;
+    line-height: 1.2;
+    max-width: 100%;
   }
   @keyframes lrLevelIconBounce {
     0%, 100% { transform: translateY(0) scale(1); }
@@ -6101,8 +6104,9 @@ function showLevelUpPopup(newTier) {
     window._levelUpShareTier = null;
   } else {
     const levelName = PLAYER_LEVEL_NAMES[newTier];
+    const levelEmojis = { 2: '🦊🏘️', 3: '🛰️🧠', 4: '🗺️👑' };
     titleEl.textContent = lang === 'he' ? 'עלית רמה!' : 'Level Up!';
-    document.querySelector('.lr-levelup-icon').textContent = '🚀';
+    document.querySelector('.lr-levelup-icon').textContent = levelEmojis[newTier] || '🚀';
     levelEl.textContent = lang === 'he'
       ? `רמה ${newTier}` : `Level ${newTier}`;
     nameEl.textContent = lang === 'he'
