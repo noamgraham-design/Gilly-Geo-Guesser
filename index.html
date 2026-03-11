@@ -6868,14 +6868,22 @@ window._onAuthChange = function(user) {
           if (typeof data.cumulativePoints === 'number') {
             cumulativePoints = data.cumulativePoints;
           } else {
-            // Migrate existing player: interpolate from familiarity level
-            const oldLvl = getFamiliarityLevel() ?? 4;
-            const tierTowns = TOWNS.filter(t => t.tier === oldLvl);
-            const knownInTier = tierTowns.filter(t => (locationFamiliarity[t.name] ?? 0) >= 2).length;
-            const tierProgress = tierTowns.length > 0 ? knownInTier / tierTowns.length : 0;
-            const basePts = LEVEL_POINTS[oldLvl] || 0;
-            const nextPts = LEVEL_POINTS[Math.min(oldLvl + 1, 5)] || basePts;
-            cumulativePoints = Math.round(basePts + tierProgress * (nextPts - basePts));
+            // Migrate existing player: sum weighted familiarity across all tiers
+            // Familiarity 1 (partly) = 0.5 credit, familiarity 2 (full) = 1.0 credit
+            let migrationPts = 0;
+            for (let tier = 1; tier <= 4; tier++) {
+              const tierTowns = TOWNS.filter(t => t.tier === tier);
+              if (tierTowns.length === 0) continue;
+              const tierCredit = tierTowns.reduce((sum, t) => {
+                const fam = locationFamiliarity[t.name] ?? 0;
+                return sum + (fam >= 2 ? 1 : fam === 1 ? 0.5 : 0);
+              }, 0);
+              const tierProgress = tierCredit / tierTowns.length;
+              const basePts = LEVEL_POINTS[tier] || 0;
+              const nextPts = LEVEL_POINTS[Math.min(tier + 1, 5)] || basePts;
+              migrationPts += tierProgress * (nextPts - basePts);
+            }
+            cumulativePoints = Math.round(migrationPts);
             await setDoc(doc(window._fbDb, 'users', user.uid), { cumulativePoints, level: getPlayerLevel() }, { merge: true });
           }
           // Set default difficulty based on player level (only when on the menu)
