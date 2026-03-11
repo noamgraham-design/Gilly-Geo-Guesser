@@ -7295,12 +7295,14 @@ function renderPlayerRow(p, globalRank) {
 
   const lvl = PLAYER_LEVEL_NAMES[p.level] || PLAYER_LEVEL_NAMES[1];
   const lvlText = lang === 'he' ? lvl.he : lvl.en;
+  const SB_LEVEL_EMOJIS = { 1: '🗺️', 2: '🦊', 3: '🛰️', 4: '👑', 5: '🧔' };
+  const lvlEmoji = SB_LEVEL_EMOJIS[p.level] || '🗺️';
   return `
     <div class="sb-row ${p.isMe ? 'sb-me' : ''}">
       ${rankHtml}
       <span class="sb-name">
         <span class="sb-name-text">${p.isMe ? `<strong>${esc(p.name)}</strong>` : esc(p.name)}</span>
-        <span class="sb-level-badge">${lvlText}</span>
+        <span class="sb-level-badge">${lvlEmoji} ${lvlText}</span>
       </span>
       <span class="sb-score">${p.score}</span>
     </div>`;
@@ -7611,7 +7613,9 @@ async function loadScoreboard(myScore) {
     // Player's current level
     const myLevel = myIdx !== -1 ? players[myIdx].level : getPlayerLevel();
     const myLvl   = PLAYER_LEVEL_NAMES[myLevel] || PLAYER_LEVEL_NAMES[1];
-    const myLvlText = lang === 'he' ? myLvl.he : myLvl.en;
+    const SB_MY_EMOJIS = { 1: '🗺️', 2: '🦊', 3: '🛰️', 4: '👑', 5: '🧔' };
+    const myLvlEmoji = SB_MY_EMOJIS[myLevel] || '🗺️';
+    const myLvlText = (myLvlEmoji + ' ') + (lang === 'he' ? myLvl.he : myLvl.en);
 
     // Player's nickname
     const myName = myNickname || window._userNickname || (lang === 'he' ? 'שחקן אנונימי' : 'Anonymous');
