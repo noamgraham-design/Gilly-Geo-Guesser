@@ -6726,7 +6726,7 @@ function onMapClick(e) {
   // Track locationFamiliarity for quiz mode (not daily/challenge)
   if (!isDailyChallenge && !isLearningMode) {
     const nearPerfect = perfect || (pts / DIFF[difficulty].maxPts >= 0.9);
-    if (nearPerfect && town.tier === (getFamiliarityLevel() ?? 4)) {
+    if (nearPerfect) {
       const cur = locationFamiliarity[town.name] ?? 0;
       if (cur < 2) {
         locationFamiliarity[town.name] = cur + 1;
