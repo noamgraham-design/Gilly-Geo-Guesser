@@ -6177,7 +6177,7 @@ function showLevelUpPopup(newTier) {
     window._levelUpShareTier = null;
   } else {
     const levelName = PLAYER_LEVEL_NAMES[newTier];
-    const levelEmojiPairs = { 2: ['🦊','🏘️'], 3: ['🛰️','🧠'], 4: ['🗺️','👑'], 5: ['🧔','🦯'] };
+    const levelEmojiPairs = { 2: ['🦊','🏘️'], 3: ['🛰️','🧠'], 4: ['🥾','👑'], 5: ['🧔','🦯'] };
     const pair = levelEmojiPairs[newTier] || ['🚀','🚀'];
     titleEl.textContent = lang === 'he' ? 'עלית רמה!' : 'Level Up!';
     setEmojis(pair[0], pair[1]);
@@ -6230,8 +6230,8 @@ function shareLevelUpWhatsApp() {
       en: '🚀 I leveled up to Level 3 on Gilly\'s Israel Quiz!\nI\'m now: Satellite Brain 🛰️🧠\nPlay now: ' + url
     },
     4: {
-      he: '\u200F🚀 עליתי לרמה 4 בחידון ישראל של גילי!\n\u200Fאני עכשיו: מלך השבילים 🗺️👑\n\u200Fבואו לשחק: ' + url,
-      en: '🚀 I leveled up to Level 4 on Gilly\'s Israel Quiz!\nI\'m now: King of the Trails 🗺️👑\nPlay now: ' + url
+      he: '\u200F🚀 עליתי לרמה 4 בחידון ישראל של גילי!\n\u200Fאני עכשיו: מלך השבילים 🥾👑\n\u200Fבואו לשחק: ' + url,
+      en: '🚀 I leveled up to Level 4 on Gilly\'s Israel Quiz!\nI\'m now: King of the Trails 🥾👑\nPlay now: ' + url
     },
     5: {
       he: '\u200F🚀 עליתי לרמה 5 בחידון ישראל של גילי!\n\u200Fאני עכשיו: אגדת הארץ 🧔🦯\n\u200Fבואו לשחק: ' + url,
@@ -7339,7 +7339,7 @@ function renderPlayerRow(p, globalRank) {
 
   const lvl = PLAYER_LEVEL_NAMES[p.level] || PLAYER_LEVEL_NAMES[1];
   const lvlText = lang === 'he' ? lvl.he : lvl.en;
-  const SB_LEVEL_EMOJIS = { 1: '🚗🗺️', 2: '🦊🏘️', 3: '🛰️🧠', 4: '🗺️👑', 5: '🧔🦯' };
+  const SB_LEVEL_EMOJIS = { 1: '🚗🗺️', 2: '🦊🏘️', 3: '🛰️🧠', 4: '🥾👑', 5: '🧔🦯' };
   const lvlEmoji = SB_LEVEL_EMOJIS[p.level] || '🚗🗺️';
   return `
     <div class="sb-row ${p.isMe ? 'sb-me' : ''}">
@@ -7657,7 +7657,7 @@ async function loadScoreboard(myScore) {
     // Player's current level
     const myLevel = myIdx !== -1 ? players[myIdx].level : getPlayerLevel();
     const myLvl   = PLAYER_LEVEL_NAMES[myLevel] || PLAYER_LEVEL_NAMES[1];
-    const SB_MY_EMOJIS = { 1: '🚗🗺️', 2: '🦊🏘️', 3: '🛰️🧠', 4: '🗺️👑', 5: '🧔🦯' };
+    const SB_MY_EMOJIS = { 1: '🚗🗺️', 2: '🦊🏘️', 3: '🛰️🧠', 4: '🥾👑', 5: '🧔🦯' };
     const myLvlEmoji = SB_MY_EMOJIS[myLevel] || '🚗🗺️';
     const myLvlText = (myLvlEmoji + ' ') + (lang === 'he' ? myLvl.he : myLvl.en);
 
@@ -7745,7 +7745,7 @@ function showQuizProgress(pendingScore) {
     fillEl.style.width = '0%';
     requestAnimationFrame(() => { requestAnimationFrame(() => { fillEl.style.width = pct + '%'; }); });
 
-    const qpLevelEmojis = { 1: '🗺️', 2: '🦊', 3: '🛰️', 4: '👑', 5: '🧔' };
+    const qpLevelEmojis = { 1: '🗺️', 2: '🦊', 3: '🛰️', 4: '🥾', 5: '🧔' };
     document.getElementById('qp-emoji').textContent = qpLevelEmojis[lvl] || '🗺️';
 
     // Show points progress instead of known places table
