@@ -6156,15 +6156,10 @@ function showLevelUpPopup(newTier) {
   const emojiLeft = document.getElementById('lr-emoji-left');
   const emojiRight = document.getElementById('lr-emoji-right');
 
-  // Helper: reset animations so they replay on each popup open
+  // Helper: set emoji content (animation restart happens after overlay is shown)
   function setEmojis(left, right) {
     emojiLeft.textContent = left;
     emojiRight.textContent = right;
-    emojiLeft.style.animation = 'none';
-    emojiRight.style.animation = 'none';
-    void emojiLeft.offsetWidth; // force reflow
-    emojiLeft.style.animation = '';
-    emojiRight.style.animation = '';
   }
 
   if (isAllMastered) {
@@ -6210,6 +6205,15 @@ function showLevelUpPopup(newTier) {
   }
 
   overlay.classList.add('show');
+
+  // Restart emoji animations now that the overlay is visible (display:flex)
+  requestAnimationFrame(() => {
+    emojiLeft.style.animation = 'none';
+    emojiRight.style.animation = 'none';
+    void emojiLeft.offsetWidth; // force reflow
+    emojiLeft.style.animation = '';
+    emojiRight.style.animation = '';
+  });
 }
 
 function closeLevelUpPopup() {
