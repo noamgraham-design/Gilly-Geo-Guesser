@@ -3647,7 +3647,10 @@
     <div id="qp-accent-bar"></div>
     <!-- Logged-in view -->
     <div id="qp-auth">
-      <div id="qp-emoji" style="font-size:2.2rem;margin-bottom:2px">🗺️</div>
+      <div class="lr-levelup-icon-wrap" id="qp-emoji-wrap" style="margin-bottom:2px;min-height:3rem">
+        <span class="lr-levelup-emoji" id="qp-emoji-left" style="font-size:2.2rem">🗺️</span>
+        <span class="lr-levelup-emoji" id="qp-emoji-right" style="font-size:2.2rem">🗺️</span>
+      </div>
       <div id="qp-nickname" style="font-size:1rem;font-weight:800;text-align:center;letter-spacing:0.3px;color:var(--text);margin-bottom:2px"></div>
       <div id="qp-level-section">
         <div id="qp-level-title"></div>
@@ -7753,8 +7756,17 @@ function showQuizProgress(pendingScore) {
     fillEl.style.width = '0%';
     requestAnimationFrame(() => { requestAnimationFrame(() => { fillEl.style.width = pct + '%'; }); });
 
-    const qpLevelEmojis = { 1: '🗺️', 2: '🦊', 3: '🛰️', 4: '🥾', 5: '🧔' };
-    document.getElementById('qp-emoji').textContent = qpLevelEmojis[lvl] || '🗺️';
+    const qpEmojiPairs = { 1: ['🚗','🗺️'], 2: ['🦊','🏘️'], 3: ['🛰️','🧠'], 4: ['🥾','👑'], 5: ['🧔','🦯'] };
+    const qpPair = qpEmojiPairs[lvl] || ['🚗','🗺️'];
+    const qpLeft = document.getElementById('qp-emoji-left');
+    const qpRight = document.getElementById('qp-emoji-right');
+    qpLeft.textContent = qpPair[0];
+    qpRight.textContent = qpPair[1];
+    // Reset animations
+    qpLeft.style.animation = 'none';
+    qpRight.style.animation = 'none';
+    qpLeft.classList.remove('lr-emoji-left');
+    qpRight.classList.remove('lr-emoji-right');
 
     // Show points progress instead of known places table
     const ptsDisplay = lvl >= 5
@@ -7793,6 +7805,18 @@ function showQuizProgress(pendingScore) {
   }
 
   document.getElementById('quiz-progress-popup').classList.add('show');
+
+  // Trigger emoji animations now that popup is visible
+  const qpL = document.getElementById('qp-emoji-left');
+  const qpR = document.getElementById('qp-emoji-right');
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      qpL.style.animation = '';
+      qpL.classList.add('lr-emoji-left');
+      qpR.style.animation = '';
+      qpR.classList.add('lr-emoji-right');
+    });
+  });
 }
 
 function closeQuizProgress() {
