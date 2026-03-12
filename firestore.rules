@@ -1,0 +1,83 @@
+// Hardened Firestore Security Rules for Gilly Geo Guesser
+//
+// MANUAL STEPS (Firebase Console):
+// 1. Enforce App Check on Firestore: Console > App Check > APIs > Cloud Firestore > Enforce
+//    Without enforcement, App Check is advisory only and requests without tokens still succeed.
+// 2. Set budget alerts: GCP Console > Billing > Budgets & Alerts (e.g. $5, $10, $25)
+// 3. Deploy these rules: firebase deploy --only firestore:rules
+//    Or paste directly into Firebase Console > Firestore > Rules
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider != 'anonymous';
+    }
+
+    // ── Scores collection (game history) ──
+    match /scores/{doc} {
+      allow read: if isSignedIn();
+
+      allow create: if isSignedIn()
+        && request.auth.uid == request.resource.data.uid
+        && request.resource.data.keys().hasOnly([
+             'uid', 'displayName', 'score', 'difficulty',
+             'region', 'rounds', 'hits', 'timestamp'
+           ])
+        && request.resource.data.score is int
+        && request.resource.data.score >= 0
+        && request.resource.data.score <= 10000;
+
+      // Scores are immutable — no updates allowed
+      allow update: if false;
+
+      allow delete: if isSignedIn()
+        && request.auth.uid == resource.data.uid;
+    }
+
+    // ── Users collection (profiles & highest scores) ──
+    match /users/{userId} {
+      allow read: if isSignedIn();
+
+      allow write: if isSignedIn()
+        && request.auth.uid == userId
+        && request.resource.data.keys().hasOnly([
+             'nickname', 'gender', 'language', 'updatedAt',
+             'highest_score', 'level', 'locationFamiliarity',
+             'emailUpdates'
+           ])
+        && (
+             !('nickname' in request.resource.data)
+             || (request.resource.data.nickname is string
+                 && request.resource.data.nickname.size() <= 30)
+           );
+    }
+
+    // ── Daily Scores collection (daily challenge) ──
+    match /daily_scores/{docId} {
+      allow read: if isSignedIn();
+
+      allow create: if isSignedIn()
+        && request.auth.uid == request.resource.data.uid
+        && request.resource.data.keys().hasOnly([
+             'uid', 'date', 'score', 'timestamp'
+           ])
+        && request.resource.data.score is int
+        && request.resource.data.score >= 0
+        && request.resource.data.score <= 10000;
+
+      // Daily scores are immutable — no updates allowed
+      allow update: if false;
+
+      allow delete: if isSignedIn()
+        && request.auth.uid == resource.data.uid;
+    }
+
+    // ── Deny everything else ──
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

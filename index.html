@@ -85,6 +85,15 @@
     deleteDoc, writeBatch, deleteUser
   };
 
+  // ── Client-side rate limiter (DDoS / abuse protection) ──
+  const _rateLimits = {};
+  function rateLimited(key, cooldownMs) {
+    const now = Date.now();
+    if (_rateLimits[key] && now - _rateLimits[key] < cooldownMs) return true;
+    _rateLimits[key] = now;
+    return false;
+  }
+
   onAuthStateChanged(auth, user => {
     window._fbUser = user || null;
     if (window._onAuthChange) window._onAuthChange(user);
@@ -7205,6 +7214,7 @@ async function deleteAccount() {
 // ── SAVE SCORE TO FIRESTORE ───────────────────────────────────────────────
 async function saveScore(scoreData) {
   if (!window._fbUser) return;
+  if (rateLimited('saveScore', 5000)) return { ok: false, isNewRecord: false };
   const { collection, addDoc, serverTimestamp } = window._fbFns;
   try {
     // Save the game record
@@ -7249,6 +7259,7 @@ async function loadHistory() {
   const section = document.getElementById('history-section');
   const list    = document.getElementById('history-list');
   if (!window._fbUser) { section.classList.remove('show'); return; }
+  if (rateLimited('loadHistory', 3000)) return;
 
   const { collection, query, where, orderBy, limit, getDocs } = window._fbFns;
   try {
@@ -7433,6 +7444,7 @@ function shareLeaderboardScore() {
 
 async function saveDailyScore(myScore) {
   if (!window._fbUser || window._fbUser.isAnonymous) return;
+  if (rateLimited('saveDailyScore', 10000)) return;
   const { collection, setDoc, getDoc, doc, serverTimestamp } = window._fbFns;
   const uid   = window._fbUser.uid;
   const today = _getDailyChallengeDay().dateStr; // Israel date, resets at 04:00 IST
@@ -7450,6 +7462,7 @@ async function saveDailyScore(myScore) {
 }
 
 async function showDailyPercentile(myScore) {
+  if (rateLimited('showDailyPercentile', 10000)) return;
   const popup      = document.getElementById('daily-percentile-popup');
   const scoreEl    = document.getElementById('dp-score');
   const ring       = document.getElementById('dp-ring-wrap');
@@ -7577,6 +7590,7 @@ async function showDailyPercentile(myScore) {
 }
 
 async function loadScoreboard(myScore) {
+  if (rateLimited('loadScoreboard', 5000)) return;
   if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
     window._logEvent('leaderboard_reached', {});
   }
