@@ -28,7 +28,7 @@ service cloud.firestore {
            ])
         && request.resource.data.score is int
         && request.resource.data.score >= 0
-        && request.resource.data.score <= 10000;
+        && request.resource.data.score <= 2000;
 
       // Scores are immutable — no updates allowed
       allow update: if false;
@@ -52,6 +52,12 @@ service cloud.firestore {
              !('nickname' in request.resource.data)
              || (request.resource.data.nickname is string
                  && request.resource.data.nickname.size() <= 30)
+           )
+        && (
+             !('highest_score' in request.resource.data)
+             || (request.resource.data.highest_score is int
+                 && request.resource.data.highest_score >= 0
+                 && request.resource.data.highest_score <= 2000)
            );
     }
 
@@ -66,7 +72,7 @@ service cloud.firestore {
            ])
         && request.resource.data.score is int
         && request.resource.data.score >= 0
-        && request.resource.data.score <= 10000;
+        && request.resource.data.score <= 2000;
 
       // Daily scores are immutable — no updates allowed
       allow update: if false;
