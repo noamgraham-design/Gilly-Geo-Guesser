@@ -2977,8 +2977,8 @@
     border-radius: 24px;
     padding: 32px 28px 28px;
     text-align: center;
-    max-width: 340px;
-    width: 90%;
+    max-width: 370px;
+    width: 92%;
     box-shadow: 0 8px 60px rgba(0,0,0,0.35);
     animation: lrLevelCardPop 0.6s cubic-bezier(.34,1.56,.64,1);
     overflow: hidden;
@@ -3003,18 +3003,44 @@
     60%  { opacity: 1; transform: scale(1.08) rotate(2deg); }
     100% { opacity: 1; transform: scale(1) rotate(0deg); }
   }
-  .lr-levelup-icon {
-    font-size: 3.5rem;
+  .lr-levelup-icon-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
     margin-bottom: 8px;
-    animation: lrLevelIconBounce 1s ease infinite;
-    white-space: nowrap;
-    line-height: 1.2;
-    max-width: 100%;
+    min-height: 4.5rem;
   }
-  @keyframes lrLevelIconBounce {
-    0%, 100% { transform: translateY(0) scale(1); }
-    30%      { transform: translateY(-14px) scale(1.2); }
-    50%      { transform: translateY(-6px) scale(1.05); }
+  .lr-levelup-emoji {
+    font-size: 3rem;
+    display: inline-block;
+    line-height: 1;
+  }
+  .lr-emoji-left {
+    animation: lrEmojiEnterLeft 0.6s cubic-bezier(.34,1.56,.64,1) both,
+               lrEmojiFloatLeft 2.5s ease-in-out 0.6s infinite;
+  }
+  .lr-emoji-right {
+    animation: lrEmojiEnterRight 0.6s cubic-bezier(.34,1.56,.64,1) 0.15s both,
+               lrEmojiFloatRight 2.5s ease-in-out 0.75s infinite;
+  }
+  @keyframes lrEmojiEnterLeft {
+    0%   { opacity: 0; transform: translateX(-40px) scale(0.3) rotate(-20deg); }
+    100% { opacity: 1; transform: translateX(0) scale(1) rotate(0deg); }
+  }
+  @keyframes lrEmojiEnterRight {
+    0%   { opacity: 0; transform: translateX(40px) scale(0.3) rotate(20deg); }
+    100% { opacity: 1; transform: translateX(0) scale(1) rotate(0deg); }
+  }
+  @keyframes lrEmojiFloatLeft {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    25%      { transform: translateY(-8px) rotate(-6deg); }
+    75%      { transform: translateY(4px) rotate(3deg); }
+  }
+  @keyframes lrEmojiFloatRight {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    25%      { transform: translateY(4px) rotate(6deg); }
+    75%      { transform: translateY(-8px) rotate(-3deg); }
   }
   .lr-levelup-title {
     font-family: 'Playfair Display', 'Alef', serif;
@@ -3054,10 +3080,11 @@
     50%      { transform: scale(1.1); filter: brightness(1.3); }
   }
   .lr-levelup-name {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     font-weight: 700;
     color: var(--text);
     margin-bottom: 4px;
+    white-space: nowrap;
   }
   .lr-levelup-stars {
     font-size: 1.4rem;
@@ -3726,7 +3753,10 @@
 <div id="lr-levelup-overlay">
   <div id="lr-levelup-card">
     <div class="lr-levelup-particles" id="lr-levelup-particles"></div>
-    <div class="lr-levelup-icon">🚀</div>
+    <div class="lr-levelup-icon-wrap">
+      <span class="lr-levelup-emoji lr-emoji-left" id="lr-emoji-left">🚀</span>
+      <span class="lr-levelup-emoji lr-emoji-right" id="lr-emoji-right">🚀</span>
+    </div>
     <div class="lr-levelup-title" id="lr-levelup-title">Level Up!</div>
     <div class="lr-levelup-nickname" id="lr-levelup-nickname"></div>
     <div class="lr-levelup-level" id="lr-levelup-level"></div>
@@ -6123,9 +6153,23 @@ function showLevelUpPopup(newTier) {
   const waBtn = document.getElementById('lr-levelup-wa');
   const waLabel = document.getElementById('lr-levelup-wa-label');
 
+  const emojiLeft = document.getElementById('lr-emoji-left');
+  const emojiRight = document.getElementById('lr-emoji-right');
+
+  // Helper: reset animations so they replay on each popup open
+  function setEmojis(left, right) {
+    emojiLeft.textContent = left;
+    emojiRight.textContent = right;
+    emojiLeft.style.animation = 'none';
+    emojiRight.style.animation = 'none';
+    void emojiLeft.offsetWidth; // force reflow
+    emojiLeft.style.animation = '';
+    emojiRight.style.animation = '';
+  }
+
   if (isAllMastered) {
     titleEl.textContent = lang === 'he' ? 'שלטת בהכל!' : 'All Mastered!';
-    document.querySelector('.lr-levelup-icon').textContent = '🏆';
+    setEmojis('🏆', '🏆');
     levelEl.textContent = lang === 'he' ? 'אלוף!' : 'Champion!';
     nameEl.textContent = '';
     closeEl.textContent = lang === 'he' ? '💪 יאללה!' : '💪 Let\'s Go!';
@@ -6133,13 +6177,13 @@ function showLevelUpPopup(newTier) {
     window._levelUpShareTier = null;
   } else {
     const levelName = PLAYER_LEVEL_NAMES[newTier];
-    const levelEmojis = { 2: '🦊🏘️', 3: '🛰️🧠', 4: '🗺️👑', 5: '🧔🦯' };
+    const levelEmojiPairs = { 2: ['🦊','🏘️'], 3: ['🛰️','🧠'], 4: ['🥾','👑'], 5: ['🧔','🦯'] };
+    const pair = levelEmojiPairs[newTier] || ['🚀','🚀'];
     titleEl.textContent = lang === 'he' ? 'עלית רמה!' : 'Level Up!';
-    document.querySelector('.lr-levelup-icon').textContent = levelEmojis[newTier] || '🚀';
+    setEmojis(pair[0], pair[1]);
     levelEl.textContent = lang === 'he'
       ? `רמה ${newTier}` : `Level ${newTier}`;
-    nameEl.textContent = lang === 'he'
-      ? levelName.he : levelName.en;
+    nameEl.textContent = lang === 'he' ? levelName.he : levelName.en;
     closeEl.textContent = lang === 'he' ? '💪 יאללה!' : '💪 Let\'s Go!';
     waBtn.style.display = 'flex';
     waBtn.dir = heDir;
@@ -6186,8 +6230,8 @@ function shareLevelUpWhatsApp() {
       en: '🚀 I leveled up to Level 3 on Gilly\'s Israel Quiz!\nI\'m now: Satellite Brain 🛰️🧠\nPlay now: ' + url
     },
     4: {
-      he: '\u200F🚀 עליתי לרמה 4 בחידון ישראל של גילי!\n\u200Fאני עכשיו: מלך השבילים 🗺️👑\n\u200Fבואו לשחק: ' + url,
-      en: '🚀 I leveled up to Level 4 on Gilly\'s Israel Quiz!\nI\'m now: King of the Trails 🗺️👑\nPlay now: ' + url
+      he: '\u200F🚀 עליתי לרמה 4 בחידון ישראל של גילי!\n\u200Fאני עכשיו: מלך השבילים 🥾👑\n\u200Fבואו לשחק: ' + url,
+      en: '🚀 I leveled up to Level 4 on Gilly\'s Israel Quiz!\nI\'m now: King of the Trails 🥾👑\nPlay now: ' + url
     },
     5: {
       he: '\u200F🚀 עליתי לרמה 5 בחידון ישראל של גילי!\n\u200Fאני עכשיו: אגדת הארץ 🧔🦯\n\u200Fבואו לשחק: ' + url,
@@ -7295,8 +7339,8 @@ function renderPlayerRow(p, globalRank) {
 
   const lvl = PLAYER_LEVEL_NAMES[p.level] || PLAYER_LEVEL_NAMES[1];
   const lvlText = lang === 'he' ? lvl.he : lvl.en;
-  const SB_LEVEL_EMOJIS = { 1: '🗺️', 2: '🦊', 3: '🛰️', 4: '👑', 5: '🧔' };
-  const lvlEmoji = SB_LEVEL_EMOJIS[p.level] || '🗺️';
+  const SB_LEVEL_EMOJIS = { 1: '🚗🗺️', 2: '🦊🏘️', 3: '🛰️🧠', 4: '🥾👑', 5: '🧔🦯' };
+  const lvlEmoji = SB_LEVEL_EMOJIS[p.level] || '🚗🗺️';
   return `
     <div class="sb-row ${p.isMe ? 'sb-me' : ''}">
       ${rankHtml}
@@ -7613,8 +7657,8 @@ async function loadScoreboard(myScore) {
     // Player's current level
     const myLevel = myIdx !== -1 ? players[myIdx].level : getPlayerLevel();
     const myLvl   = PLAYER_LEVEL_NAMES[myLevel] || PLAYER_LEVEL_NAMES[1];
-    const SB_MY_EMOJIS = { 1: '🗺️', 2: '🦊', 3: '🛰️', 4: '👑', 5: '🧔' };
-    const myLvlEmoji = SB_MY_EMOJIS[myLevel] || '🗺️';
+    const SB_MY_EMOJIS = { 1: '🚗🗺️', 2: '🦊🏘️', 3: '🛰️🧠', 4: '🥾👑', 5: '🧔🦯' };
+    const myLvlEmoji = SB_MY_EMOJIS[myLevel] || '🚗🗺️';
     const myLvlText = (myLvlEmoji + ' ') + (lang === 'he' ? myLvl.he : myLvl.en);
 
     // Player's nickname
@@ -7701,7 +7745,7 @@ function showQuizProgress(pendingScore) {
     fillEl.style.width = '0%';
     requestAnimationFrame(() => { requestAnimationFrame(() => { fillEl.style.width = pct + '%'; }); });
 
-    const qpLevelEmojis = { 1: '🗺️', 2: '🦊', 3: '🛰️', 4: '👑', 5: '🧔' };
+    const qpLevelEmojis = { 1: '🗺️', 2: '🦊', 3: '🛰️', 4: '🥾', 5: '🧔' };
     document.getElementById('qp-emoji').textContent = qpLevelEmojis[lvl] || '🗺️';
 
     // Show points progress instead of known places table
