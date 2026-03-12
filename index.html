@@ -6204,15 +6204,19 @@ function showLevelUpPopup(newTier) {
     particleContainer.appendChild(p);
   }
 
+  // Kill animations before showing
+  emojiLeft.style.animation = 'none';
+  emojiRight.style.animation = 'none';
+
   overlay.classList.add('show');
 
-  // Restart emoji animations now that the overlay is visible (display:flex)
+  // Double-rAF: first frame renders with animation:none (visible, no motion),
+  // second frame clears inline style so CSS class animations restart cleanly
   requestAnimationFrame(() => {
-    emojiLeft.style.animation = 'none';
-    emojiRight.style.animation = 'none';
-    void emojiLeft.offsetWidth; // force reflow
-    emojiLeft.style.animation = '';
-    emojiRight.style.animation = '';
+    requestAnimationFrame(() => {
+      emojiLeft.style.animation = '';
+      emojiRight.style.animation = '';
+    });
   });
 }
 
