@@ -920,6 +920,21 @@
   }
   .hud-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); display: block; font-weight: 600; }
   .hud-value { font-family: 'Playfair Display', 'Alef', serif; font-size: 1.7rem; font-weight: 900; line-height: 1; }
+  #quiz-countdown-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    display: none;
+    overflow: hidden;
+  }
+  #quiz-countdown-fill {
+    height: 100%;
+    width: 100%;
+    background-color: #1a7f37;
+    transform-origin: left center;
+  }
   #progress-bar-wrap { min-width: 140px; }
   #progress-bar-bg { height: 5px; background: rgba(255,255,255,0.07); border-radius: 99px; overflow: hidden; }
   #progress-bar-fill { height: 100%; background: linear-gradient(90deg, #58a6ff, #bc8cff); border-radius: 99px; transition: width 0.4s ease; width: 0%; }
@@ -3402,6 +3417,7 @@
     </div>
   </div>
   <button id="mobile-home-btn" onclick="mobileGoHome()" style="display:none">🏠</button>
+  <div id="quiz-countdown-bar"><div id="quiz-countdown-fill"></div></div>
 </div>
 
 <!-- Mobile "Are you sure?" confirmation modal -->
@@ -4591,6 +4607,39 @@ let learningSequence = [], learningIdx = 0, learningAttempt = 0;
 let learningSessionResults = [], learningPins = [];
 let learningPreviewActive = false, learningPreviewTimer = null, learningPreviewInterval = null;
 
+// ── Quiz Countdown Bar ────────────────────────────────────────────────────────
+let _quizCdRaf = null;
+let _quizCdStart = null;
+const QUIZ_CD_DURATION = 10000;
+
+function startQuizCountdown() {
+  stopQuizCountdown();
+  const bar  = document.getElementById('quiz-countdown-bar');
+  const fill = document.getElementById('quiz-countdown-fill');
+  if (!bar || !fill) return;
+  bar.style.display = 'block';
+  fill.style.width = '100%';
+  fill.style.backgroundColor = '#1a7f37';
+  _quizCdStart = performance.now();
+  function tick(now) {
+    const pct = Math.max(0, 1 - (now - _quizCdStart) / QUIZ_CD_DURATION);
+    fill.style.width = (pct * 100) + '%';
+    // Interpolate green (#1a7f37 = rgb(26,127,55)) → khaki (rgb(195,170,120))
+    const r = Math.round(26  + (195 - 26)  * (1 - pct));
+    const g = Math.round(127 + (170 - 127) * (1 - pct));
+    const b = Math.round(55  + (120 - 55)  * (1 - pct));
+    fill.style.backgroundColor = `rgb(${r},${g},${b})`;
+    if (pct > 0) _quizCdRaf = requestAnimationFrame(tick);
+  }
+  _quizCdRaf = requestAnimationFrame(tick);
+}
+
+function stopQuizCountdown() {
+  if (_quizCdRaf) { cancelAnimationFrame(_quizCdRaf); _quizCdRaf = null; }
+  const bar = document.getElementById('quiz-countdown-bar');
+  if (bar) bar.style.display = 'none';
+}
+
 // ── Daily Challenge State ─────────────────────────────────────────────────────
 let isDailyChallenge = false;
 let dailyChallengePreviewActive = false;
@@ -5766,6 +5815,7 @@ function loadTown() {
   if (currentLayer === 'street') toggleMapLayer(true);
   updateHintBtn();
   updateHUD();
+  if (!isLearningMode) startQuizCountdown();
 }
 
 function updateHintBtn() {
@@ -5945,6 +5995,7 @@ function initPlaneAnimation() {
 function showMenu() {
   isLearningMode = false;
   isDailyChallenge = false;
+  stopQuizCountdown();
   clearLearningPreview();
   clearDailyChallengePreview();
   document.getElementById('learning-hud').classList.remove('active');
@@ -6815,6 +6866,7 @@ function onMapClick(e) {
   showCityPolygon(polyFeature, perfect);
 
   waiting = true;
+  stopQuizCountdown();
   streak = newStreak;
   score += scorePts + (newStreak >= 3 && perfect ? 10 : 0);
   results.push({ town, hit: perfect, distKm: distKm.toFixed(1), pts });
