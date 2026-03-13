@@ -5730,6 +5730,9 @@ function cancelLocation() {
   document.getElementById('confirm-popup').style.display = 'none';
   _pendingClickEvent = null;
 }
+document.getElementById('confirm-popup').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('confirm-popup')) cancelLocation();
+});
 
 function confirmLocation() {
   document.getElementById('confirm-popup').style.display = 'none';
