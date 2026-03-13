@@ -927,13 +927,11 @@
     right: 12px;
     height: 3px;
     display: none;
-    border-radius: 0 0 3px 3px;
-    overflow: hidden;
   }
   #quiz-countdown-fill {
     height: 100%;
     width: 100%;
-    border-radius: 0 3px 3px 0;
+    border-radius: 0 99px 99px 0;
     background-color: #2da44e;
     box-shadow: 0 0 6px rgba(45,164,78,0.45);
   }
@@ -2236,6 +2234,9 @@
       gap: 8px;
       flex-wrap: nowrap;
       position: relative;
+    }
+    #quiz-countdown-bar {
+      bottom: -2px;
     }
 
     /* Town name — centered between HUD and ☰ */
