@@ -7094,7 +7094,7 @@ async function _postAuthActions() {
   }
   if (document.getElementById('quiz-progress-popup').classList.contains('show')) {
     const hits = results.filter(r => r.pts >= 90).length;
-    await saveScore({ score, difficulty, region, rounds: roundCount, hits });
+    await saveScore({ score, difficulty, region, rounds: roundCount, hits, results: [...results] });
     loadHistory();
     showQuizProgress(_qpPendingScore); // refresh with logged-in view
     return;
@@ -7103,7 +7103,7 @@ async function _postAuthActions() {
     showDailyPercentile(_dpPendingScore);
   } else if (document.getElementById('scoreboard-panel').classList.contains('show')) {
     const hits = results.filter(r => r.pts >= 90).length;
-    await saveScore({ score, difficulty, region, rounds: roundCount, hits });
+    await saveScore({ score, difficulty, region, rounds: roundCount, hits, results: [...results] });
     loadHistory();
     loadScoreboard(score);
   }
@@ -7228,12 +7228,13 @@ async function saveScore(scoreData) {
     const isNewRecord = scoreData.score > current;
     const oldLevel = getPlayerLevel();
     const prevCumulative = cumulativePoints;
-    // Level 3+ players: non-tier-3/4 locations earn only 25% cumulative points
-    if (oldLevel >= 3 && results.length) {
+    // Level 3+ players: non-tier-3/4 locations earn only 10% cumulative points
+    const roundResults = scoreData.results || [];
+    if (oldLevel >= 3 && roundResults.length) {
       let cumulativeAdd = 0;
-      for (const r of results) {
+      for (const r of roundResults) {
         const tier = r.town && r.town.tier;
-        const factor = (tier === 3 || tier === 4) ? 1 : 0.25;
+        const factor = (tier === 3 || tier === 4) ? 1 : 0.1;
         cumulativeAdd += r.pts * factor;
       }
       cumulativePoints += Math.round(cumulativeAdd);
@@ -7862,7 +7863,7 @@ showResults = async function() {
   recPopup.classList.remove('show');
 
   if (window._fbUser) {
-    const result = await saveScore({ score, difficulty, region, rounds: roundCount, hits });
+    const result = await saveScore({ score, difficulty, region, rounds: roundCount, hits, results: [...results] });
     if (result?.ok) {
       if (result.isNewRecord) {
         if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
