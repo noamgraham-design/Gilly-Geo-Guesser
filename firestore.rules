@@ -1,0 +1,155 @@
+rules_version = '2';
+
+// ── FIREBASE CONSOLE HARDENING CHECKLIST ──────────────────────────────────
+//
+// Deploy these rules, then also configure the following in the Firebase/GCP
+// Console to fully protect against DDoS and abuse:
+//
+// 1. APP CHECK ENFORCEMENT (Firebase Console → App Check → Firestore)
+//    - Click "Enforce" for Cloud Firestore so that ALL requests (not just
+//      SDK-side) must pass reCAPTCHA v3 verification. Without enforcement,
+//      attackers can bypass App Check by calling the REST API directly.
+//
+// 2. BUDGET ALERTS (GCP Console → Billing → Budgets & alerts)
+//    - Create budget alerts at $5, $10, and $25 thresholds.
+//    - Optionally set a hard spending cap on the Firebase project.
+//
+// 3. FIRESTORE DAILY SPENDING LIMIT (GCP Console → APIs → Firestore →
+//    Quotas & System Limits)
+//    - Set daily read/write limits to cap worst-case spend.
+//    - For example: 50K reads/day, 20K writes/day is generous for a quiz app.
+//
+// 4. AUTH ABUSE PREVENTION (Firebase Console → Authentication → Settings)
+//    - Enable "Email enumeration protection" to prevent account enumeration.
+//    - Verify the default rate limits are active (100 signups/IP/hour).
+//    - Consider enabling multi-factor authentication for admin accounts.
+//
+// 5. FIRESTORE INDEXES
+//    - Only create composite indexes that are actually used. Unused indexes
+//      still cost storage and can be exploited in queries.
+//
+// ──────────────────────────────────────────────────────────────────────────
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper: user is signed in (not anonymous) ──
+    function isSignedIn() {
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider != 'anonymous';
+    }
+
+    // ── Helper: validate string field ──
+    function isString(field) {
+      return field is string;
+    }
+
+    // ── Helper: validate number field ──
+    function isNumber(field) {
+      return field is number || field is int;
+    }
+
+    // ── USERS collection ──────────────────────────────────────────────────
+    match /users/{userId} {
+      allow read: if isSignedIn();
+
+      allow write: if isSignedIn()
+        && request.auth.uid == userId
+        // Restrict allowed fields to prevent arbitrary data injection
+        && request.resource.data.keys().hasOnly([
+          'nickname', 'email', 'emailUpdates', 'gender', 'displayName',
+          'cumulativePoints', 'level', 'highest_score',
+          'locationFamiliarity', 'language',
+          'createdAt', 'updatedAt', 'lastUpdated'
+        ])
+        // Validate nickname if present
+        && (
+          !('nickname' in request.resource.data)
+          || (isString(request.resource.data.nickname)
+              && request.resource.data.nickname.size() >= 1
+              && request.resource.data.nickname.size() <= 15)
+        )
+        // Validate level if present (1-5)
+        && (
+          !('level' in request.resource.data)
+          || (isNumber(request.resource.data.level)
+              && request.resource.data.level >= 1
+              && request.resource.data.level <= 5)
+        )
+        // Validate cumulativePoints if present (non-negative)
+        && (
+          !('cumulativePoints' in request.resource.data)
+          || (isNumber(request.resource.data.cumulativePoints)
+              && request.resource.data.cumulativePoints >= 0)
+        )
+        // Validate highest_score if present (non-negative)
+        && (
+          !('highest_score' in request.resource.data)
+          || (isNumber(request.resource.data.highest_score)
+              && request.resource.data.highest_score >= 0)
+        )
+        // Validate gender if present
+        && (
+          !('gender' in request.resource.data)
+          || request.resource.data.gender == null
+          || request.resource.data.gender in ['male', 'female', 'other']
+        );
+    }
+
+    // ── SCORES collection ─────────────────────────────────────────────────
+    match /scores/{doc} {
+      allow read: if isSignedIn();
+
+      allow create: if isSignedIn()
+        && request.auth.uid == request.resource.data.uid
+        // Require essential fields
+        && request.resource.data.keys().hasAll(['uid', 'score', 'difficulty', 'rounds', 'hits', 'timestamp'])
+        // Restrict allowed fields
+        && request.resource.data.keys().hasOnly([
+          'uid', 'displayName', 'score', 'difficulty', 'region', 'rounds', 'hits', 'timestamp'
+        ])
+        // Validate score (non-negative, reasonable max)
+        && isNumber(request.resource.data.score)
+        && request.resource.data.score >= 0
+        && request.resource.data.score <= 10000
+        // Validate difficulty
+        && request.resource.data.difficulty in ['easy', 'medium', 'hard']
+        // Validate rounds and hits
+        && isNumber(request.resource.data.rounds)
+        && request.resource.data.rounds >= 1
+        && request.resource.data.rounds <= 20
+        && isNumber(request.resource.data.hits)
+        && request.resource.data.hits >= 0
+        && request.resource.data.hits <= request.resource.data.rounds;
+
+      allow delete: if isSignedIn()
+        && request.auth.uid == resource.data.uid;
+    }
+
+    // ── DAILY_SCORES collection ───────────────────────────────────────────
+    match /daily_scores/{docId} {
+      allow read: if isSignedIn();
+
+      allow create: if isSignedIn()
+        && request.auth.uid == request.resource.data.uid
+        // Document ID must follow {uid}_{date} pattern
+        && docId.split('_')[0] == request.auth.uid
+        // Require essential fields
+        && request.resource.data.keys().hasAll(['uid', 'date', 'score', 'timestamp'])
+        // Restrict allowed fields
+        && request.resource.data.keys().hasOnly(['uid', 'date', 'score', 'timestamp'])
+        // Validate score
+        && isNumber(request.resource.data.score)
+        && request.resource.data.score >= 0
+        && request.resource.data.score <= 10000
+        // Validate date is a string
+        && isString(request.resource.data.date);
+
+      // No updates allowed — daily scores are write-once
+      allow update: if false;
+
+      allow delete: if isSignedIn()
+        && request.auth.uid == resource.data.uid;
+    }
+  }
+}

@@ -3943,6 +3943,16 @@
 // ── Feature flags ──────────────────────────────────────────────────────────
 const ENABLE_PLANE_ANIMATION = false; // Set to true to re-enable animated F-16 formations
 
+// ── RATE LIMITER (DDoS protection) ────────────────────────────────────────
+// Prevents rapid-fire Firebase calls from the client side.
+const _rateLimits = {};
+function _checkRate(name, cooldownMs) {
+  const now = Date.now();
+  if (_rateLimits[name] && now - _rateLimits[name] < cooldownMs) return false;
+  _rateLimits[name] = now;
+  return true;
+}
+
 // ── HTML ESCAPE UTILITY (XSS prevention) ───────────────────────────────────
 function esc(s) {
   const d = document.createElement('div');
@@ -7205,6 +7215,7 @@ async function deleteAccount() {
 // ── SAVE SCORE TO FIRESTORE ───────────────────────────────────────────────
 async function saveScore(scoreData) {
   if (!window._fbUser) return;
+  if (!_checkRate('saveScore', 10000)) return { ok: false, isNewRecord: false };
   const { collection, addDoc, serverTimestamp } = window._fbFns;
   try {
     // Save the game record
@@ -7249,6 +7260,7 @@ async function loadHistory() {
   const section = document.getElementById('history-section');
   const list    = document.getElementById('history-list');
   if (!window._fbUser) { section.classList.remove('show'); return; }
+  if (!_checkRate('loadHistory', 5000)) return;
 
   const { collection, query, where, orderBy, limit, getDocs } = window._fbFns;
   try {
@@ -7433,6 +7445,7 @@ function shareLeaderboardScore() {
 
 async function saveDailyScore(myScore) {
   if (!window._fbUser || window._fbUser.isAnonymous) return;
+  if (!_checkRate('saveDailyScore', 30000)) return;
   const { collection, setDoc, getDoc, doc, serverTimestamp } = window._fbFns;
   const uid   = window._fbUser.uid;
   const today = _getDailyChallengeDay().dateStr; // Israel date, resets at 04:00 IST
@@ -7577,6 +7590,7 @@ async function showDailyPercentile(myScore) {
 }
 
 async function loadScoreboard(myScore) {
+  if (!_checkRate('loadScoreboard', 5000)) return;
   if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
     window._logEvent('leaderboard_reached', {});
   }
