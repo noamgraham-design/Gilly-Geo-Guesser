@@ -7843,22 +7843,25 @@ let _sbModalTop5 = false;
 
 function renderStandaloneScrollableView() {
   if (!_sbModalData) return '';
-  const { players, visibleStart, visibleEnd } = _sbModalData;
+  const { players, visibleStart, visibleEnd, baseRank } = _sbModalData;
+  const base = baseRank || 0;
   const visible = players.slice(visibleStart, visibleEnd);
   let html = '';
-  if (visibleStart > 0) html += `<div class="sb-divider">· · ·</div>`;
-  visible.forEach((p, i) => { html += renderPlayerRow(p, visibleStart + i + 1); });
+  // Show ··· above if there are players above this window (either in the list or known via baseRank)
+  if (visibleStart > 0 || base > 0) html += `<div class="sb-divider">· · ·</div>`;
+  visible.forEach((p, i) => { html += renderPlayerRow(p, base + visibleStart + i + 1); });
   if (visibleEnd < players.length) html += `<div class="sb-divider">· · ·</div>`;
   return html;
 }
 
 function renderStandaloneTop10View() {
   if (!_sbModalData) return '';
-  const { players } = _sbModalData;
-  const top = players.slice(0, 10);
+  // For neighbourhood view, use the stored top-200 slice for accurate global top 10
+  const source = _sbModalData.top200 || _sbModalData.players;
+  const top = source.slice(0, 10);
   let html = '';
   top.forEach((p, i) => { html += renderPlayerRow(p, i + 1); });
-  if (players.length > 10) html += `<div class="sb-divider">· · ·</div>`;
+  if (source.length > 10) html += `<div class="sb-divider">· · ·</div>`;
   return html;
 }
 
@@ -7936,61 +7939,131 @@ async function loadStandaloneScoreboard() {
   list.innerHTML = `<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:8px 0">${isHe ? 'טוען…' : 'Loading…'}</div>`;
 
   try {
-    const { collection, getDocs, query, orderBy, limit } = window._fbFns;
-    const snap = await getDocs(query(
-      collection(window._fbDb, 'users'),
-      orderBy('highest_score', 'desc'),
-      limit(200)
-    ));
+    const { collection, getDocs, query, orderBy, limit, where, getDoc, doc } = window._fbFns;
+    const uid = window._fbUser.uid;
 
-    const players = [];
-    snap.forEach(doc => {
-      const d = doc.data();
-      if (d.highest_score > 0) {
-        players.push({
-          uid:   doc.id,
-          name:  d.nickname || d.displayName || (isHe ? 'שחקן אנונימי' : 'Anonymous'),
-          score: d.highest_score,
-          level: d.level || 1,
-          isMe:  doc.id === window._fbUser.uid,
+    // Fetch top 200 and the user's own document in parallel
+    const [topSnap, myDocSnap] = await Promise.all([
+      getDocs(query(collection(window._fbDb, 'users'), orderBy('highest_score', 'desc'), limit(200))),
+      getDoc(doc(collection(window._fbDb, 'users'), uid)),
+    ]);
+
+    const top200 = [];
+    let userInTop200 = false;
+    topSnap.forEach(d => {
+      const data = d.data();
+      if (data.highest_score > 0) {
+        if (d.id === uid) userInTop200 = true;
+        top200.push({
+          uid:   d.id,
+          name:  data.nickname || data.displayName || (isHe ? 'שחקן אנונימי' : 'Anonymous'),
+          score: data.highest_score,
+          level: data.level || 1,
+          isMe:  d.id === uid,
         });
       }
     });
+    top200.sort((a, b) => b.score - a.score);
 
-    if (players.length === 0) {
+    if (top200.length === 0) {
       list.innerHTML = `<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:8px 0">${isHe ? 'אין נתונים עדיין' : 'No scores yet'}</div>`;
       return;
     }
 
-    players.sort((a, b) => b.score - a.score);
-    const myIdx = players.findIndex(p => p.isMe);
-
-    // Window of 100 players centered on the user's best score
-    let visibleStart, visibleEnd;
-    if (myIdx === -1) {
-      // No score yet: show the bottom of the list (lowest scores)
-      visibleStart = Math.max(0, players.length - 100);
-      visibleEnd   = players.length;
-    } else {
-      visibleStart = Math.max(0, myIdx - 50);
-      visibleEnd   = Math.min(players.length, visibleStart + 100);
-      if (visibleEnd - visibleStart < 100) visibleStart = Math.max(0, visibleEnd - 100);
+    function _scrollToMe() {
+      requestAnimationFrame(() => {
+        const target = list.querySelector('.sb-me');
+        if (target) {
+          const listRect   = list.getBoundingClientRect();
+          const targetRect = target.getBoundingClientRect();
+          list.scrollTop += targetRect.top - listRect.top - listRect.height / 2 + targetRect.height / 2;
+        } else {
+          list.scrollTop = list.scrollHeight;
+        }
+      });
     }
 
-    _sbModalData = { players, visibleStart, visibleEnd };
-    top5Btn.style.display = 'inline-block';
+    if (userInTop200) {
+      // User is in the top 200 — window centred on their position
+      const myIdx = top200.findIndex(p => p.isMe);
+      let visibleStart = Math.max(0, myIdx - 50);
+      let visibleEnd   = Math.min(top200.length, visibleStart + 100);
+      if (visibleEnd - visibleStart < 100) visibleStart = Math.max(0, visibleEnd - 100);
+      _sbModalData = { players: top200, visibleStart, visibleEnd };
+      top5Btn.style.display = 'inline-block';
+      list.innerHTML = renderStandaloneScrollableView();
+      _scrollToMe();
+      return;
+    }
 
-    list.innerHTML = renderStandaloneScrollableView();
-    requestAnimationFrame(() => {
-      const target = list.querySelector('.sb-me');
-      if (target) {
-        const listRect   = list.getBoundingClientRect();
-        const targetRect = target.getBoundingClientRect();
-        list.scrollTop += targetRect.top - listRect.top - listRect.height / 2 + targetRect.height / 2;
-      } else {
-        list.scrollTop = list.scrollHeight; // no score yet: scroll to bottom
+    // User is outside the top 200 (or has no score)
+    const myData  = myDocSnap.exists() ? myDocSnap.data() : null;
+    const myScore = myData ? (myData.highest_score || 0) : 0;
+
+    if (myScore === 0) {
+      // No score yet: show the bottom of the top-200 list
+      const visibleStart = Math.max(0, top200.length - 100);
+      _sbModalData = { players: top200, visibleStart, visibleEnd: top200.length };
+      top5Btn.style.display = 'inline-block';
+      list.innerHTML = renderStandaloneScrollableView();
+      requestAnimationFrame(() => { list.scrollTop = list.scrollHeight; });
+      return;
+    }
+
+    // User has a score but ranks below position 200 — fetch their neighbourhood
+    const myName  = myData.nickname || myData.displayName || (isHe ? 'שחקן אנונימי' : 'Anonymous');
+    const myLevel = myData.level || 1;
+
+    // 50 closest players strictly above the user (ordered asc → closest first, then reversed)
+    // 51 players at-or-below the user's score (ordered desc → highest first; includes the user)
+    const [aboveSnap, belowSnap] = await Promise.all([
+      getDocs(query(collection(window._fbDb, 'users'), where('highest_score', '>', myScore), orderBy('highest_score', 'asc'),  limit(50))),
+      getDocs(query(collection(window._fbDb, 'users'), where('highest_score', '<=', myScore), orderBy('highest_score', 'desc'), limit(51))),
+    ]);
+
+    const abovePlayers = [];
+    aboveSnap.forEach(d => {
+      const data = d.data();
+      if (data.highest_score > 0) {
+        abovePlayers.push({
+          uid:   d.id,
+          name:  data.nickname || data.displayName || (isHe ? 'שחקן אנונימי' : 'Anonymous'),
+          score: data.highest_score,
+          level: data.level || 1,
+          isMe:  false,
+        });
       }
     });
+    abovePlayers.reverse(); // flip to descending order for display
+
+    const belowPlayers = [];
+    belowSnap.forEach(d => {
+      const data = d.data();
+      if (data.highest_score > 0) {
+        belowPlayers.push({
+          uid:   d.id,
+          name:  d.id === uid ? myName : (data.nickname || data.displayName || (isHe ? 'שחקן אנונימי' : 'Anonymous')),
+          score: data.highest_score,
+          level: d.id === uid ? myLevel : (data.level || 1),
+          isMe:  d.id === uid,
+        });
+      }
+    });
+
+    const neighbourhood = [...abovePlayers, ...belowPlayers];
+
+    // baseRank = 200: we know ≥200 players rank above this window, so ranks here
+    // start at 201+.  ··· is always shown above the window via renderStandaloneScrollableView.
+    _sbModalData = {
+      players:     neighbourhood,
+      visibleStart: 0,
+      visibleEnd:  neighbourhood.length,
+      baseRank:    200,
+      top200,       // used by renderStandaloneTop10View for an accurate global top 10
+    };
+    top5Btn.style.display = 'inline-block';
+    list.innerHTML = renderStandaloneScrollableView();
+    _scrollToMe();
   } catch(e) {
     console.error('Standalone scoreboard failed:', e);
     list.innerHTML = `<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:8px 0">${isHe ? 'שגיאה בטעינה' : 'Could not load'}</div>`;
