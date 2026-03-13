@@ -7228,7 +7228,18 @@ async function saveScore(scoreData) {
     const isNewRecord = scoreData.score > current;
     const oldLevel = getPlayerLevel();
     const prevCumulative = cumulativePoints;
-    cumulativePoints += scoreData.score;
+    // Level 3+ players: non-tier-3/4 locations earn only 25% cumulative points
+    if (oldLevel >= 3 && results.length) {
+      let cumulativeAdd = 0;
+      for (const r of results) {
+        const tier = r.town && r.town.tier;
+        const factor = (tier === 3 || tier === 4) ? 1 : 0.25;
+        cumulativeAdd += r.pts * factor;
+      }
+      cumulativePoints += Math.round(cumulativeAdd);
+    } else {
+      cumulativePoints += scoreData.score;
+    }
     const newLevel = getPlayerLevel();
     const isLevelUp = newLevel > oldLevel;
     const updates = { level: newLevel, cumulativePoints, locationFamiliarity };
