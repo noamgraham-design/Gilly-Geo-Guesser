@@ -922,18 +922,20 @@
   .hud-value { font-family: 'Playfair Display', 'Alef', serif; font-size: 1.7rem; font-weight: 900; line-height: 1; }
   #quiz-countdown-bar {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    bottom: -1px;
+    left: 12px;
+    right: 12px;
     height: 3px;
     display: none;
+    border-radius: 0 0 3px 3px;
     overflow: hidden;
   }
   #quiz-countdown-fill {
     height: 100%;
     width: 100%;
-    background-color: #1a7f37;
-    transform-origin: left center;
+    border-radius: 0 3px 3px 0;
+    background-color: #2da44e;
+    box-shadow: 0 0 6px rgba(45,164,78,0.45);
   }
   #progress-bar-wrap { min-width: 140px; }
   #progress-bar-bg { height: 5px; background: rgba(255,255,255,0.07); border-radius: 99px; overflow: hidden; }
@@ -4619,17 +4621,22 @@ function startQuizCountdown() {
   if (!bar || !fill) return;
   bar.style.display = 'block';
   fill.style.width = '100%';
-  fill.style.backgroundColor = '#1a7f37';
   _quizCdStart = performance.now();
   function tick(now) {
-    const pct = Math.max(0, 1 - (now - _quizCdStart) / QUIZ_CD_DURATION);
-    fill.style.width = (pct * 100) + '%';
-    // Interpolate green (#1a7f37 = rgb(26,127,55)) → khaki (rgb(195,170,120))
-    const r = Math.round(26  + (195 - 26)  * (1 - pct));
-    const g = Math.round(127 + (170 - 127) * (1 - pct));
-    const b = Math.round(55  + (120 - 55)  * (1 - pct));
-    fill.style.backgroundColor = `rgb(${r},${g},${b})`;
-    if (pct > 0) _quizCdRaf = requestAnimationFrame(tick);
+    const linear = Math.max(0, 1 - (now - _quizCdStart) / QUIZ_CD_DURATION);
+    // Ease-out curve: decelerates as it drains — feels more natural
+    const pct = linear * linear;
+    fill.style.width = (linear * 100) + '%';
+    // Hue-based interpolation: green (142°) → khaki/tan (38°) via HSL
+    const t = 1 - linear;
+    const hue = Math.round(142 - 104 * t);
+    const sat = Math.round(72  - 30  * t);
+    const lit = Math.round(36  + 22  * t);
+    fill.style.backgroundColor = `hsl(${hue},${sat}%,${lit}%)`;
+    // Glow fades with the bar
+    const glowAlpha = (linear * 0.45).toFixed(2);
+    fill.style.boxShadow = `0 0 ${Math.round(6 * linear)}px hsla(${hue},${sat}%,${lit}%,${glowAlpha})`;
+    if (linear > 0) _quizCdRaf = requestAnimationFrame(tick);
   }
   _quizCdRaf = requestAnimationFrame(tick);
 }
