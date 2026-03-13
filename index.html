@@ -783,6 +783,62 @@
     text-align: center; color: var(--muted);
     padding: 0;
   }
+
+  /* ── STANDALONE SCOREBOARD MODAL ──────────────────────────────────── */
+  #sb-modal {
+    display: none; position: fixed; inset: 0; z-index: 9500;
+    background: rgba(0,0,0,0.55); backdrop-filter: blur(4px);
+    align-items: center; justify-content: center;
+  }
+  #sb-modal.open { display: flex; }
+  #sb-modal-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 18px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.16), 0 2px 8px rgba(0,0,0,0.07);
+    display: flex; flex-direction: column;
+    width: 320px; max-width: 92vw;
+    padding: 20px 18px 18px;
+    max-height: 80vh; overflow: hidden;
+    animation: loginPop 0.28s cubic-bezier(.34,1.4,.64,1);
+  }
+  #sb-modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  #sb-modal-title {
+    font-family: 'Playfair Display', 'Alef', serif;
+    font-size: 1.35rem; font-weight: 900; margin-bottom: 0;
+    background: linear-gradient(90deg, #1a6fd4, #7c3aed);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: 0.5px;
+  }
+  #sb-modal-header-actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  #sb-modal-top5-btn {
+    display: none; background: var(--bg); border: 1px solid var(--border);
+    color: var(--muted); font-size: 0.75rem; font-weight: 700; cursor: pointer;
+    padding: 4px 8px; border-radius: 8px; line-height: 1; white-space: nowrap;
+    transition: all 0.18s;
+  }
+  #sb-modal-top5-btn:hover { background: rgba(26,111,212,0.08); border-color: rgba(26,111,212,0.3); color: #1a6fd4; }
+  #sb-modal-top5-btn.active {
+    background: linear-gradient(135deg, #1a6fd4, #7c3aed);
+    color: #fff; border-color: transparent;
+  }
+  #sb-modal-top5-btn.active:hover { opacity: 0.9; }
+  #sb-modal-close-btn {
+    background: transparent; border: none;
+    color: var(--muted); font-size: 1rem; cursor: pointer;
+    padding: 2px 6px; border-radius: 6px; line-height: 1;
+  }
+  #sb-modal-close-btn:hover { background: var(--bg); }
+  #sb-modal-list {
+    overflow-y: auto; min-height: 0; flex: 1;
+  }
+  #sb-modal-list::-webkit-scrollbar { width: 4px; }
+  #sb-modal-list::-webkit-scrollbar-thumb { background: #c8ccd2; border-radius: 99px; }
+  #sb-modal-guest {
+    text-align: center; color: var(--muted); padding: 0;
+  }
   .sb-guest-blurred {
     position: relative; overflow: hidden; pointer-events: none; user-select: none;
     filter: blur(5px); opacity: 0.45; margin-bottom: -10px;
@@ -3521,6 +3577,11 @@
             <div id="auth-dropdown-email"></div>
           </div>
           <div class="auth-dropdown-divider"></div>
+          <button class="auth-dropdown-item" onclick="openStandaloneScoreboard()">
+            <span style="font-size:1.1em;line-height:1">🏆</span>
+            <span id="auth-dd-scoreboard">Scoreboard</span>
+          </button>
+          <div class="auth-dropdown-divider"></div>
           <button class="auth-dropdown-item" onclick="openSettingsModal()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
             <span id="auth-dd-settings">Settings</span>
@@ -3636,6 +3697,29 @@
         <div class="sb-guest-hook" id="sb-guest-hook">Where do you rank?</div>
         <div class="sb-guest-sub" id="sb-guest-sub">Sign in to reveal your place.</div>
         <button class="sb-guest-cta" onclick="openLoginModal()" id="sb-signin-link">Sign in →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── STANDALONE SCOREBOARD MODAL ─────────────────────────────────── -->
+<div id="sb-modal" role="dialog" aria-modal="true" aria-label="Scoreboard">
+  <div id="sb-modal-card">
+    <div id="sb-modal-header">
+      <h3 id="sb-modal-title"><span style="-webkit-text-fill-color:initial;background:none">🏆</span> Leaderboard</h3>
+      <div id="sb-modal-header-actions">
+        <button id="sb-modal-top5-btn" onclick="toggleStandaloneTop5View()">▲ Top 10</button>
+        <button id="sb-modal-close-btn" onclick="closeStandaloneScoreboard()" aria-label="סגור לוח תוצאות / Close scoreboard">✕</button>
+      </div>
+    </div>
+    <div id="sb-modal-list"></div>
+    <div id="sb-modal-guest" style="display:none">
+      <div class="sb-guest-blurred" id="sb-modal-guest-blur"></div>
+      <div class="sb-guest-overlay">
+        <div class="sb-guest-lock">🔮</div>
+        <div class="sb-guest-hook" id="sb-modal-guest-hook">Where do you rank?</div>
+        <div class="sb-guest-sub" id="sb-modal-guest-sub">Sign in to reveal your place.</div>
+        <button class="sb-guest-cta" onclick="openLoginModal()" id="sb-modal-signin-link">Sign in →</button>
       </div>
     </div>
   </div>
@@ -4404,8 +4488,9 @@ function applyLang() {
     document.getElementById('auth-label').textContent = lang === 'he' ? 'התחברות' : 'Log in';
   }
   if (document.getElementById('auth-dd-settings')) {
-    document.getElementById('auth-dd-signout').textContent  = lang === 'he' ? 'התנתקות'     : 'Sign out';
-    document.getElementById('auth-dd-settings').textContent = lang === 'he' ? 'הגדרות'      : 'Settings';
+    document.getElementById('auth-dd-signout').textContent   = lang === 'he' ? 'התנתקות'      : 'Sign out';
+    document.getElementById('auth-dd-settings').textContent  = lang === 'he' ? 'הגדרות'       : 'Settings';
+    document.getElementById('auth-dd-scoreboard').textContent = lang === 'he' ? 'לוח תוצאות' : 'Scoreboard';
   }
   if (document.getElementById('auth-dd-switch')) {
     document.getElementById('auth-dd-switch').textContent   = lang === 'he' ? 'החלף חשבון'  : 'Switch account';
@@ -7035,6 +7120,9 @@ function _resetGoogleSignupStep() {
 document.getElementById('login-modal').addEventListener('click', e => {
   if (e.target === document.getElementById('login-modal')) closeLoginModal();
 });
+document.getElementById('sb-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('sb-modal')) closeStandaloneScoreboard();
+});
 
 function toggleAuthMode() {
   _authMode = _authMode === 'signin' ? 'signup' : 'signin';
@@ -7749,6 +7837,166 @@ async function loadScoreboard(myScore) {
     list.innerHTML = `<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:8px 0">${lang === 'he' ? 'שגיאה בטעינה' : 'Could not load'}</div>`;
   }
 }
+// ── STANDALONE SCOREBOARD (from main-menu dropdown) ──────────────────────
+let _sbModalData = null;
+let _sbModalTop5 = false;
+
+function renderStandaloneScrollableView() {
+  if (!_sbModalData) return '';
+  const { players, visibleStart, visibleEnd } = _sbModalData;
+  const visible = players.slice(visibleStart, visibleEnd);
+  let html = '';
+  if (visibleStart > 0) html += `<div class="sb-divider">· · ·</div>`;
+  visible.forEach((p, i) => { html += renderPlayerRow(p, visibleStart + i + 1); });
+  if (visibleEnd < players.length) html += `<div class="sb-divider">· · ·</div>`;
+  return html;
+}
+
+function renderStandaloneTop10View() {
+  if (!_sbModalData) return '';
+  const { players } = _sbModalData;
+  const top = players.slice(0, 10);
+  let html = '';
+  top.forEach((p, i) => { html += renderPlayerRow(p, i + 1); });
+  if (players.length > 10) html += `<div class="sb-divider">· · ·</div>`;
+  return html;
+}
+
+function toggleStandaloneTop5View() {
+  if (!_sbModalData) return;
+  const btn  = document.getElementById('sb-modal-top5-btn');
+  const list = document.getElementById('sb-modal-list');
+  _sbModalTop5 = !_sbModalTop5;
+  btn.classList.toggle('active', _sbModalTop5);
+  btn.innerHTML = _sbModalTop5 ? '▼ Top 10' : '▲ Top 10';
+  list.innerHTML = _sbModalTop5 ? renderStandaloneTop10View() : renderStandaloneScrollableView();
+  if (!_sbModalTop5) {
+    requestAnimationFrame(() => {
+      const target = list.querySelector('.sb-me');
+      if (target) {
+        const listRect   = list.getBoundingClientRect();
+        const targetRect = target.getBoundingClientRect();
+        list.scrollTop += targetRect.top - listRect.top - listRect.height / 2 + targetRect.height / 2;
+      }
+    });
+  }
+}
+
+function openStandaloneScoreboard() {
+  closeAuthDropdown();
+  document.getElementById('sb-modal').classList.add('open');
+  loadStandaloneScoreboard();
+}
+
+function closeStandaloneScoreboard() {
+  document.getElementById('sb-modal').classList.remove('open');
+}
+
+async function loadStandaloneScoreboard() {
+  if (!_checkRate('loadStandaloneScoreboard', 5000)) return;
+  const list    = document.getElementById('sb-modal-list');
+  const guest   = document.getElementById('sb-modal-guest');
+  const top5Btn = document.getElementById('sb-modal-top5-btn');
+
+  list.innerHTML = '';
+  _sbModalData = null;
+  _sbModalTop5 = false;
+  top5Btn.classList.remove('active');
+  top5Btn.innerHTML = '▲ Top 10';
+  top5Btn.style.display = 'none';
+
+  const isHe = lang === 'he';
+  document.getElementById('sb-modal-title').innerHTML =
+    '<span style="-webkit-text-fill-color:initial;background:none">🏆</span> ' +
+    (isHe ? 'לוח תוצאות' : 'Leaderboard');
+  document.getElementById('sb-modal-signin-link').textContent = isHe ? 'התחבר ←' : 'Sign in →';
+  document.getElementById('sb-modal-signin-link').dir         = isHe ? 'rtl' : 'ltr';
+  document.getElementById('sb-modal-guest-hook').textContent  = isHe ? 'איפה אתה בדירוג?' : 'Where do you rank?';
+  document.getElementById('sb-modal-guest-hook').dir          = isHe ? 'rtl' : 'ltr';
+  document.getElementById('sb-modal-guest-sub').textContent   = isHe ? 'התחבר כדי לגלות את המיקום שלך.' : 'Sign in to reveal your place.';
+  document.getElementById('sb-modal-guest-sub').dir           = isHe ? 'rtl' : 'ltr';
+
+  if (!window._fbUser) {
+    list.style.display  = 'none';
+    guest.style.display = 'block';
+    const blurEl = document.getElementById('sb-modal-guest-blur');
+    blurEl.dir = isHe ? 'rtl' : 'ltr';
+    const fakeNames  = isHe ? ['שחקן מסתורי', 'גיאוגרף מומחה', 'נווט אלוף'] : ['Mystery Player', 'Geo Expert', 'Top Navigator'];
+    const fakeScores = [4850, 4620, 4510];
+    const medals = ['🥇', '🥈', '🥉'];
+    blurEl.innerHTML = fakeNames.map((n, i) =>
+      `<div class="sb-row"><span class="sb-rank ${i===0?'gold':i===1?'silver':'bronze'}">${medals[i]}</span>` +
+      `<div class="sb-name"><span class="sb-name-text">${n}</span></div>` +
+      `<span class="sb-score">${fakeScores[i]}</span></div>`).join('');
+    return;
+  }
+
+  guest.style.display = 'none';
+  list.style.display  = 'block';
+  list.innerHTML = `<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:8px 0">${isHe ? 'טוען…' : 'Loading…'}</div>`;
+
+  try {
+    const { collection, getDocs, query, orderBy, limit } = window._fbFns;
+    const snap = await getDocs(query(
+      collection(window._fbDb, 'users'),
+      orderBy('highest_score', 'desc'),
+      limit(200)
+    ));
+
+    const players = [];
+    snap.forEach(doc => {
+      const d = doc.data();
+      if (d.highest_score > 0) {
+        players.push({
+          uid:   doc.id,
+          name:  d.nickname || d.displayName || (isHe ? 'שחקן אנונימי' : 'Anonymous'),
+          score: d.highest_score,
+          level: d.level || 1,
+          isMe:  doc.id === window._fbUser.uid,
+        });
+      }
+    });
+
+    if (players.length === 0) {
+      list.innerHTML = `<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:8px 0">${isHe ? 'אין נתונים עדיין' : 'No scores yet'}</div>`;
+      return;
+    }
+
+    players.sort((a, b) => b.score - a.score);
+    const myIdx = players.findIndex(p => p.isMe);
+
+    // Window of 100 players centered on the user's best score
+    let visibleStart, visibleEnd;
+    if (myIdx === -1) {
+      // No score yet: show the bottom of the list (lowest scores)
+      visibleStart = Math.max(0, players.length - 100);
+      visibleEnd   = players.length;
+    } else {
+      visibleStart = Math.max(0, myIdx - 50);
+      visibleEnd   = Math.min(players.length, visibleStart + 100);
+      if (visibleEnd - visibleStart < 100) visibleStart = Math.max(0, visibleEnd - 100);
+    }
+
+    _sbModalData = { players, visibleStart, visibleEnd };
+    top5Btn.style.display = 'inline-block';
+
+    list.innerHTML = renderStandaloneScrollableView();
+    requestAnimationFrame(() => {
+      const target = list.querySelector('.sb-me');
+      if (target) {
+        const listRect   = list.getBoundingClientRect();
+        const targetRect = target.getBoundingClientRect();
+        list.scrollTop += targetRect.top - listRect.top - listRect.height / 2 + targetRect.height / 2;
+      } else {
+        list.scrollTop = list.scrollHeight; // no score yet: scroll to bottom
+      }
+    });
+  } catch(e) {
+    console.error('Standalone scoreboard failed:', e);
+    list.innerHTML = `<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:8px 0">${isHe ? 'שגיאה בטעינה' : 'Could not load'}</div>`;
+  }
+}
+
 // ── QUIZ PROGRESS POPUP ───────────────────────────────────────────────────
 let _qpPendingScore = null;
 
