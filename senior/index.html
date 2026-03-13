@@ -3133,8 +3133,8 @@
     </div>
 
     <div class="diff-row" id="diff-row">
-      <button class="diff-btn" id="d-easy"   onclick="setDiff('easy')">קל</button>
-      <button class="diff-btn active-medium" id="d-medium" onclick="setDiff('medium')">בינוני</button>
+      <button class="diff-btn active-easy" id="d-easy"   onclick="setDiff('easy')">קל</button>
+      <button class="diff-btn" id="d-medium" onclick="setDiff('medium')">בינוני</button>
       <button class="diff-btn" id="d-hard"   onclick="setDiff('hard')">קשה</button>
     </div>
     <div class="diff-note" id="diff-note">ערים ועיירות</div>
@@ -3756,7 +3756,7 @@ function applyLang() {
 }
 
 let lang = "he";
-let difficulty = "medium", region = "all", sequence = [], currentIdx = 0, score = 0, roundCount = 8;
+let difficulty = "easy", region = "all", sequence = [], currentIdx = 0, score = 0, roundCount = 8;
 let streak = 0, hintUsed = false, streetUsedThisRound = false, results = [], waiting = false;
 let correctMarkers = [], clickMarker = null, circle = null, hintCircle = null, guessLine = null;
 
@@ -5903,7 +5903,7 @@ function showResults() {
 
 }
 
-setDiff('medium');
+setDiff('easy');
 setRegion('all');
 applyLang();
 
@@ -6920,7 +6920,7 @@ function showChallengeIntro() {
 
 function startChallengeGame() {
   document.getElementById('challenge-intro').classList.remove('open');
-  difficulty = 'medium';
+  difficulty = 'easy';
   region = 'all';
   sequence = [_challengeTown];
   roundCount = 1;
