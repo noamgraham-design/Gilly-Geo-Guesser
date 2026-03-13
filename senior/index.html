@@ -978,13 +978,7 @@
   #map { width:100%; height:100%; cursor: crosshair !important; }
   #map .leaflet-container { cursor: crosshair !important; }
   .leaflet-control-attribution {
-    font-size: 10px !important;
-    padding: 1px 5px !important;
-    line-height: 1.2 !important;
-    max-width: 60vw;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    display: none !important;
   }
   /* Tooltip */
   .city-label {
@@ -3801,6 +3795,7 @@ const map = L.map('map', {
   minZoom: 7,
   maxZoom: 18,
   zoomControl: true,
+  attributionControl: false,
   maxBounds: ISRAEL_BOUNDS,
   maxBoundsViscosity: 1.0,
 });
