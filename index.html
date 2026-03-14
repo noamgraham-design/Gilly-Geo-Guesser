@@ -3956,7 +3956,7 @@
     <div id="settings-email-updates-row">
       <span id="settings-email-updates-lbl">Email updates about new game levels and features</span>
       <label class="toggle-switch" aria-label="Toggle email updates">
-        <input type="checkbox" id="settings-email-updates" onchange="saveEmailUpdatesPref()"/>
+        <input type="checkbox" id="settings-email-updates" onchange="saveSettings()"/>
         <span class="toggle-track"></span>
       </label>
     </div>
@@ -7374,13 +7374,6 @@ async function signOutUser() {
   await signOut(window._fbAuth);
 }
 
-async function saveEmailUpdatesPref() {
-  if (!window._fbUser) return;
-  const val = document.getElementById('settings-email-updates').checked;
-  const { setDoc, doc } = window._fbFns;
-  await setDoc(doc(window._fbDb, 'users', window._fbUser.uid), { emailUpdates: val }, { merge: true });
-}
-
 // ── DELETE ACCOUNT ────────────────────────────────────────────────────────
 function showDeleteConfirm() {
   document.getElementById('settings-delete-confirm').classList.add('visible');
@@ -8402,6 +8395,8 @@ async function openSettingsModal() {
           selectGender(data.gender || 'male');
           selectSettingsLang(data.language || lang);
           document.getElementById('settings-email-updates').checked = data.emailUpdates === true;
+          validateLocationPick = data.validateLocation === true;
+          localStorage.setItem('validateLocationPick', validateLocationPick ? 'true' : 'false');
         } else {
           const nick = generateRandomNickname();
           window._userNickname = nick;
@@ -8437,6 +8432,7 @@ function closeSettingsModal() {
 function toggleValidatePick() {
   validateLocationPick = document.getElementById('settings-validate-pick').checked;
   localStorage.setItem('validateLocationPick', validateLocationPick ? 'true' : 'false');
+  if (!_settingsLoading) saveSettings();
 }
 
 function _showLocConfirmPopup() {
@@ -8543,10 +8539,12 @@ async function saveSettings() {
     const { setDoc, doc } = window._fbFns;
     window._userNickname = nickname;
     await setDoc(doc(window._fbDb, 'users', window._fbUser.uid), {
-      nickname:    nickname,
-      gender:      _selectedGender || null,
-      language:    selectedLang,
-      updatedAt:   new Date(),
+      nickname:         nickname,
+      gender:           _selectedGender || null,
+      language:         selectedLang,
+      emailUpdates:     document.getElementById('settings-email-updates').checked,
+      validateLocation: validateLocationPick,
+      updatedAt:        new Date(),
     }, { merge: true });
 
     // Apply language change immediately
