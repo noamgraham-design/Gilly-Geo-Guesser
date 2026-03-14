@@ -7359,7 +7359,7 @@ function exitChallengeMode() {
   // Re-populate prompt if overlay is open and beforeinstallprompt arrives late
   window._pwaRefreshPopup = function() {
     var overlay = document.getElementById('pwa-install-overlay');
-    if (overlay && overlay.classList.contains('show')) {
+    if (overlay && overlay.classList.contains('open')) {
       populatePrompt();
     }
   };
