@@ -8991,6 +8991,7 @@ function exitChallengeMode() {
     localStorage.setItem(INSTALL_KEY, 'true');
     clearDeferredPrompt();
     closePwaOverlay();
+    if (window._logEvent) window._logEvent('pwa_install', { method: 'browser' });
   });
 
   function isStandalone() {
@@ -9155,6 +9156,7 @@ function exitChallengeMode() {
     if (dp) {
       dp.prompt();
       dp.userChoice.then((result) => {
+        if (window._logEvent) window._logEvent('pwa_install_prompt', { outcome: result.outcome });
         if (result.outcome === 'accepted') {
           localStorage.setItem(INSTALL_KEY, 'true');
         }
