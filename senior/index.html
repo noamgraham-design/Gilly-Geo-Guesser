@@ -20,7 +20,11 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Gilly">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<script>window._pwaEvent=null;window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window._pwaEvent=e;});</script>
+<script>
+window._pwaEvent=null;
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window._pwaEvent=e;if(window._pwaRefreshPopup)window._pwaRefreshPopup();});
+if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(function(){});
+</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
@@ -7156,13 +7160,6 @@ function exitChallengeMode() {
   </div>
 </div>
 <script>
-// ── PWA: Service Worker Registration ──
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
-  });
-}
-
 // ── PWA: Install Prompt Logic ──
 (function() {
   const DISMISS_KEY = 'pwa-install-dismissed';
@@ -7357,6 +7354,14 @@ if ('serviceWorker' in navigator) {
 
   window._pwaShowFromMenu = function() {
     showPwaOverlay();
+  };
+
+  // Re-populate prompt if overlay is open and beforeinstallprompt arrives late
+  window._pwaRefreshPopup = function() {
+    var overlay = document.getElementById('pwa-install-overlay');
+    if (overlay && overlay.classList.contains('show')) {
+      populatePrompt();
+    }
   };
 
   // Show/hide the dropdown button based on install state
