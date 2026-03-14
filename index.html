@@ -372,13 +372,17 @@
   }
   /* Location confirmation popup */
   #loc-confirm-popup {
-    display: none; position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+    display: none; position: fixed; bottom: 80px; left: 0; right: 0;
+    width: fit-content; margin: 0 auto;
     z-index: 8000; background: var(--surface); border-radius: 14px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.22); padding: 12px 16px;
     align-items: center; gap: 12px; white-space: nowrap;
-    animation: loginPop 0.22s cubic-bezier(.34,1.4,.64,1);
   }
-  #loc-confirm-popup.visible { display: flex; }
+  #loc-confirm-popup.visible { display: flex; animation: locConfirmPop 0.22s cubic-bezier(.34,1.4,.64,1); }
+  @keyframes locConfirmPop {
+    from { opacity: 0; translate: 0 10px; }
+    to   { opacity: 1; translate: 0 0; }
+  }
   #loc-confirm-popup span {
     font-size: 0.88rem; font-weight: 600; color: var(--text);
   }
@@ -4578,6 +4582,8 @@ function applyLang() {
     document.getElementById('gender-female').innerHTML = lang === 'he' ? '👩 נקבה'  : '👩 Female';
     document.getElementById('gender-other').innerHTML  = lang === 'he' ? '🧑 אחר'   : '🧑 Other';
     document.getElementById('settings-email-updates-lbl').textContent  = lang === 'he' ? 'עדכונים במייל על רמות ותכונות חדשות' : 'Email updates about new game levels and features';
+    const vpLbl = document.getElementById('settings-validate-pick-lbl');
+    if (vpLbl) { vpLbl.textContent = lang === 'he' ? 'אשר בחירת מיקום' : 'Confirm location before submitting'; vpLbl.dir = lang === 'he' ? 'rtl' : 'ltr'; }
     document.getElementById('settings-delete-btn').textContent        = lang === 'he' ? '🗑️ מחיקת חשבון'                                                                           : '🗑️ Delete my account';
     document.getElementById('settings-delete-confirm-msg').textContent = lang === 'he' ? 'פעולה זו תמחק לצמיתות את חשבונך וכל הנתונים. לא ניתן לבטל.' : 'This will permanently delete your account and all data. This cannot be undone.';
     document.getElementById('settings-delete-cancel').textContent     = lang === 'he' ? 'ביטול'  : 'Cancel';
@@ -8434,9 +8440,11 @@ function toggleValidatePick() {
 function _showLocConfirmPopup() {
   const popup = document.getElementById('loc-confirm-popup');
   const msg = document.getElementById('loc-confirm-msg');
-  msg.textContent = lang === 'he' ? '📍 לאשר את המיקום?' : '📍 Confirm location?';
-  document.getElementById('loc-confirm-yes').textContent = lang === 'he' ? '✓ אשר' : '✓ Confirm';
-  document.getElementById('loc-confirm-no').textContent  = lang === 'he' ? '✕ בטל'  : '✕ Cancel';
+  const isHe = lang === 'he';
+  msg.textContent = isHe ? '📍 לאשר את המיקום?' : '📍 Confirm location?';
+  document.getElementById('loc-confirm-yes').textContent = isHe ? '✓ אשר' : '✓ Confirm';
+  document.getElementById('loc-confirm-no').textContent  = isHe ? '✕ בטל'  : '✕ Cancel';
+  popup.dir = isHe ? 'rtl' : 'ltr';
   popup.classList.add('visible');
   document.getElementById('loc-confirm-yes').focus();
 }
