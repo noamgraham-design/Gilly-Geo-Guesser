@@ -3719,6 +3719,11 @@
             <span style="font-size:1.1em;line-height:1">🏆</span>
             <span id="auth-dd-scoreboard">Scoreboard</span>
           </button>
+          <div class="auth-dropdown-divider" id="auth-dd-pwa-divider" style="display:none"></div>
+          <button class="auth-dropdown-item" id="auth-dd-pwa-btn" style="display:none" onclick="closeAuthDropdown(); if(window._pwaShowFromMenu) window._pwaShowFromMenu()">
+            <span style="font-size:1.1em;line-height:1">📱</span>
+            <span id="auth-dd-pwa">Add to Home Screen</span>
+          </button>
           <div class="auth-dropdown-divider"></div>
           <button class="auth-dropdown-item" onclick="openSettingsModal()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -4637,6 +4642,7 @@ function applyLang() {
     document.getElementById('auth-dd-signout').textContent   = lang === 'he' ? 'התנתקות'      : 'Sign out';
     document.getElementById('auth-dd-settings').textContent  = lang === 'he' ? 'הגדרות'       : 'Settings';
     document.getElementById('auth-dd-scoreboard').textContent = lang === 'he' ? 'לוח תוצאות' : 'Scoreboard';
+    document.getElementById('auth-dd-pwa').textContent = lang === 'he' ? 'הוסף למסך הבית' : 'Add to Home Screen';
   }
   if (document.getElementById('auth-dd-switch')) {
     document.getElementById('auth-dd-switch').textContent   = lang === 'he' ? 'החלף חשבון'  : 'Switch account';
@@ -9142,6 +9148,22 @@ if ('serviceWorker' in navigator) {
       if (shouldShowPrompt()) showPwaOverlay();
     }, 2000);
   };
+
+  window._pwaShowFromMenu = function() {
+    showPwaOverlay();
+  };
+
+  // Show/hide the dropdown button based on install state
+  function updatePwaDropdownBtn() {
+    var btn = document.getElementById('auth-dd-pwa-btn');
+    var div = document.getElementById('auth-dd-pwa-divider');
+    if (!btn) return;
+    var show = !isStandalone() && localStorage.getItem(INSTALL_KEY) !== 'true';
+    btn.style.display = show ? '' : 'none';
+    div.style.display = show ? '' : 'none';
+  }
+  updatePwaDropdownBtn();
+  window.addEventListener('appinstalled', updatePwaDropdownBtn);
 })();
 </script>
 
