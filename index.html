@@ -3818,7 +3818,7 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
     <div id="results-list"></div>
     <div class="btn-row">
       <button id="btn-play-again" class="btn btn-primary" onclick="startGame()">▶ שחק שוב</button>
-      <button id="btn-menu" class="btn-secondary" onclick="showMenu()">תפריט</button>
+      <button id="btn-menu" class="btn-secondary" onclick="showMenu(); if(window._pwaShowAfterGame) window._pwaShowAfterGame()">תפריט</button>
     </div>
     <!-- personal-best banner removed; now handled by #new-record-popup -->
     <div id="history-section">
@@ -3897,7 +3897,7 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
       <div id="qp-list"></div>
       <div style="display:flex;flex-direction:column;gap:8px;width:100%;margin-top:12px">
         <button class="btn btn-primary" id="qp-scores-btn" onclick="closeQuizProgress()" style="width:100%">🏆 View Scores</button>
-        <button class="btn-secondary" id="qp-menu-btn" onclick="showMenu()" style="width:100%;text-align:center;padding:9px 16px">← Menu</button>
+        <button class="btn-secondary" id="qp-menu-btn" onclick="showMenu(); if(window._pwaShowAfterGame) window._pwaShowAfterGame()" style="width:100%;text-align:center;padding:9px 16px">← Menu</button>
       </div>
     </div>
     <!-- Guest view -->
@@ -3979,7 +3979,7 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
     <div id="lr-list"></div>
     <div class="btn-row" style="flex-direction:column;gap:8px;width:100%;margin-top:10px">
       <button class="btn btn-primary" id="lr-continue-btn" onclick="continueLearning()" style="width:100%">📚 Continue</button>
-      <button class="btn-secondary" id="lr-menu-btn" onclick="showMenu()" style="width:100%;text-align:center;padding:9px 16px">← Menu</button>
+      <button class="btn-secondary" id="lr-menu-btn" onclick="showMenu(); if(window._pwaShowAfterGame) window._pwaShowAfterGame()" style="width:100%;text-align:center;padding:9px 16px">← Menu</button>
     </div>
   </div>
 </div>
