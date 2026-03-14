@@ -14,10 +14,9 @@
 <meta name="twitter:title"      content="Gilly's Israel Quiz"/>
 <meta name="twitter:image"      content="logo.png"/>
 <link rel="manifest" href="/senior/manifest.json">
-<meta name="theme-color" content="#1a6fd4">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Gilly">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <script>
@@ -7359,7 +7358,7 @@ function exitChallengeMode() {
   // Re-populate prompt if overlay is open and beforeinstallprompt arrives late
   window._pwaRefreshPopup = function() {
     var overlay = document.getElementById('pwa-install-overlay');
-    if (overlay && overlay.classList.contains('show')) {
+    if (overlay && overlay.classList.contains('open')) {
       populatePrompt();
     }
   };
@@ -7369,7 +7368,7 @@ function exitChallengeMode() {
     var btn = document.getElementById('auth-dd-pwa-btn');
     var div = document.getElementById('auth-dd-pwa-divider');
     if (!btn) return;
-    var show = !isStandalone() && localStorage.getItem(INSTALL_KEY) !== 'true';
+    var show = !isStandalone();
     btn.style.display = show ? '' : 'none';
     div.style.display = show ? '' : 'none';
   }
