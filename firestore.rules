@@ -61,7 +61,7 @@ service cloud.firestore {
           'nickname', 'email', 'emailUpdates', 'gender', 'displayName',
           'cumulativePoints', 'level', 'highest_score',
           'locationFamiliarity', 'language', 'validateLocation',
-          'createdAt', 'updatedAt', 'lastUpdated'
+          'createdAt', 'updatedAt', 'lastUpdated', 'pwaDismissed'
         ];
       }
 
