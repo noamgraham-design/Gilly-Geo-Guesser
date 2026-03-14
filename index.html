@@ -363,6 +363,37 @@
   #settings-email-updates-lbl {
     font-size: 0.82rem; color: var(--text); line-height: 1.4; flex: 1;
   }
+  /* Settings validate-pick toggle */
+  #settings-validate-pick-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 0;
+  }
+  #settings-validate-pick-lbl {
+    font-size: 0.82rem; color: var(--text); line-height: 1.4; flex: 1;
+  }
+  /* Location confirmation popup */
+  #loc-confirm-popup {
+    display: none; position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+    z-index: 8000; background: var(--surface); border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.22); padding: 12px 16px;
+    align-items: center; gap: 12px; white-space: nowrap;
+    animation: loginPop 0.22s cubic-bezier(.34,1.4,.64,1);
+  }
+  #loc-confirm-popup.visible { display: flex; }
+  #loc-confirm-popup span {
+    font-size: 0.88rem; font-weight: 600; color: var(--text);
+  }
+  #loc-confirm-popup .loc-confirm-yes {
+    padding: 7px 16px; border-radius: 10px; border: none;
+    background: #1a7f37; color: #fff; font-weight: 700; font-size: 0.85rem;
+    cursor: pointer; transition: opacity 0.15s;
+  }
+  #loc-confirm-popup .loc-confirm-yes:hover { opacity: 0.85; }
+  #loc-confirm-popup .loc-confirm-no {
+    padding: 7px 14px; border-radius: 10px; border: 1.5px solid var(--border);
+    background: none; color: var(--text); font-weight: 600; font-size: 0.85rem;
+    cursor: pointer; transition: border-color 0.15s;
+  }
+  #loc-confirm-popup .loc-confirm-no:hover { border-color: #cf2316; color: #cf2316; }
   .toggle-switch { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
   .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
   .toggle-track {
@@ -3435,6 +3466,13 @@
   </div>
 </div>
 
+<!-- Location confirmation popup (shown when validateLocationPick is enabled) -->
+<div id="loc-confirm-popup" role="dialog" aria-modal="true" aria-label="Confirm location">
+  <span id="loc-confirm-msg">📍 Confirm location?</span>
+  <button class="loc-confirm-yes" id="loc-confirm-yes" onclick="confirmLocationPick()">✓ Confirm</button>
+  <button class="loc-confirm-no"  id="loc-confirm-no"  onclick="cancelLocationPick()">✕ Cancel</button>
+</div>
+
 <div id="town-card">
   <div style="min-width:160px">
     <button class="btn btn-hint" id="btn-back" onclick="showMenu()" style="display:none">← תפריט</button>
@@ -3915,6 +3953,14 @@
       <span id="settings-email-updates-lbl">Email updates about new game levels and features</span>
       <label class="toggle-switch" aria-label="Toggle email updates">
         <input type="checkbox" id="settings-email-updates" onchange="saveEmailUpdatesPref()"/>
+        <span class="toggle-track"></span>
+      </label>
+    </div>
+
+    <div id="settings-validate-pick-row">
+      <span id="settings-validate-pick-lbl">Confirm location before submitting</span>
+      <label class="toggle-switch" aria-label="Toggle location confirmation">
+        <input type="checkbox" id="settings-validate-pick" onchange="toggleValidatePick()"/>
         <span class="toggle-track"></span>
       </label>
     </div>
@@ -4596,6 +4642,8 @@ let streak = 0, hintUsed = false, streetUsedThisRound = false, results = [], wai
 let locationFamiliarity = {}; // { [townName]: 0 | 1 | 2 } — 0=unfamiliar, 1=partly, 2=familiar
 let cumulativePoints = 0;    // total points earned across all regular quiz games (for leveling)
 let correctMarkers = [], clickMarker = null, circle = null, hintCircle = null, guessLine = null;
+let validateLocationPick = localStorage.getItem('validateLocationPick') === 'true';
+let _pendingMarker = null, _pendingLatLng = null;
 
 // ── Challenge mode state ──────────────────────────────────────────────────────
 let isChallengeMode = false;
@@ -6839,6 +6887,21 @@ function onMapClick(e) {
   if (waiting) return;
   if (isLearningMode) { handleLearningClick(e); return; }
 
+  // If confirmation mode is on, show a pending marker and await user confirmation
+  if (validateLocationPick) {
+    if (_pendingMarker) { map.removeLayer(_pendingMarker); _pendingMarker = null; }
+    _pendingLatLng = e.latlng;
+    _pendingMarker = L.circleMarker([e.latlng.lat, e.latlng.lng], {
+      radius: 8, color: '#1a6fd4', weight: 2.5, fillColor: '#1a6fd4', fillOpacity: 0.45,
+    }).addTo(map);
+    _showLocConfirmPopup();
+    return;
+  }
+
+  _processMapClick(e);
+}
+
+function _processMapClick(e) {
   haptic(30); // subtle tap on pin placement
 
   const town = sequence[currentIdx];
@@ -8352,6 +8415,7 @@ async function openSettingsModal() {
     }
   } finally {
     _settingsLoading = false;
+    document.getElementById('settings-validate-pick').checked = validateLocationPick;
   }
 }
 
@@ -8361,6 +8425,48 @@ function closeSettingsModal() {
   releaseFocus(modal);
   hideDeleteConfirm();
 }
+
+function toggleValidatePick() {
+  validateLocationPick = document.getElementById('settings-validate-pick').checked;
+  localStorage.setItem('validateLocationPick', validateLocationPick ? 'true' : 'false');
+}
+
+function _showLocConfirmPopup() {
+  const popup = document.getElementById('loc-confirm-popup');
+  const msg = document.getElementById('loc-confirm-msg');
+  msg.textContent = lang === 'he' ? '📍 לאשר את המיקום?' : '📍 Confirm location?';
+  document.getElementById('loc-confirm-yes').textContent = lang === 'he' ? '✓ אשר' : '✓ Confirm';
+  document.getElementById('loc-confirm-no').textContent  = lang === 'he' ? '✕ בטל'  : '✕ Cancel';
+  popup.classList.add('visible');
+  document.getElementById('loc-confirm-yes').focus();
+}
+
+function _hideLocConfirmPopup() {
+  document.getElementById('loc-confirm-popup').classList.remove('visible');
+}
+
+function confirmLocationPick() {
+  _hideLocConfirmPopup();
+  if (_pendingLatLng) {
+    const fakeEvent = { latlng: _pendingLatLng };
+    _pendingLatLng = null;
+    if (_pendingMarker) { map.removeLayer(_pendingMarker); _pendingMarker = null; }
+    _processMapClick(fakeEvent);
+  }
+}
+
+function cancelLocationPick() {
+  _hideLocConfirmPopup();
+  _pendingLatLng = null;
+  if (_pendingMarker) { map.removeLayer(_pendingMarker); _pendingMarker = null; }
+}
+
+document.addEventListener('keydown', (e) => {
+  const popup = document.getElementById('loc-confirm-popup');
+  if (!popup || !popup.classList.contains('visible')) return;
+  if (e.key === 'Escape') { e.preventDefault(); cancelLocationPick(); }
+  else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); confirmLocationPick(); }
+});
 function openPrivacyModal() {
   document.getElementById('privacy-modal').classList.add('open');
 }
