@@ -8997,7 +8997,30 @@ if ('serviceWorker' in navigator) {
     if (isStandalone()) return false;
     if (localStorage.getItem(INSTALL_KEY) === 'true') return false;
     if (wasDismissedRecently()) return false;
-    return deferredPrompt !== null || (isIOS() && isSafari());
+    return true;
+  }
+
+  function isAndroid() {
+    return /Android/.test(navigator.userAgent);
+  }
+
+  function getBrowserInstructions(isHe) {
+    var ua = navigator.userAgent;
+    if (/Edg/.test(ua)) return isHe
+      ? '1. לחצו על <strong>⋯</strong> (תפריט) בפינה העליונה<br>2. בחרו <strong>"התקן אפליקציה"</strong>'
+      : '1. Tap <strong>⋯</strong> (menu) at the top<br>2. Select <strong>"Install app"</strong>';
+    if (/Chrome/.test(ua) && !isAndroid()) return isHe
+      ? '1. לחצו על <strong>⋮</strong> (תפריט) בפינה העליונה<br>2. בחרו <strong>"התקנת האפליקציה"</strong>'
+      : '1. Click <strong>⋮</strong> (menu) at the top right<br>2. Select <strong>"Install app"</strong>';
+    if (/Chrome|CriOS/.test(ua) && isAndroid()) return isHe
+      ? '1. לחצו על <strong>⋮</strong> (תפריט) בפינה העליונה<br>2. בחרו <strong>"הוסף למסך הבית"</strong>'
+      : '1. Tap <strong>⋮</strong> (menu) at the top right<br>2. Tap <strong>"Add to Home screen"</strong>';
+    if (/Firefox/.test(ua)) return isHe
+      ? '1. לחצו על <strong>⋮</strong> (תפריט)<br>2. בחרו <strong>"התקן"</strong>'
+      : '1. Tap <strong>⋮</strong> (menu)<br>2. Select <strong>"Install"</strong>';
+    return isHe
+      ? 'פתחו את תפריט הדפדפן ובחרו <strong>"הוסף למסך הבית"</strong>'
+      : 'Open your browser menu and select <strong>"Add to Home Screen"</strong>';
   }
 
   function populatePrompt() {
@@ -9010,12 +9033,26 @@ if ('serviceWorker' in navigator) {
     const dismissBtn = document.getElementById('pwa-dismiss-btn');
 
     card.dir = isHe ? 'rtl' : 'ltr';
+    titleEl.textContent = isHe ? 'הוסיפו למסך הבית' : 'Add to Home Screen';
+    subEl.textContent = isHe
+      ? 'שחקו מהר יותר, בלי דפדפן, ישר מהמסך!'
+      : 'Play faster, no browser, right from your screen!';
 
-    if (isIOS() && isSafari()) {
-      titleEl.textContent = isHe ? 'התקינו את האפליקציה' : 'Add to Home Screen';
-      subEl.textContent = isHe
-        ? 'הוסיפו את החידון למסך הבית לחוויה מלאה!'
-        : 'Add the quiz to your home screen for the full experience!';
+    if (deferredPrompt) {
+      // Native install available (Android/Desktop Chrome/Edge)
+      bodyEl.innerHTML = isHe
+        ? '<ul class="pwa-benefits" dir="rtl">' +
+          '<li>⚡ גישה מהירה מהמסך הראשי</li>' +
+          '<li>📱 חוויה של אפליקציה מלאה</li>' +
+          '<li>🎯 ללא סרגל דפדפן</li></ul>'
+        : '<ul class="pwa-benefits">' +
+          '<li>⚡ Quick access from home screen</li>' +
+          '<li>📱 Full-screen app experience</li>' +
+          '<li>🎯 No browser toolbar</li></ul>';
+      installBtn.textContent = isHe ? 'הוסיפו למסך הבית' : 'Add to Home Screen';
+      installBtn.onclick = function() { triggerPwaInstall(); };
+    } else if (isIOS() && isSafari()) {
+      // iOS Safari — share sheet instructions
       bodyEl.innerHTML = isHe
         ? '<div class="pwa-ios-steps" dir="rtl">' +
           '1. לחצו על <span class="step-icon">⬆️</span> (שיתוף) בסרגל הכלים<br>' +
@@ -9028,21 +9065,11 @@ if ('serviceWorker' in navigator) {
       installBtn.textContent = isHe ? 'הבנתי!' : 'Got it!';
       installBtn.onclick = function() { dismissPwaPrompt(); };
     } else {
-      titleEl.textContent = isHe ? 'התקינו את האפליקציה' : 'Install the App';
-      subEl.textContent = isHe
-        ? 'שחקו מהר יותר, בלי דפדפן, ישר מהמסך!'
-        : 'Play faster, no browser, right from your screen!';
-      bodyEl.innerHTML = isHe
-        ? '<ul class="pwa-benefits" dir="rtl">' +
-          '<li>⚡ גישה מהירה מהמסך הראשי</li>' +
-          '<li>📱 חוויה של אפליקציה מלאה</li>' +
-          '<li>🎯 ללא סרגל דפדפן</li></ul>'
-        : '<ul class="pwa-benefits">' +
-          '<li>⚡ Quick access from home screen</li>' +
-          '<li>📱 Full-screen app experience</li>' +
-          '<li>🎯 No browser toolbar</li></ul>';
-      installBtn.textContent = isHe ? 'הוסיפו למסך הבית' : 'Add to Home Screen';
-      installBtn.onclick = function() { triggerPwaInstall(); };
+      // Fallback — browser-specific menu instructions
+      bodyEl.innerHTML = '<div class="pwa-ios-steps"' + (isHe ? ' dir="rtl"' : '') + '>' +
+        getBrowserInstructions(isHe) + '</div>';
+      installBtn.textContent = isHe ? 'הבנתי!' : 'Got it!';
+      installBtn.onclick = function() { dismissPwaPrompt(); };
     }
     dismissBtn.textContent = isHe ? 'לא עכשיו' : 'Not now';
   }
