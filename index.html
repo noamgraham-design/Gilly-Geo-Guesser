@@ -8438,9 +8438,11 @@ function toggleValidatePick() {
 function _showLocConfirmPopup() {
   const popup = document.getElementById('loc-confirm-popup');
   const msg = document.getElementById('loc-confirm-msg');
-  msg.textContent = lang === 'he' ? '📍 לאשר את המיקום?' : '📍 Confirm location?';
-  document.getElementById('loc-confirm-yes').textContent = lang === 'he' ? '✓ אשר' : '✓ Confirm';
-  document.getElementById('loc-confirm-no').textContent  = lang === 'he' ? '✕ בטל'  : '✕ Cancel';
+  const isHe = lang === 'he';
+  msg.textContent = isHe ? '📍 לאשר את המיקום?' : '📍 Confirm location?';
+  document.getElementById('loc-confirm-yes').textContent = isHe ? '✓ אשר' : '✓ Confirm';
+  document.getElementById('loc-confirm-no').textContent  = isHe ? '✕ בטל'  : '✕ Cancel';
+  popup.dir = isHe ? 'rtl' : 'ltr';
   popup.classList.add('visible');
   document.getElementById('loc-confirm-yes').focus();
 }
