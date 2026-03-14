@@ -8537,6 +8537,7 @@ async function saveSettings() {
   const msgEl = document.getElementById('settings-save-msg');
   msgEl.style.color = 'var(--muted)';
   msgEl.textContent = lang === 'he' ? 'שומר…' : 'Saving…';
+  msgEl.dir = lang === 'he' ? 'rtl' : 'ltr';
 
   try {
     const { setDoc, doc } = window._fbFns;
@@ -8553,6 +8554,7 @@ async function saveSettings() {
 
     msgEl.style.color = 'var(--green)';
     msgEl.textContent = selectedLang === 'he' ? '✅ נשמר!' : '✅ Saved!';
+    msgEl.dir = selectedLang === 'he' ? 'rtl' : 'ltr';
     setTimeout(() => { msgEl.textContent = ''; }, 2500);
   } catch(e) {
     msgEl.style.color = 'var(--red)';
