@@ -60,7 +60,7 @@ service cloud.firestore {
         return [
           'nickname', 'email', 'emailUpdates', 'gender', 'displayName',
           'cumulativePoints', 'level', 'highest_score',
-          'locationFamiliarity', 'language', 'validateLocation',
+          'locationFamiliarity', 'language',
           'createdAt', 'updatedAt', 'lastUpdated'
         ];
       }
