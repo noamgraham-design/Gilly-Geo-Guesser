@@ -32,6 +32,12 @@
 }
 </script>
 <link rel="icon" type="image/png" href="logo_head.png"/>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#1a6fd4">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Gilly">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
@@ -3410,6 +3416,66 @@
       transition-duration: 0.01ms !important;
     }
   }
+
+  /* ── PWA INSTALL PROMPT ───────────────────────────────────── */
+  #pwa-install-overlay {
+    display:none; position:fixed; inset:0; z-index:10200;
+    background:rgba(0,0,0,0.55); backdrop-filter:blur(4px);
+    align-items:center; justify-content:center;
+  }
+  #pwa-install-overlay.open { display:flex; }
+  #pwa-install-card {
+    background:var(--surface); border-radius:20px;
+    padding:32px 28px 24px; width:min(380px, 92vw);
+    box-shadow:0 24px 60px rgba(0,0,0,0.25);
+    display:flex; flex-direction:column; align-items:center; gap:14px;
+    animation:loginPop 0.28s cubic-bezier(.34,1.4,.64,1);
+    position:relative; text-align:center;
+  }
+  #pwa-install-card .pwa-icon {
+    width:72px; height:72px; border-radius:16px;
+    box-shadow:0 4px 16px rgba(0,0,0,0.12);
+  }
+  #pwa-install-card h3 {
+    font-family:'Playfair Display','Alef',serif;
+    font-size:1.4rem; font-weight:900;
+    background:linear-gradient(90deg,#1a6fd4,#7c3aed);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    background-clip:text; color:transparent;
+    margin:0;
+  }
+  #pwa-install-card .pwa-sub {
+    color:var(--muted); font-size:0.92rem; line-height:1.5;
+  }
+  #pwa-install-card .pwa-benefits {
+    list-style:none; padding:0; margin:0;
+    text-align:left; font-size:0.88rem; color:var(--text);
+  }
+  [dir="rtl"] #pwa-install-card .pwa-benefits { text-align:right; }
+  #pwa-install-card .pwa-benefits li { padding:3px 0; }
+  .pwa-btn-install {
+    width:100%; padding:12px; border-radius:50px; border:none;
+    background:linear-gradient(135deg,#1a6fd4,#7c3aed); color:#fff;
+    font-size:1rem; font-weight:700; font-family:'Source Serif 4','Alef',serif;
+    cursor:pointer; transition:all 0.15s;
+    box-shadow:0 4px 14px rgba(26,111,212,0.35);
+  }
+  .pwa-btn-install:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(26,111,212,0.45); }
+  .pwa-btn-dismiss {
+    background:none; border:none; color:var(--muted);
+    font-size:0.85rem; cursor:pointer; font-family:'Source Serif 4','Alef',serif;
+    padding:4px 12px;
+  }
+  .pwa-btn-dismiss:hover { color:var(--text); }
+  #pwa-install-close {
+    position:absolute; top:12px; right:16px;
+    background:none; border:none; font-size:1.3rem;
+    color:var(--muted); cursor:pointer; line-height:1;
+  }
+  [dir="rtl"] #pwa-install-close { right:auto; left:16px; }
+  .pwa-ios-steps { font-size:0.88rem; color:var(--text); line-height:1.7; text-align:left; }
+  [dir="rtl"] .pwa-ios-steps { text-align:right; }
+  .pwa-ios-steps .step-icon { font-size:1.1rem; vertical-align:middle; }
 </style>
 </head>
 <body>
@@ -3842,7 +3908,7 @@
     <div id="dp-count"></div>
     <div id="dp-btn-row">
       <button id="dp-share-btn"></button>
-      <button id="dp-close-btn" onclick="document.getElementById('daily-percentile-popup').classList.remove('show'); showMenu()" aria-label="סגור / Close"></button>
+      <button id="dp-close-btn" onclick="document.getElementById('daily-percentile-popup').classList.remove('show'); showMenu(); if(window._pwaShowAfterGame) window._pwaShowAfterGame()" aria-label="סגור / Close"></button>
     </div>
   </div>
 </div>
@@ -8295,6 +8361,7 @@ function closeQuizProgress() {
   document.getElementById('quiz-progress-popup').classList.remove('show');
   loadScoreboard(_qpPendingScore);
   _qpPendingScore = null;
+  if (window._pwaShowAfterGame) window._pwaShowAfterGame();
 }
 
 const _origShowResults = showResults;
@@ -8866,6 +8933,173 @@ function exitChallengeMode() {
   window.history.replaceState({}, '', url.toString());
   showMenu();
 }
+</script>
+
+<!-- PWA Install Prompt -->
+<div id="pwa-install-overlay" role="dialog" aria-modal="true" aria-labelledby="pwa-install-title"
+     onclick="if(event.target===this)dismissPwaPrompt()">
+  <div id="pwa-install-card">
+    <button id="pwa-install-close" onclick="dismissPwaPrompt()" aria-label="Close">&#10005;</button>
+    <img class="pwa-icon" src="logo_head.png" alt="Gilly's Israel Quiz" width="72" height="72">
+    <h3 id="pwa-install-title"></h3>
+    <p class="pwa-sub" id="pwa-install-sub"></p>
+    <div id="pwa-install-body"></div>
+    <button class="pwa-btn-install" id="pwa-install-btn"></button>
+    <button class="pwa-btn-dismiss" onclick="dismissPwaPrompt()" id="pwa-dismiss-btn"></button>
+  </div>
+</div>
+<script>
+// ── PWA: Service Worker Registration ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+
+// ── PWA: Install Prompt Logic ──
+(function() {
+  let deferredPrompt = null;
+  const DISMISS_KEY = 'pwa-install-dismissed';
+  const DISMISS_DAYS = 14;
+  const INSTALL_KEY = 'pwa-installed';
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+  });
+
+  window.addEventListener('appinstalled', () => {
+    localStorage.setItem(INSTALL_KEY, 'true');
+    deferredPrompt = null;
+    closePwaOverlay();
+  });
+
+  function isStandalone() {
+    return window.matchMedia('(display-mode: standalone)').matches
+        || window.navigator.standalone === true;
+  }
+
+  function isIOS() {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  }
+
+  function isSafari() {
+    return /Safari/.test(navigator.userAgent) && !/Chrome|CriOS|FxiOS/.test(navigator.userAgent);
+  }
+
+  function wasDismissedRecently() {
+    const ts = localStorage.getItem(DISMISS_KEY);
+    if (!ts) return false;
+    return (Date.now() - parseInt(ts, 10)) / (1000 * 60 * 60 * 24) < DISMISS_DAYS;
+  }
+
+  function shouldShowPrompt() {
+    if (isStandalone()) return false;
+    if (localStorage.getItem(INSTALL_KEY) === 'true') return false;
+    if (wasDismissedRecently()) return false;
+    return deferredPrompt !== null || (isIOS() && isSafari());
+  }
+
+  function populatePrompt() {
+    const isHe = (typeof lang !== 'undefined' && lang === 'he');
+    const card = document.getElementById('pwa-install-card');
+    const titleEl = document.getElementById('pwa-install-title');
+    const subEl = document.getElementById('pwa-install-sub');
+    const bodyEl = document.getElementById('pwa-install-body');
+    const installBtn = document.getElementById('pwa-install-btn');
+    const dismissBtn = document.getElementById('pwa-dismiss-btn');
+
+    card.dir = isHe ? 'rtl' : 'ltr';
+
+    if (isIOS() && isSafari()) {
+      titleEl.textContent = isHe ? 'התקינו את האפליקציה' : 'Add to Home Screen';
+      subEl.textContent = isHe
+        ? 'הוסיפו את החידון למסך הבית לחוויה מלאה!'
+        : 'Add the quiz to your home screen for the full experience!';
+      bodyEl.innerHTML = isHe
+        ? '<div class="pwa-ios-steps" dir="rtl">' +
+          '1. לחצו על <span class="step-icon">⬆️</span> (שיתוף) בסרגל הכלים<br>' +
+          '2. גללו ובחרו <strong>"הוסף למסך הבית"</strong> <span class="step-icon">➕</span><br>' +
+          '3. לחצו <strong>"הוסף"</strong></div>'
+        : '<div class="pwa-ios-steps">' +
+          '1. Tap <span class="step-icon">⬆️</span> (Share) in the toolbar<br>' +
+          '2. Scroll and tap <strong>"Add to Home Screen"</strong> <span class="step-icon">➕</span><br>' +
+          '3. Tap <strong>"Add"</strong></div>';
+      installBtn.textContent = isHe ? 'הבנתי!' : 'Got it!';
+      installBtn.onclick = function() { dismissPwaPrompt(); };
+    } else {
+      titleEl.textContent = isHe ? 'התקינו את האפליקציה' : 'Install the App';
+      subEl.textContent = isHe
+        ? 'שחקו מהר יותר, בלי דפדפן, ישר מהמסך!'
+        : 'Play faster, no browser, right from your screen!';
+      bodyEl.innerHTML = isHe
+        ? '<ul class="pwa-benefits" dir="rtl">' +
+          '<li>⚡ גישה מהירה מהמסך הראשי</li>' +
+          '<li>📱 חוויה של אפליקציה מלאה</li>' +
+          '<li>🎯 ללא סרגל דפדפן</li></ul>'
+        : '<ul class="pwa-benefits">' +
+          '<li>⚡ Quick access from home screen</li>' +
+          '<li>📱 Full-screen app experience</li>' +
+          '<li>🎯 No browser toolbar</li></ul>';
+      installBtn.textContent = isHe ? 'הוסיפו למסך הבית' : 'Add to Home Screen';
+      installBtn.onclick = function() { triggerPwaInstall(); };
+    }
+    dismissBtn.textContent = isHe ? 'לא עכשיו' : 'Not now';
+  }
+
+  function showPwaOverlay() {
+    populatePrompt();
+    const overlay = document.getElementById('pwa-install-overlay');
+    overlay.classList.add('open');
+    document.getElementById('pwa-install-btn').focus();
+    overlay.addEventListener('keydown', pwaKeyHandler);
+  }
+
+  function closePwaOverlay() {
+    const overlay = document.getElementById('pwa-install-overlay');
+    overlay.classList.remove('open');
+    overlay.removeEventListener('keydown', pwaKeyHandler);
+  }
+
+  function pwaKeyHandler(e) {
+    if (e.key === 'Escape') { dismissPwaPrompt(); return; }
+    if (e.key === 'Tab') {
+      const focusable = document.querySelectorAll('#pwa-install-card button');
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault(); last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault(); first.focus();
+      }
+    }
+  }
+
+  window.dismissPwaPrompt = function() {
+    localStorage.setItem(DISMISS_KEY, Date.now().toString());
+    closePwaOverlay();
+  };
+
+  window.triggerPwaInstall = function() {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((result) => {
+        if (result.outcome === 'accepted') {
+          localStorage.setItem(INSTALL_KEY, 'true');
+        }
+        deferredPrompt = null;
+        closePwaOverlay();
+      });
+    }
+  };
+
+  window._pwaShowAfterGame = function() {
+    if (!shouldShowPrompt()) return;
+    setTimeout(() => {
+      if (shouldShowPrompt()) showPwaOverlay();
+    }, 2000);
+  };
+})();
 </script>
 
 </body>
