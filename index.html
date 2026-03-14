@@ -6895,8 +6895,8 @@ function onMapClick(e) {
   if (waiting) return;
   if (isLearningMode) { handleLearningClick(e); return; }
 
-  // If confirmation mode is on, show a pending marker and await user confirmation
-  if (validateLocationPick) {
+  // If confirmation mode is on (logged-in users only), show a pending marker and await user confirmation
+  if (validateLocationPick && window._fbUser && !window._fbUser.isAnonymous) {
     if (_pendingMarker) { map.removeLayer(_pendingMarker); _pendingMarker = null; }
     _pendingLatLng = e.latlng;
     _pendingMarker = L.circleMarker([e.latlng.lat, e.latlng.lng], {
@@ -8418,7 +8418,9 @@ async function openSettingsModal() {
     }
   } finally {
     _settingsLoading = false;
-    document.getElementById('settings-validate-pick').checked = validateLocationPick;
+    const isLoggedIn = window._fbUser && !window._fbUser.isAnonymous;
+    document.getElementById('settings-validate-pick-row').style.display = isLoggedIn ? '' : 'none';
+    document.getElementById('settings-validate-pick').checked = isLoggedIn && validateLocationPick;
   }
 }
 
