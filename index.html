@@ -3432,10 +3432,21 @@
     animation:loginPop 0.28s cubic-bezier(.34,1.4,.64,1);
     position:relative; text-align:center;
   }
-  #pwa-install-card .pwa-icon {
-    width:72px; height:72px; border-radius:16px;
-    box-shadow:0 4px 16px rgba(0,0,0,0.12);
+  .pwa-logo-wrap {
+    position:relative; width:80px; height:80px; margin-bottom:4px;
   }
+  .pwa-logo-wrap .pwa-icon {
+    width:80px; height:80px; object-fit:contain;
+    animation:ciLogoFloat 2.6s ease-in-out infinite;
+  }
+  .pwa-logo-wrap .ci-spark {
+    position:absolute; font-size:13px; line-height:1;
+    animation:ciSpark 2.6s ease-in-out infinite;
+    pointer-events:none; user-select:none;
+  }
+  .pwa-logo-wrap .ci-spark-1 { top:-6px; right:-4px; color:#7c3aed; animation-delay:0s; font-size:15px; }
+  .pwa-logo-wrap .ci-spark-2 { bottom:2px; left:-8px; color:#1a6fd4; animation-delay:0.9s; font-size:10px; }
+  .pwa-logo-wrap .ci-spark-3 { top:50%; right:-12px; color:#e57c1a; animation-delay:1.7s; font-size:11px; }
   #pwa-install-card h3 {
     font-family:'Playfair Display','Alef',serif;
     font-size:1.4rem; font-weight:900;
@@ -8940,7 +8951,12 @@ function exitChallengeMode() {
      onclick="if(event.target===this)dismissPwaPrompt()">
   <div id="pwa-install-card">
     <button id="pwa-install-close" onclick="dismissPwaPrompt()" aria-label="Close">&#10005;</button>
-    <img class="pwa-icon" src="logo_head.png" alt="Gilly's Israel Quiz" width="72" height="72">
+    <div class="pwa-logo-wrap">
+      <img class="pwa-icon" src="logo_head.png" alt="Gilly's Israel Quiz">
+      <span class="ci-spark ci-spark-1">✦</span>
+      <span class="ci-spark ci-spark-2">✦</span>
+      <span class="ci-spark ci-spark-3">✦</span>
+    </div>
     <h3 id="pwa-install-title"></h3>
     <p class="pwa-sub" id="pwa-install-sub"></p>
     <div id="pwa-install-body"></div>
@@ -9035,7 +9051,7 @@ if ('serviceWorker' in navigator) {
     card.dir = isHe ? 'rtl' : 'ltr';
     titleEl.textContent = isHe ? 'הוסיפו למסך הבית' : 'Add to Home Screen';
     subEl.textContent = isHe
-      ? 'שחקו מהר יותר, בלי דפדפן, ישר מהמסך!'
+      ? 'שחקו מהר יותר, בלי דפדפן, במסך מלא!'
       : 'Play faster, no browser, right from your screen!';
 
     if (deferredPrompt) {
