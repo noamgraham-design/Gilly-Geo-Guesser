@@ -50,50 +50,78 @@ service cloud.firestore {
     }
 
     // ── USERS collection ──────────────────────────────────────────────────
+    // Allowed top-level fields for user documents
+    // Note: create checks ALL fields; update checks only CHANGED fields
+    // (because setDoc merge:true makes request.resource.data include the
+    //  entire document, which would fail hasOnly if any pre-existing field
+    //  was written before these rules existed).
     match /users/{userId} {
-      allow read: if isSignedIn();
-
-      allow write: if isSignedIn()
-        && request.auth.uid == userId
-        // Restrict allowed fields to prevent arbitrary data injection
-        && request.resource.data.keys().hasOnly([
+      function validUserFields() {
+        return [
           'nickname', 'email', 'emailUpdates', 'gender', 'displayName',
           'cumulativePoints', 'level', 'highest_score',
           'locationFamiliarity', 'language',
           'createdAt', 'updatedAt', 'lastUpdated'
-        ])
-        // Validate nickname if present
-        && (
-          !('nickname' in request.resource.data)
-          || (isString(request.resource.data.nickname)
-              && request.resource.data.nickname.size() >= 1
-              && request.resource.data.nickname.size() <= 15)
-        )
-        // Validate level if present (1-5)
-        && (
-          !('level' in request.resource.data)
-          || (isNumber(request.resource.data.level)
-              && request.resource.data.level >= 1
-              && request.resource.data.level <= 5)
-        )
-        // Validate cumulativePoints if present (non-negative)
-        && (
-          !('cumulativePoints' in request.resource.data)
-          || (isNumber(request.resource.data.cumulativePoints)
-              && request.resource.data.cumulativePoints >= 0)
-        )
-        // Validate highest_score if present (non-negative)
-        && (
-          !('highest_score' in request.resource.data)
-          || (isNumber(request.resource.data.highest_score)
-              && request.resource.data.highest_score >= 0)
-        )
-        // Validate gender if present
-        && (
-          !('gender' in request.resource.data)
-          || request.resource.data.gender == null
-          || request.resource.data.gender in ['male', 'female', 'other']
+        ];
+      }
+
+      function validUserData() {
+        return (
+          // Validate nickname if present
+          (
+            !('nickname' in request.resource.data)
+            || (isString(request.resource.data.nickname)
+                && request.resource.data.nickname.size() >= 1
+                && request.resource.data.nickname.size() <= 15)
+          )
+          // Validate level if present (1-5)
+          && (
+            !('level' in request.resource.data)
+            || (isNumber(request.resource.data.level)
+                && request.resource.data.level >= 1
+                && request.resource.data.level <= 5)
+          )
+          // Validate cumulativePoints if present (non-negative)
+          && (
+            !('cumulativePoints' in request.resource.data)
+            || (isNumber(request.resource.data.cumulativePoints)
+                && request.resource.data.cumulativePoints >= 0)
+          )
+          // Validate highest_score if present (non-negative)
+          && (
+            !('highest_score' in request.resource.data)
+            || (isNumber(request.resource.data.highest_score)
+                && request.resource.data.highest_score >= 0)
+          )
+          // Validate gender if present
+          && (
+            !('gender' in request.resource.data)
+            || request.resource.data.gender == null
+            || request.resource.data.gender in ['male', 'female', 'other']
+          )
         );
+      }
+
+      allow read: if isSignedIn();
+
+      // Create: validate all fields in the new document
+      allow create: if isSignedIn()
+        && request.auth.uid == userId
+        && request.resource.data.keys().hasOnly(validUserFields())
+        && validUserData();
+
+      // Update: only validate the fields being changed (not the entire doc)
+      // This avoids permission-denied when setDoc merge:true includes all
+      // existing fields in request.resource.data
+      allow update: if isSignedIn()
+        && request.auth.uid == userId
+        && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(validUserFields())
+        && validUserData();
+
+      // Delete: owner only (used by account deletion)
+      allow delete: if isSignedIn()
+        && request.auth.uid == userId;
     }
 
     // ── SCORES collection ─────────────────────────────────────────────────
