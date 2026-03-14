@@ -19,6 +19,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Gilly">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
+<script>window._pwaEvent=null;window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window._pwaEvent=e;});</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
@@ -7163,19 +7164,17 @@ if ('serviceWorker' in navigator) {
 
 // ── PWA: Install Prompt Logic ──
 (function() {
-  let deferredPrompt = null;
   const DISMISS_KEY = 'pwa-install-dismissed';
   const DISMISS_DAYS = 14;
   const INSTALL_KEY = 'pwa-installed';
 
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-  });
+  // Use the early-captured event from <head>, keep it in sync
+  function getDeferredPrompt() { return window._pwaEvent; }
+  function clearDeferredPrompt() { window._pwaEvent = null; }
 
   window.addEventListener('appinstalled', () => {
     localStorage.setItem(INSTALL_KEY, 'true');
-    deferredPrompt = null;
+    clearDeferredPrompt();
     closePwaOverlay();
   });
 
@@ -7259,7 +7258,7 @@ if ('serviceWorker' in navigator) {
       ? 'שחקו מהר יותר, בלי דפדפן, במסך מלא!'
       : 'Play faster, no browser, right from your screen!';
 
-    if (deferredPrompt) {
+    if (getDeferredPrompt()) {
       // Native install available (Android/Desktop Chrome/Edge)
       bodyEl.innerHTML = isHe
         ? '<ul class="pwa-benefits" dir="rtl">' +
@@ -7335,13 +7334,14 @@ if ('serviceWorker' in navigator) {
   };
 
   window.triggerPwaInstall = function() {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then((result) => {
+    var dp = getDeferredPrompt();
+    if (dp) {
+      dp.prompt();
+      dp.userChoice.then((result) => {
         if (result.outcome === 'accepted') {
           localStorage.setItem(INSTALL_KEY, 'true');
         }
-        deferredPrompt = null;
+        clearDeferredPrompt();
         closePwaOverlay();
       });
     }
