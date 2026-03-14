@@ -7368,7 +7368,7 @@ function exitChallengeMode() {
     var btn = document.getElementById('auth-dd-pwa-btn');
     var div = document.getElementById('auth-dd-pwa-divider');
     if (!btn) return;
-    var show = !isStandalone() && localStorage.getItem(INSTALL_KEY) !== 'true';
+    var show = !isStandalone();
     btn.style.display = show ? '' : 'none';
     div.style.display = show ? '' : 'none';
   }
