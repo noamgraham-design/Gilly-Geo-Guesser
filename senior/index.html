@@ -7173,6 +7173,7 @@ function exitChallengeMode() {
     localStorage.setItem(INSTALL_KEY, 'true');
     clearDeferredPrompt();
     closePwaOverlay();
+    if (window._logEvent) window._logEvent('pwa_install', { method: 'browser' });
   });
 
   function isStandalone() {
@@ -7272,13 +7273,15 @@ function exitChallengeMode() {
       // iOS Safari — share sheet instructions
       bodyEl.innerHTML = isHe
         ? '<div class="pwa-ios-steps" dir="rtl">' +
-          '1. לחצו על <span class="step-icon">⬆️</span> (שיתוף) בסרגל הכלים<br>' +
-          '2. גללו ובחרו <strong>"הוסף למסך הבית"</strong> <span class="step-icon">➕</span><br>' +
-          '3. לחצו <strong>"הוסף"</strong></div>'
+          '1. לחצו על <strong>⋯</strong> (אפשרויות נוספות) בתחתית המסך<br>' +
+          '2. לחצו על <span class="step-icon">⬆️</span> (שיתוף) בסרגל הכלים<br>' +
+          '3. גללו ובחרו <strong>"הוסף למסך הבית"</strong> <span class="step-icon">➕</span><br>' +
+          '4. לחצו <strong>"הוסף"</strong></div>'
         : '<div class="pwa-ios-steps">' +
-          '1. Tap <span class="step-icon">⬆️</span> (Share) in the toolbar<br>' +
-          '2. Scroll and tap <strong>"Add to Home Screen"</strong> <span class="step-icon">➕</span><br>' +
-          '3. Tap <strong>"Add"</strong></div>';
+          '1. Tap <strong>⋯</strong> (more options) at the bottom of the screen<br>' +
+          '2. Tap <span class="step-icon">⬆️</span> (Share) in the toolbar<br>' +
+          '3. Scroll and tap <strong>"Add to Home Screen"</strong> <span class="step-icon">➕</span><br>' +
+          '4. Tap <strong>"Add"</strong></div>';
       installBtn.textContent = isHe ? 'הבנתי!' : 'Got it!';
       installBtn.onclick = function() { dismissPwaPrompt(); };
     } else {
@@ -7335,6 +7338,7 @@ function exitChallengeMode() {
     if (dp) {
       dp.prompt();
       dp.userChoice.then((result) => {
+        if (window._logEvent) window._logEvent('pwa_install_prompt', { outcome: result.outcome });
         if (result.outcome === 'accepted') {
           localStorage.setItem(INSTALL_KEY, 'true');
         }
