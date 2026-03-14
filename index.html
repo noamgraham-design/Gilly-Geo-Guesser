@@ -7207,6 +7207,7 @@ window._onAuthChange = function(user) {
       getDoc(doc(window._fbDb, 'users', user.uid)).then(async snap => {
         if (snap.exists()) {
           const data = snap.data();
+          if (data.pwaDismissed) window._fbPwaDismissedTs = data.pwaDismissed;
           if (data.language) setLang(data.language);
           if (data.gender) {
             // Update in-memory state and gender button UI without triggering a save.
@@ -9009,6 +9010,10 @@ if ('serviceWorker' in navigator) {
     return /Safari/.test(navigator.userAgent) && !/Chrome|CriOS|FxiOS/.test(navigator.userAgent);
   }
 
+  function isDesktop() {
+    return !/Android|iPhone|iPad|iPod/.test(navigator.userAgent);
+  }
+
   function wasDismissedRecently() {
     const ts = localStorage.getItem(DISMISS_KEY);
     if (!ts) return false;
@@ -9018,7 +9023,19 @@ if ('serviceWorker' in navigator) {
   function shouldShowPrompt() {
     if (isStandalone()) return false;
     if (localStorage.getItem(INSTALL_KEY) === 'true') return false;
-    if (wasDismissedRecently()) return false;
+
+    // Logged-in user: check Firestore dismissal
+    if (window._fbUser && !window._fbUser.isAnonymous && window._fbPwaDismissedTs) {
+      if (isDesktop()) return false; // Desktop: permanent
+      var ms = typeof window._fbPwaDismissedTs.toMillis === 'function'
+        ? window._fbPwaDismissedTs.toMillis() : window._fbPwaDismissedTs;
+      if ((Date.now() - ms) / (1000 * 60 * 60 * 24) < DISMISS_DAYS) return false;
+      return true;
+    }
+
+    // Guest/anonymous: use localStorage
+    if (isDesktop() && localStorage.getItem(DISMISS_KEY)) return false; // Desktop: permanent
+    if (wasDismissedRecently()) return false; // Mobile: 14-day cooldown
     return true;
   }
 
@@ -9126,6 +9143,12 @@ if ('serviceWorker' in navigator) {
 
   window.dismissPwaPrompt = function() {
     localStorage.setItem(DISMISS_KEY, Date.now().toString());
+    if (window._fbUser && !window._fbUser.isAnonymous && window._fbFns && window._fbDb) {
+      var fns = window._fbFns;
+      fns.setDoc(fns.doc(window._fbDb, 'users', window._fbUser.uid),
+        { pwaDismissed: new Date() }, { merge: true }).catch(function(){});
+      window._fbPwaDismissedTs = Date.now();
+    }
     closePwaOverlay();
   };
 
