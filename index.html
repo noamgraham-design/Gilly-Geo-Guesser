@@ -6075,6 +6075,7 @@ function showMenu() {
   document.body.classList.remove('postgame');
   document.getElementById('scoreboard-panel').className = '';
   document.getElementById('quiz-progress-popup').classList.remove('show');
+  cancelLocationPick();
   document.getElementById('btn-back').style.display = 'none';
   closeMobileTools();
   clearAllMarkers();
