@@ -4734,7 +4734,7 @@ function applyLang() {
 
 let lang = "he";
 let difficulty = "easy", region = "all", sequence = [], currentIdx = 0, score = 0, roundCount = 8;
-let streak = 0, hintUsed = false, streetUsedThisRound = false, results = [], waiting = false;
+let streak = 0, hintUsed = false, streetUsedThisRound = false, results = [], waiting = false, _nextRoundTimer = null;
 let locationFamiliarity = {}; // { [townName]: 0 | 1 | 2 } — 0=unfamiliar, 1=partly, 2=familiar
 let cumulativePoints = 0;    // total points earned across all regular quiz games (for leveling)
 let correctMarkers = [], clickMarker = null, circle = null, hintCircle = null, guessLine = null;
@@ -6147,6 +6147,7 @@ function initPlaneAnimation() {
 function showMenu() {
   isLearningMode = false;
   isDailyChallenge = false;
+  if (_nextRoundTimer) { clearTimeout(_nextRoundTimer); _nextRoundTimer = null; }
   stopQuizCountdown();
   clearLearningPreview();
   clearDailyChallengePreview();
@@ -6953,6 +6954,7 @@ async function startGame() {
   // Outer shuffle randomises round order
   sequence = shuffle([...tierSelected, ...remaining]);
   roundCount = sequence.length;
+  if (_nextRoundTimer) { clearTimeout(_nextRoundTimer); _nextRoundTimer = null; }
   currentIdx = score = streak = 0;
   results = [];
   waiting = false;
@@ -7108,7 +7110,8 @@ function _processMapClick(e) {
 
   updateHUD();
 
-  setTimeout(() => {
+  _nextRoundTimer = setTimeout(() => {
+    _nextRoundTimer = null;
     clearMapFeedback();
     currentIdx++;
     waiting = false;
