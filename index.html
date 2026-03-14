@@ -4582,6 +4582,8 @@ function applyLang() {
     document.getElementById('gender-female').innerHTML = lang === 'he' ? '👩 נקבה'  : '👩 Female';
     document.getElementById('gender-other').innerHTML  = lang === 'he' ? '🧑 אחר'   : '🧑 Other';
     document.getElementById('settings-email-updates-lbl').textContent  = lang === 'he' ? 'עדכונים במייל על רמות ותכונות חדשות' : 'Email updates about new game levels and features';
+    const vpLbl = document.getElementById('settings-validate-pick-lbl');
+    if (vpLbl) { vpLbl.textContent = lang === 'he' ? 'אשר בחירת מיקום' : 'Confirm location before submitting'; vpLbl.dir = lang === 'he' ? 'rtl' : 'ltr'; }
     document.getElementById('settings-delete-btn').textContent        = lang === 'he' ? '🗑️ מחיקת חשבון'                                                                           : '🗑️ Delete my account';
     document.getElementById('settings-delete-confirm-msg').textContent = lang === 'he' ? 'פעולה זו תמחק לצמיתות את חשבונך וכל הנתונים. לא ניתן לבטל.' : 'This will permanently delete your account and all data. This cannot be undone.';
     document.getElementById('settings-delete-cancel').textContent     = lang === 'he' ? 'ביטול'  : 'Cancel';
