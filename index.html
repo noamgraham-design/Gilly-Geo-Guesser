@@ -5581,6 +5581,7 @@ function closeFactModal() {
   const factModal = document.getElementById('fact-modal');
   factModal.style.display = 'none';
   factModalOpen = false;
+  window._pendingFactTown = null;
   releaseFocus(factModal);
 }
 
