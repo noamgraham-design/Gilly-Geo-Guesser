@@ -5573,7 +5573,9 @@ function openFactModal(townName) {
 }
 
 function openLoginModalForFact() {
+  const town = window._pendingFactTown;
   closeFactModal();
+  window._pendingFactTown = town;
   openLoginModal();
 }
 
@@ -5581,6 +5583,7 @@ function closeFactModal() {
   const factModal = document.getElementById('fact-modal');
   factModal.style.display = 'none';
   factModalOpen = false;
+  window._pendingFactTown = null;
   releaseFocus(factModal);
 }
 
