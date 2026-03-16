@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coordinate Picker – Gilly Geo Guesser</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; display: flex; height: 100vh; background: #1a1a2e; color: #eee; }
+
+  /* ── Sidebar ── */
+  #sidebar {
+    width: 340px; min-width: 340px; display: flex; flex-direction: column;
+    background: #16213e; border-right: 1px solid #0f3460;
+  }
+  #sidebar h1 { font-size: 16px; padding: 14px 16px 10px; color: #e94560; }
+  #search-box {
+    margin: 0 12px 10px; padding: 8px 12px; border-radius: 6px;
+    border: 1px solid #0f3460; background: #1a1a2e; color: #eee; font-size: 14px;
+  }
+  #search-box::placeholder { color: #888; }
+  #filter-bar {
+    display: flex; gap: 6px; padding: 0 12px 10px; flex-wrap: wrap;
+  }
+  .filter-btn {
+    padding: 4px 10px; border-radius: 12px; border: 1px solid #0f3460;
+    background: transparent; color: #aaa; font-size: 12px; cursor: pointer;
+  }
+  .filter-btn.active { background: #0f3460; color: #e94560; border-color: #e94560; }
+  #town-list {
+    flex: 1; overflow-y: auto; padding: 0 8px;
+  }
+  .town-item {
+    padding: 8px 10px; margin-bottom: 2px; border-radius: 6px; cursor: pointer;
+    font-size: 13px; display: flex; justify-content: space-between; align-items: center;
+    transition: background .15s;
+  }
+  .town-item:hover { background: #1a1a2e; }
+  .town-item.selected { background: #0f3460; border-left: 3px solid #e94560; }
+  .town-name { font-weight: 600; }
+  .town-name-he { color: #aaa; font-size: 12px; margin-left: 6px; }
+  .town-tier { font-size: 11px; color: #888; white-space: nowrap; }
+
+  /* ── Map area ── */
+  #map-area { flex: 1; display: flex; flex-direction: column; }
+  #map { flex: 1; }
+
+  /* ── Bottom panel ── */
+  #panel {
+    background: #16213e; border-top: 1px solid #0f3460;
+    padding: 14px 20px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+  }
+  #panel .label { font-size: 12px; color: #888; margin-bottom: 2px; }
+  #panel .value { font-size: 14px; font-family: 'Courier New', monospace; color: #e94560; }
+  .coord-group { min-width: 160px; }
+  #copy-btn, #copy-obj-btn {
+    padding: 8px 18px; border-radius: 6px; border: none; cursor: pointer;
+    font-size: 13px; font-weight: 600; transition: background .15s;
+  }
+  #copy-btn { background: #e94560; color: #fff; }
+  #copy-btn:hover { background: #c73652; }
+  #copy-obj-btn { background: #0f3460; color: #eee; }
+  #copy-obj-btn:hover { background: #1a4a8a; }
+  #copy-btn:disabled, #copy-obj-btn:disabled { opacity: .4; cursor: default; }
+  #instructions {
+    font-size: 12px; color: #888; margin-left: auto; max-width: 300px; text-align: right; line-height: 1.4;
+  }
+
+  /* Toast */
+  #toast {
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+    background: #e94560; color: #fff; padding: 10px 24px; border-radius: 8px;
+    font-size: 14px; font-weight: 600; opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 9999;
+  }
+  #toast.show { opacity: 1; }
+
+  /* Distance badge */
+  #distance-info {
+    font-size: 13px; color: #ffa500; font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <h1>Coordinate Picker</h1>
+  <input id="search-box" type="text" placeholder="Search town (English / Hebrew)..." />
+  <div id="filter-bar">
+    <button class="filter-btn active" data-tier="all">All</button>
+    <button class="filter-btn" data-tier="1">Tier 1</button>
+    <button class="filter-btn" data-tier="2">Tier 2</button>
+    <button class="filter-btn" data-tier="3">Tier 3</button>
+  </div>
+  <div id="town-list"></div>
+</div>
+
+<div id="map-area">
+  <div id="map"></div>
+  <div id="panel">
+    <div class="coord-group">
+      <div class="label">Selected Town</div>
+      <div class="value" id="sel-town">—</div>
+    </div>
+    <div class="coord-group">
+      <div class="label">Original Coords</div>
+      <div class="value" id="orig-coords">—</div>
+    </div>
+    <div class="coord-group">
+      <div class="label">Picked Coords</div>
+      <div class="value" id="picked-coords">—</div>
+    </div>
+    <div id="distance-info"></div>
+    <button id="copy-btn" disabled>Copy lat, lng</button>
+    <button id="copy-obj-btn" disabled>Copy as Object</button>
+    <div id="instructions">Click a town in the list, then click the map to pick corrected coordinates.</div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="towns.js"></script>
+<script>
+(function() {
+  const towns = typeof ALL_TOWNS !== 'undefined' ? ALL_TOWNS : TOWNS;
+
+  // ── Map setup ──
+  const map = L.map('map', { zoomControl: true }).setView([31.5, 35.0], 8);
+
+  const street = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap', maxZoom: 19
+  });
+  const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: '© Esri', maxZoom: 19
+  });
+  street.addTo(map);
+  L.control.layers({ 'Street': street, 'Satellite': satellite }).addTo(map);
+
+  // ── Marker icons ──
+  function makeIcon(color) {
+    return L.divIcon({
+      className: '',
+      html: `<svg width="24" height="36" viewBox="0 0 24 36"><path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 24 12 24s12-15 12-24C24 5.4 18.6 0 12 0z" fill="${color}"/><circle cx="12" cy="12" r="5" fill="#fff"/></svg>`,
+      iconSize: [24, 36], iconAnchor: [12, 36], popupAnchor: [0, -36]
+    });
+  }
+  const redIcon = makeIcon('#e94560');
+  const greenIcon = makeIcon('#00c853');
+  const blueIcon = makeIcon('#2979ff');
+
+  // ── State ──
+  let selectedTown = null;
+  let pickedLatLng = null;
+  let originalMarker = null;
+  let pickedMarker = null;
+  let connectionLine = null;
+  let tierFilter = 'all';
+
+  // ── Town markers layer ──
+  const townMarkers = L.layerGroup().addTo(map);
+
+  function addTownMarkers(filteredTowns) {
+    townMarkers.clearLayers();
+    filteredTowns.forEach(t => {
+      const m = L.circleMarker([t.lat, t.lng], {
+        radius: 5, color: '#e94560', fillColor: '#e94560', fillOpacity: 0.6, weight: 1
+      });
+      m.bindTooltip(`${t.name} (${t.nameHe})`, { direction: 'top', offset: [0, -8] });
+      m.on('click', () => selectTown(t));
+      m.addTo(townMarkers);
+    });
+  }
+
+  // ── Sidebar list ──
+  const listEl = document.getElementById('town-list');
+  const searchBox = document.getElementById('search-box');
+
+  function renderList() {
+    const q = searchBox.value.toLowerCase();
+    const filtered = towns.filter(t => {
+      if (tierFilter !== 'all' && t.tier !== Number(tierFilter)) return false;
+      if (q && !t.name.toLowerCase().includes(q) && !(t.nameHe && t.nameHe.includes(q))) return false;
+      return true;
+    });
+    listEl.innerHTML = '';
+    filtered.forEach(t => {
+      const div = document.createElement('div');
+      div.className = 'town-item' + (selectedTown === t ? ' selected' : '');
+      div.innerHTML = `<span><span class="town-name">${t.name}</span><span class="town-name-he">${t.nameHe || ''}</span></span><span class="town-tier">T${t.tier} · ${t.region}</span>`;
+      div.addEventListener('click', () => selectTown(t));
+      listEl.appendChild(div);
+    });
+    addTownMarkers(filtered);
+  }
+
+  searchBox.addEventListener('input', renderList);
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      tierFilter = btn.dataset.tier;
+      renderList();
+    });
+  });
+
+  // ── Select a town ──
+  function selectTown(t) {
+    selectedTown = t;
+    pickedLatLng = null;
+    document.getElementById('sel-town').textContent = `${t.name} (${t.nameHe || ''})`;
+    document.getElementById('orig-coords').textContent = `${t.lat}, ${t.lng}`;
+    document.getElementById('picked-coords').textContent = '—';
+    document.getElementById('distance-info').textContent = '';
+    document.getElementById('copy-btn').disabled = true;
+    document.getElementById('copy-obj-btn').disabled = true;
+
+    // Clear old markers
+    if (originalMarker) map.removeLayer(originalMarker);
+    if (pickedMarker) map.removeLayer(pickedMarker);
+    if (connectionLine) map.removeLayer(connectionLine);
+
+    originalMarker = L.marker([t.lat, t.lng], { icon: redIcon })
+      .addTo(map)
+      .bindPopup(`<b>${t.name}</b><br>Original: ${t.lat}, ${t.lng}`);
+
+    map.setView([t.lat, t.lng], 14);
+    renderList();
+  }
+
+  // ── Pick coords on map ──
+  map.on('click', function(e) {
+    if (!selectedTown) {
+      toast('Select a town first');
+      return;
+    }
+    pickedLatLng = e.latlng;
+    const lat = round6(e.latlng.lat);
+    const lng = round6(e.latlng.lng);
+
+    document.getElementById('picked-coords').textContent = `${lat}, ${lng}`;
+    document.getElementById('copy-btn').disabled = false;
+    document.getElementById('copy-obj-btn').disabled = false;
+
+    if (pickedMarker) map.removeLayer(pickedMarker);
+    if (connectionLine) map.removeLayer(connectionLine);
+
+    pickedMarker = L.marker([lat, lng], { icon: greenIcon })
+      .addTo(map)
+      .bindPopup(`<b>${selectedTown.name}</b><br>Picked: ${lat}, ${lng}`);
+
+    connectionLine = L.polyline(
+      [[selectedTown.lat, selectedTown.lng], [lat, lng]],
+      { color: '#ffa500', weight: 2, dashArray: '6,6' }
+    ).addTo(map);
+
+    const dist = map.distance([selectedTown.lat, selectedTown.lng], [lat, lng]);
+    document.getElementById('distance-info').textContent =
+      dist < 1000 ? `${Math.round(dist)} m` : `${(dist / 1000).toFixed(2)} km`;
+  });
+
+  // ── Copy buttons ──
+  document.getElementById('copy-btn').addEventListener('click', () => {
+    if (!pickedLatLng) return;
+    const text = `lat:${round6(pickedLatLng.lat)}, lng:${round6(pickedLatLng.lng)}`;
+    copyToClipboard(text);
+    toast('Copied: ' + text);
+  });
+
+  document.getElementById('copy-obj-btn').addEventListener('click', () => {
+    if (!pickedLatLng || !selectedTown) return;
+    const t = selectedTown;
+    const text = `{ name:"${t.name}", lat:${round6(pickedLatLng.lat)}, lng:${round6(pickedLatLng.lng)}, region:"${t.region}", tier:${t.tier} }`;
+    copyToClipboard(text);
+    toast('Copied object snippet');
+  });
+
+  // ── Helpers ──
+  function round6(n) { return Math.round(n * 1000000) / 1000000; }
+
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    });
+  }
+
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 2000);
+  }
+
+  // ── Init ──
+  renderList();
+})();
+</script>
+</body>
+</html>
