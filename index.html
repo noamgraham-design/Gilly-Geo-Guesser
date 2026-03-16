@@ -5573,7 +5573,9 @@ function openFactModal(townName) {
 }
 
 function openLoginModalForFact() {
+  const town = window._pendingFactTown;
   closeFactModal();
+  window._pendingFactTown = town;
   openLoginModal();
 }
 
