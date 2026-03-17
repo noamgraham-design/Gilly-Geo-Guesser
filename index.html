@@ -3943,9 +3943,9 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
       מצא/י את המיקום על המפה
     </p>
     <div class="diff-row" id="diff-row">
-      <button class="diff-btn" id="d-easy"   onclick="setDiff('easy', true)">קל</button>
-      <button class="diff-btn active-medium" id="d-medium" onclick="setDiff('medium', true)">בינוני</button>
-      <button class="diff-btn" id="d-hard"   onclick="setDiff('hard', true)">קשה</button>
+      <button class="diff-btn" id="d-easy"   onclick="setDiff('easy')">קל</button>
+      <button class="diff-btn active-medium" id="d-medium" onclick="setDiff('medium')">בינוני</button>
+      <button class="diff-btn" id="d-hard"   onclick="setDiff('hard')">קשה</button>
     </div>
     <div class="diff-note" id="diff-note">ערים ועיירות</div>
     <div style="width:100%;border-top:1px solid var(--border);margin:4px 0 2px"></div>
@@ -4917,7 +4917,7 @@ function applyLang() {
 
 let lang = "he";
 let difficulty = "easy", region = "all", sequence = [], currentIdx = 0, score = 0, roundCount = 8;
-let _userChangedDiff = false;
+let _menuInteractive = false;
 let streak = 0, hintUsed = false, streetUsedThisRound = false, results = [], waiting = false, _nextRoundTimer = null;
 let locationFamiliarity = {}; // { [townName]: 0 | 1 | 2 } — 0=unfamiliar, 1=partly, 2=familiar
 let cumulativePoints = 0;    // total points earned across all regular quiz games (for leveling)
@@ -6168,8 +6168,7 @@ function updateHintBtn() {
   toolsBtn.textContent = text;
 }
 
-function setDiff(d, userAction) {
-  if (userAction) _userChangedDiff = true;
+function setDiff(d) {
   difficulty = d;
   ['easy','medium','hard'].forEach(k => {
     document.getElementById(`d-${k}`).className = `diff-btn${k === d ? ` active-${k}` : ''}`;
@@ -6335,7 +6334,6 @@ function initPlaneAnimation() {
 function showMenu() {
   isLearningMode = false;
   isDailyChallenge = false;
-  _userChangedDiff = false;
   if (_nextRoundTimer) { clearTimeout(_nextRoundTimer); _nextRoundTimer = null; }
   stopQuizCountdown();
   clearLearningPreview();
@@ -7133,6 +7131,15 @@ async function startLearning() {
 }
 
 async function startGame() {
+  // Sync difficulty & region from the DOM so the game always matches what the user sees,
+  // guarding against any state desync (e.g. async overrides, timing issues).
+  if (document.getElementById('d-easy').classList.contains('active-easy')) difficulty = 'easy';
+  else if (document.getElementById('d-hard').classList.contains('active-hard')) difficulty = 'hard';
+  else difficulty = 'medium';
+  region = 'all';
+  for (const k of ['north','center','south']) {
+    if (document.getElementById(`r-${k}`).classList.contains('active')) { region = k; break; }
+  }
   if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
     window._logEvent('quiz_game_start', { difficulty, region: region || 'all' });
   }
@@ -7409,6 +7416,7 @@ function generateRandomNickname() {
 
 // ── SPLASH SCREEN DISMISS ─────────────────────────────────────────────────
 function dismissSplash() {
+  _menuInteractive = true;
   const el = document.getElementById('splash-screen');
   if (el && !el.classList.contains('hidden')) {
     el.classList.add('hidden');
@@ -7489,9 +7497,9 @@ window._onAuthChange = function(user) {
             await setDoc(doc(window._fbDb, 'users', user.uid), { cumulativePoints, level: getPlayerLevel() }, { merge: true });
           }
           // Set default difficulty based on player level (only when on the menu
-          // and the user hasn't manually changed it yet)
+          // and the splash is still showing — avoid overriding after user can interact)
           const onMenu = document.getElementById('menu-card')?.style.display !== 'none';
-          if (onMenu && !_userChangedDiff) {
+          if (onMenu && !_menuInteractive) {
             const lvl = getPlayerLevel();
             const defaultDiff = lvl <= 1 ? 'easy' : lvl === 2 ? 'medium' : 'hard';
             setDiff(defaultDiff);
@@ -7504,7 +7512,7 @@ window._onAuthChange = function(user) {
           await setDoc(doc(window._fbDb, 'users', user.uid), { nickname: defaultNick, cumulativePoints: 0, level: 1 }, { merge: true });
           // New user starts at level 1 → default to easy
           const onMenu2 = document.getElementById('menu-card')?.style.display !== 'none';
-          if (onMenu2 && !_userChangedDiff) setDiff('easy');
+          if (onMenu2 && !_menuInteractive) setDiff('easy');
         }
         dismissSplash();
       });
