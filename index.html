@@ -7128,6 +7128,15 @@ async function startLearning() {
 }
 
 async function startGame() {
+  // Sync difficulty & region from the DOM so the game always matches what the user sees,
+  // guarding against any state desync (e.g. async overrides, timing issues).
+  if (document.getElementById('d-easy').classList.contains('active-easy')) difficulty = 'easy';
+  else if (document.getElementById('d-hard').classList.contains('active-hard')) difficulty = 'hard';
+  else difficulty = 'medium';
+  region = 'all';
+  for (const k of ['north','center','south']) {
+    if (document.getElementById(`r-${k}`).classList.contains('active')) { region = k; break; }
+  }
   if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
     window._logEvent('quiz_game_start', { difficulty, region: region || 'all' });
   }
