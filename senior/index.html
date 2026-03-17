@@ -823,7 +823,7 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
   #pts-popup {
     position: absolute;
     left: 50%;
-    top: 35%;
+    top: 30%;
     transform: translate(-50%, -50%);
     z-index: 1900;
     pointer-events: none;
@@ -856,8 +856,8 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
       -2px  0px 0 #fff, 2px  0px 0 #fff,  0px -2px 0 #fff, 0px  2px 0 #fff;
   }
   .pts-time-bonus {
-    display: block; margin-top: 4px;
-    font-family: 'Source Serif 4', 'Alef', serif; font-size: 1.4rem; font-weight: 700;
+    display: block; margin-top: 6px;
+    font-family: 'Source Serif 4', 'Alef', serif; font-size: 1.8rem; font-weight: 700;
     letter-spacing: 1px;
     text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
   }
@@ -2480,7 +2480,16 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
     #pts-popup {
       top: 32%;
     }
-    
+    .pts-number {
+      font-size: 4.2rem !important;
+    }
+    .pts-label {
+      font-size: 2rem !important;
+    }
+    .pts-time-bonus {
+      font-size: 1.3rem;
+    }
+
     /* Feedback toast — compact on mobile */
     #feedback {
       white-space: normal !important;
@@ -2599,6 +2608,15 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
     /* Points popup smaller on small phones */
     #pts-popup {
       top: 30%;
+    }
+    .pts-number {
+      font-size: 3.2rem !important;
+    }
+    .pts-label {
+      font-size: 1.5rem !important;
+    }
+    .pts-time-bonus {
+      font-size: 1.1rem;
     }
 
     #easy-mode-banner {
@@ -4685,8 +4703,8 @@ function showPtsPopup(pts, pct, perfect, distKm, timeBonus = 0) {
   else                  { emoji='💀'; grade=lang==='he'?'רחוק מאוד!':'Way off!';         color='#cf2316'; }
   const label = `${emoji} ${grade}`;
 
-  const fontSize  = perfect ? '5.5rem' : distKm<=15 ? '4.2rem' : distKm<=40 ? '3.2rem' : '2.5rem';
-  const labelSize = perfect ? '3.3rem' : distKm<=15 ? '2.5rem' : distKm<=40 ? '1.9rem' : '1.5rem';
+  const fontSize  = perfect ? '7rem' : distKm<=15 ? '5.5rem' : distKm<=40 ? '4.2rem' : '3.2rem';
+  const labelSize = perfect ? '4rem' : distKm<=15 ? '3rem' : distKm<=40 ? '2.4rem' : '1.9rem';
 
   const cls = perfect ? 'show-perfect' : distKm<=40 ? 'show-good' : 'show-miss';
   const dir = lang === 'he' ? 'rtl' : 'ltr';
