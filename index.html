@@ -8189,10 +8189,10 @@ async function loadScoreboard(myScore) {
     const blurEl = document.getElementById('sb-guest-blur');
     blurEl.dir = isHe ? 'rtl' : 'ltr';
     const fakeNames = isHe
-      ? ['שחקן מסתורי', 'גיאוגרף מומחה', 'נווט אלוף']
-      : ['Mystery Player', 'Geo Expert', 'Top Navigator'];
-    const fakeScores = [4850, 4620, 4510];
-    const medals = ['🥇', '🥈', '🥉'];
+      ? ['שחקן מסתורי', 'גיאוגרף מומחה']
+      : ['Mystery Player', 'Geo Expert'];
+    const fakeScores = [4850, 4620];
+    const medals = ['🥇', '🥈'];
     blurEl.innerHTML = fakeNames.map((n, i) => `<div class="sb-row"><span class="sb-rank ${i===0?'gold':i===1?'silver':i===2?'bronze':''}">${medals[i] || (i+1)}</span><div class="sb-name"><span class="sb-name-text">${n}</span></div><span class="sb-score">${fakeScores[i]}</span></div>`).join('');
     return;
   }
@@ -8393,9 +8393,9 @@ async function loadStandaloneScoreboard() {
     guest.style.display = 'block';
     const blurEl = document.getElementById('sb-modal-guest-blur');
     blurEl.dir = isHe ? 'rtl' : 'ltr';
-    const fakeNames  = isHe ? ['שחקן מסתורי', 'גיאוגרף מומחה', 'נווט אלוף'] : ['Mystery Player', 'Geo Expert', 'Top Navigator'];
-    const fakeScores = [4850, 4620, 4510];
-    const medals = ['🥇', '🥈', '🥉'];
+    const fakeNames  = isHe ? ['שחקן מסתורי', 'גיאוגרף מומחה'] : ['Mystery Player', 'Geo Expert'];
+    const fakeScores = [4850, 4620];
+    const medals = ['🥇', '🥈'];
     blurEl.innerHTML = fakeNames.map((n, i) =>
       `<div class="sb-row"><span class="sb-rank ${i===0?'gold':i===1?'silver':'bronze'}">${medals[i]}</span>` +
       `<div class="sb-name"><span class="sb-name-text">${n}</span></div>` +
