@@ -6158,7 +6158,15 @@ window._onAuthChange = function(user) {
         if (snap.exists()) {
           const data = snap.data();
           if (data.pwaDismissed) window._fbPwaDismissedTs = data.pwaDismissed;
-          if (data.language) setLang(data.language);
+          if (data.language) {
+            // If user explicitly chose English before login (via URL param or toggle),
+            // keep English and persist the preference to Firestore
+            if (lang === 'en' && data.language !== 'en') {
+              setDoc(doc(window._fbDb, 'users', user.uid), { language: 'en' }, { merge: true });
+            } else {
+              setLang(data.language);
+            }
+          }
           if (data.gender) {
             // Update in-memory state and gender button UI without triggering a save.
             // saveSettings() must not run here: the settings modal is closed and the
@@ -6177,7 +6185,7 @@ window._onAuthChange = function(user) {
         } else {
           // New user with no doc yet — create one with a default nickname
           const defaultNick = generateRandomNickname();
-          await setDoc(doc(window._fbDb, 'users', user.uid), { nickname: defaultNick }, { merge: true });
+          await setDoc(doc(window._fbDb, 'users', user.uid), { nickname: defaultNick, language: lang }, { merge: true });
         }
       });
     });
