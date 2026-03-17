@@ -3858,7 +3858,7 @@ function applyLang() {
   const ciS = document.getElementById('challenge-intro-sub');
   if (ciS) ciS.textContent = lang === 'he' ? '!לחץ/י על המפה איפה שאתה/ת חושב/ת שהוא נמצא' : 'Click on the map where you think it is!';
   const ciBtn = document.getElementById('challenge-intro-btn');
-  if (ciBtn) ciBtn.textContent = lang === 'he' ? 'בואו נתחיל! ←' : "Let's go →";
+  if (ciBtn) { ciBtn.textContent = lang === 'he' ? 'בואו נתחיל! ←' : "Let's go →"; ciBtn.dir = lang === 'he' ? 'rtl' : 'ltr'; }
   // Challenge result strings
   const lcrS = document.getElementById('lbl-cr-share');
   if (lcrS) lcrS.textContent = lang === 'he' ? 'שתפ/י את התוצאה' : 'Share your result';
@@ -3867,7 +3867,7 @@ function applyLang() {
   const lcrC = document.getElementById('lbl-cr-copy');
   if (lcrC) lcrC.textContent = lang === 'he' ? 'העתק תוצאה' : 'Copy result';
   const crPlay = document.getElementById('cr-play-btn');
-  if (crPlay) crPlay.textContent = lang === 'he' ? 'למשחק המלא ←' : 'Play the full game →';
+  if (crPlay) { crPlay.textContent = lang === 'he' ? 'למשחק המלא ←' : 'Play the full game →'; crPlay.dir = lang === 'he' ? 'rtl' : 'ltr'; }
   const ciBadge = document.getElementById('challenge-intro-badge');
   if (ciBadge) ciBadge.textContent = lang === 'he' ? 'אתגר' : 'Challenge';
   // Set text direction for text-heavy elements only (not the card itself, to keep button order stable)
