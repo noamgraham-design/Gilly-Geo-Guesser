@@ -889,6 +889,8 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
   #scoreboard-guest {
     text-align: center; color: var(--muted);
     padding: 0;
+    min-height: 0;
+    overflow-y: auto;
   }
 
   /* ── STANDALONE SCOREBOARD MODAL ──────────────────────────────────── */
@@ -2365,6 +2367,7 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
       margin-top: 10px;
       padding-top: 10px;
       border-top: 1px solid var(--border);
+      flex-shrink: 0;
     }
     #sb-mobile-play-again {
       flex: 1;
