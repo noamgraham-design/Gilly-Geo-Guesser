@@ -2357,6 +2357,28 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
       padding: 14px 16px !important;
     }
     #sb-close-btn { display: block !important; }
+    #sb-mobile-actions {
+      display: flex !important;
+      gap: 10px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+    #sb-mobile-play-again {
+      flex: 1;
+      font-size: 0.9rem;
+      padding: 10px 16px;
+      white-space: nowrap;
+    }
+    #sb-mobile-review {
+      flex: 1;
+      font-size: 0.9rem;
+      padding: 10px 16px;
+      white-space: nowrap;
+    }
+    .sb-mobile-hide-play-again #btn-play-again {
+      display: none !important;
+    }
 
     /* Hide logo and title on mobile */
     #topbar h1 {
@@ -3940,7 +3962,7 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
       <div id="sb-header-actions">
         <button id="sb-share-btn" onclick="shareLeaderboardScore()" aria-label="שתף ניקוד / Share score" style="display:none"></button>
         <button id="sb-top5-btn" onclick="toggleTop5View()">▲ Top 10</button>
-        <button id="sb-close-btn" onclick="document.getElementById('scoreboard-panel').classList.remove('show')" aria-label="סגור לוח תוצאות / Close scoreboard">✕</button>
+        <button id="sb-close-btn" onclick="closePostgameScoreboard()" aria-label="סגור לוח תוצאות / Close scoreboard">✕</button>
       </div>
     </div>
     <div id="scoreboard-list"></div>
@@ -3952,6 +3974,10 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
         <div class="sb-guest-sub" id="sb-guest-sub">Sign in to reveal your place.</div>
         <button class="sb-guest-cta" onclick="openLoginModal()" id="sb-signin-link">Sign in →</button>
       </div>
+    </div>
+    <div id="sb-mobile-actions" style="display:none">
+      <button id="sb-mobile-play-again" class="btn btn-primary" onclick="startGame()">▶ שחק שוב</button>
+      <button id="sb-mobile-review" class="btn-secondary" onclick="closePostgameScoreboard()">סקירת משחק</button>
     </div>
   </div>
 </div>
@@ -6278,6 +6304,7 @@ function showMenu() {
   document.getElementById('results-panel').className = '';
   document.body.classList.remove('postgame');
   document.getElementById('scoreboard-panel').className = '';
+  document.body.classList.remove('sb-mobile-hide-play-again');
   document.getElementById('quiz-progress-popup').classList.remove('show');
   cancelLocationPick();
   document.getElementById('btn-back').style.display = 'none';
@@ -6890,6 +6917,7 @@ function startDailyChallengeGame() {
   document.getElementById('results-panel').className = '';
   document.body.classList.remove('postgame');
   document.getElementById('scoreboard-panel').className = '';
+  document.body.classList.remove('sb-mobile-hide-play-again');
   document.getElementById('btn-back').style.display = 'inline-block';
 
   // Hide round/score HUD — no LOCATION counter either (step 3e)
@@ -7037,6 +7065,7 @@ async function startLearning() {
   document.body.classList.remove('postgame');
   document.getElementById('learning-results-panel').className = '';
   document.getElementById('scoreboard-panel').className = '';
+  document.body.classList.remove('sb-mobile-hide-play-again');
   document.getElementById('btn-back').style.display = 'inline-block';
 
   const v = REGION_VIEWS['all'];
@@ -7103,6 +7132,7 @@ async function startGame() {
   document.getElementById('results-panel').className = '';
   document.body.classList.remove('postgame');
   document.getElementById('scoreboard-panel').className = '';
+  document.body.classList.remove('sb-mobile-hide-play-again');
   document.getElementById('btn-back').style.display = 'inline-block';
   const v = REGION_VIEWS[region];
   map.setView(v.center, v.zoom);
@@ -8064,6 +8094,14 @@ async function loadScoreboard(myScore) {
   const guest   = document.getElementById('scoreboard-guest');
   const top5Btn = document.getElementById('sb-top5-btn');
   section.classList.add('show');
+  // On mobile, hide top-bar Play Again and show leaderboard action buttons
+  if (window.innerWidth <= 768) {
+    document.body.classList.add('sb-mobile-hide-play-again');
+    const mobPlayBtn = document.getElementById('sb-mobile-play-again');
+    const mobReviewBtn = document.getElementById('sb-mobile-review');
+    mobPlayBtn.textContent = lang === 'he' ? '▶ שחק שוב' : '▶ Play Again';
+    mobReviewBtn.textContent = lang === 'he' ? 'סקירת משחק' : 'Review Game';
+  }
   list.innerHTML = '';
   _sbData      = null;
   _sbTop5      = false;
@@ -8248,6 +8286,11 @@ function toggleStandaloneTop5View() {
       }
     });
   }
+}
+
+function closePostgameScoreboard() {
+  document.getElementById('scoreboard-panel').classList.remove('show');
+  document.body.classList.remove('sb-mobile-hide-play-again');
 }
 
 function openStandaloneScoreboard() {
@@ -8544,6 +8587,7 @@ showResults = async function() {
   window._pwaGamePlayed = true;
   // Reset scoreboard
   document.getElementById('scoreboard-panel').classList.remove('show');
+  document.body.classList.remove('sb-mobile-hide-play-again');
   document.getElementById('scoreboard-list').innerHTML = '';
   _sbData = null;
   _sbTop5 = false;
@@ -8994,6 +9038,7 @@ function startChallengeGame() {
   document.getElementById('results-panel').className = '';
   document.body.classList.remove('postgame');
   document.getElementById('scoreboard-panel').className = '';
+  document.body.classList.remove('sb-mobile-hide-play-again');
 
   const v = REGION_VIEWS['all'];
   map.setView(v.center, v.zoom);
