@@ -964,8 +964,8 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
     animation: sbGuestPulse 2.5s ease-in-out infinite;
   }
   @keyframes sbGuestPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.12); }
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
   }
   .sb-guest-hook {
     font-size: 1.05rem; font-weight: 800; color: var(--text);
