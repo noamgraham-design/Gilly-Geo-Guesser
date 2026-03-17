@@ -768,20 +768,21 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
   }
   #streak-banner {
     position: absolute;
-    top: 68%;
+    top: 65%;
     left: 50%;
     transform: translate(-50%, -50%) scale(0.4);
     z-index: 2000;
     background: linear-gradient(270deg, #ff6b35, #f7c59f, #ffbe0b, #fb5607, #ff006e, #ffbe0b, #ff6b35);
     background-size: 400% 400%;
     color: #fff;
-    padding: 28px 56px 32px;
+    padding: 28px 48px 32px;
     border-radius: 28px;
     box-shadow: 0 8px 48px rgba(0,0,0,0.35), 0 0 60px rgba(255,190,11,0.5);
     pointer-events: none;
     opacity: 0;
     white-space: nowrap;
     text-align: center;
+    max-width: 90vw;
   }
   #streak-banner.show {
     animation: bannerPop 0.5s cubic-bezier(.34,1.56,.64,1) forwards,
@@ -822,13 +823,14 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
   #pts-popup {
     position: absolute;
     left: 50%;
-    top: 38%;
+    top: 35%;
     transform: translate(-50%, -50%);
     z-index: 1900;
     pointer-events: none;
     text-align: center;
     opacity: 0;
     white-space: nowrap;
+    max-width: 90vw;
   }
   .pts-number {
     font-family: 'Playfair Display', 'Alef', serif;
@@ -2460,6 +2462,10 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
     }
     
     /* Streak banner smaller */
+    #streak-banner {
+      padding: 20px 32px 24px;
+      top: 62%;
+    }
     .streak-main {
       font-size: 2.2rem;
     }
@@ -2468,6 +2474,11 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
     }
     .streak-flames {
       font-size: 2.8rem;
+    }
+
+    /* Points popup smaller on mobile */
+    #pts-popup {
+      top: 32%;
     }
     
     /* Feedback toast — compact on mobile */
@@ -2571,13 +2582,25 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
       width: 90%;
     }
     
+    #streak-banner {
+      padding: 16px 24px 20px;
+      top: 60%;
+    }
     .streak-main {
       font-size: 1.8rem;
     }
     .streak-hebrew {
       font-size: 1.2rem;
     }
-    
+    .streak-flames {
+      font-size: 2.2rem;
+    }
+
+    /* Points popup smaller on small phones */
+    #pts-popup {
+      top: 30%;
+    }
+
     #easy-mode-banner {
       font-size: 1.5rem;
       padding: 16px 28px 18px;
