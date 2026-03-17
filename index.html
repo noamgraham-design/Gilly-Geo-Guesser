@@ -3976,8 +3976,8 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
       </div>
     </div>
     <div id="sb-mobile-actions" style="display:none">
-      <button id="sb-mobile-play-again" class="btn btn-primary" onclick="startGame()">▶ שחק שוב</button>
       <button id="sb-mobile-review" class="btn-secondary" onclick="closePostgameScoreboard()">סקירת משחק</button>
+      <button id="sb-mobile-play-again" class="btn btn-primary" onclick="startGame()">שחק שוב ▶</button>
     </div>
   </div>
 </div>
@@ -8099,7 +8099,7 @@ async function loadScoreboard(myScore) {
     document.body.classList.add('sb-mobile-hide-play-again');
     const mobPlayBtn = document.getElementById('sb-mobile-play-again');
     const mobReviewBtn = document.getElementById('sb-mobile-review');
-    mobPlayBtn.textContent = lang === 'he' ? '▶ שחק שוב' : '▶ Play Again';
+    mobPlayBtn.textContent = lang === 'he' ? 'שחק שוב ▶' : '▶ Play Again';
     mobReviewBtn.textContent = lang === 'he' ? 'סקירת משחק' : 'Review Game';
   }
   list.innerHTML = '';
