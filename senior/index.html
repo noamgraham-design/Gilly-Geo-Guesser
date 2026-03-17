@@ -6079,6 +6079,8 @@ function showResults() {
 
 setDiff('easy');
 setRegion('all');
+// Apply English language if ?lang=en is in the URL
+if (new URLSearchParams(window.location.search).get('lang') === 'en') lang = 'en';
 applyLang();
 
 function toggleFullscreen() {
@@ -6958,9 +6960,12 @@ function closeSharePopup() {
 }
 
 function shareWhatsApp() {
-  const url = window.location.href;
-  const text = encodeURIComponent('Play Gilly\'s Israel Quiz! 🇮🇱 ' + url);
-  window.open('https://wa.me/?text=' + text, '_blank');
+  let url = window.location.origin + window.location.pathname;
+  if (lang === 'en') url += '?lang=en';
+  const msg = lang === 'he'
+    ? 'שחקו בחידון ישראל של גילי! 🇮🇱 ' + url
+    : 'Play Gilly\'s Israel Quiz! 🇮🇱 ' + url;
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
 }
 
 let _barcodeInstance = null;
@@ -7029,7 +7034,9 @@ function selectChallengeTown(englishName) {
 }
 
 function _getChallengeUrl(town) {
-  return window.location.origin + window.location.pathname + '?challenge=' + encodeURIComponent(town.name);
+  let url = window.location.origin + window.location.pathname + '?challenge=' + encodeURIComponent(town.name);
+  if (lang === 'en') url += '&lang=en';
+  return url;
 }
 
 function shareChallengeCreate(method) {
