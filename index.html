@@ -6718,7 +6718,8 @@ function closeLevelUpPopup() {
 function shareLevelUpWhatsApp() {
   const level = window._levelUpShareTier;
   if (!level || level < 2 || level > 5) return;
-  const url = window.location.origin + window.location.pathname;
+  let url = window.location.origin + window.location.pathname;
+  if (lang === 'en') url += '?lang=en';
   const messages = {
     2: {
       he: '\u200F🚀 עליתי לרמה 2 בחידון ישראל של גילי!\n\u200Fאני עכשיו: שועל פריפריה 🦊🏘️\n\u200Fבואו לשחק: ' + url,
@@ -6751,7 +6752,8 @@ let _recordShareScore = null;
 function shareRecordWhatsApp() {
   const score = _recordShareScore;
   if (!score) return;
-  const url = window.location.origin + window.location.pathname;
+  let url = window.location.origin + window.location.pathname;
+  if (lang === 'en') url += '?lang=en';
   const text = lang === 'he'
     ? '\u200F🏆 שיא חדש בחידון ישראל של גילי!\n\u200F' + score + ' נקודות!\n\u200Fבואו לשחק: ' + url
     : '🏆 New Personal Best on Gilly\'s Israel Quiz!\n' + score + ' pts!\nPlay now: ' + url;
@@ -7380,6 +7382,8 @@ function showResults() {
 
 setDiff('easy');
 setRegion('all');
+// Apply English language if ?lang=en is in the URL
+if (new URLSearchParams(window.location.search).get('lang') === 'en') lang = 'en';
 applyLang();
 
 // Detect and launch challenge mode if URL param is present
@@ -8922,9 +8926,12 @@ function closeSharePopup() {
 }
 
 function shareWhatsApp() {
-  const url = window.location.href;
-  const text = encodeURIComponent('Play Gilly\'s Israel Quiz! 🇮🇱 ' + url);
-  window.open('https://wa.me/?text=' + text, '_blank');
+  let url = window.location.origin + window.location.pathname;
+  if (lang === 'en') url += '?lang=en';
+  const msg = lang === 'he'
+    ? 'שחקו בחידון ישראל של גילי! 🇮🇱 ' + url
+    : 'Play Gilly\'s Israel Quiz! 🇮🇱 ' + url;
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
 }
 
 let _barcodeInstance = null;
@@ -8996,7 +9003,9 @@ function selectChallengeTown(englishName) {
 }
 
 function _getChallengeUrl(town) {
-  return window.location.origin + window.location.pathname + '?challenge=' + encodeURIComponent(town.name);
+  let url = window.location.origin + window.location.pathname + '?challenge=' + encodeURIComponent(town.name);
+  if (lang === 'en') url += '&lang=en';
+  return url;
 }
 
 function shareChallengeCreate(method) {
