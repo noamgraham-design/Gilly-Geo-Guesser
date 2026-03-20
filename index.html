@@ -1099,10 +1099,10 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
     box-shadow: 0 4px 14px rgba(124,58,237,0.2);
   }
   .btn-mp-orange {
-    background: linear-gradient(135deg, #f97316, #ea580c);
+    background: linear-gradient(135deg, #fdba74, #fb923c);
     color: #fff;
     border: none;
-    box-shadow: 0 4px 14px rgba(249,115,22,0.35);
+    box-shadow: 0 4px 14px rgba(251,146,60,0.3);
     font-size: 0.95rem;
     padding: 8px 28px;
     min-width: 180px;
@@ -1110,8 +1110,8 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
   }
   .btn-mp-orange:hover {
     transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(249,115,22,0.5);
-    background: linear-gradient(135deg, #fb923c, #f97316);
+    box-shadow: 0 6px 20px rgba(251,146,60,0.45);
+    background: linear-gradient(135deg, #fed7aa, #fdba74);
   }
   .btn-whatsapp {
     background: linear-gradient(135deg, #25d366, #128c7e);
@@ -3696,7 +3696,7 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
     background:var(--card-bg, #fff); border-radius:18px; padding:28px 24px;
     max-width:420px; width:92%; max-height:85vh; overflow-y:auto;
     box-shadow:0 8px 32px rgba(0,0,0,0.25); text-align:center;
-    border-top:4px solid #f97316;
+    border-top:4px solid #fb923c;
   }
   #mp-lobby-modal.open .mp-lobby-card { animation: mpSlideUp 0.25s ease-out; }
   .mp-lobby-card h2 { margin:0 0 18px; font-size:1.4rem; }
@@ -4937,12 +4937,12 @@ const STRINGS = {
     mp_lobby_title:   "חדר משחק",
     mp_invite:        "📤 הזמינו חברים בוואטסאפ",
     mp_copy_link:     "📋 העתק קישור",
-    mp_start:         "← התחל משחק",
+    mp_start:         "התחל משחק ←",
     mp_waiting:       "ממתינים שהמארח יתחיל…",
     mp_players:       "שחקנים",
     mp_leaderboard:   "🏆 לוח תוצאות",
     mp_share_results: "📲 שתף תוצאות",
-    mp_back:          "← תפריט",
+    mp_back:          "תפריט ←",
     mp_round_wait:    "ממתינים לשאר השחקנים…",
     mp_time_up:       "נגמר הזמן!",
     mp_room_full:     "החדר מלא",
@@ -7711,7 +7711,7 @@ let _pendingGoogleUser = null; // set while new Google user hasn't yet accepted 
 window._onAuthChange = function(user) {
   const avatar = document.getElementById('auth-avatar');
   const label  = document.getElementById('auth-label');
-  if (user) {
+  if (user && !user.isAnonymous) {
     label.textContent = user.displayName ? user.displayName.split(' ')[0] : 'Account';
     if (user.photoURL) {
       avatar.innerHTML = `<img src="${esc(user.photoURL)}" alt="avatar"/>`;
@@ -7803,7 +7803,7 @@ window._onAuthChange = function(user) {
 };
 
 function handleAuthBtnClick() {
-  if (window._fbUser) { toggleAuthDropdown(); } else { openLoginModal(); }
+  if (window._fbUser && !window._fbUser.isAnonymous) { toggleAuthDropdown(); } else { openLoginModal(); }
 }
 function toggleAuthDropdown() {
   const dd = document.getElementById('auth-dropdown');
@@ -9526,6 +9526,10 @@ async function _mpEnsureAuth() {
 // ── Room Creation (Host) ───────────────────────────────────────────────────
 async function createMultiplayerRoom() {
   if (!_checkRate('mp_create', 10000)) return; // 10s cooldown
+  if (!window._fbDb || !window._fbFns) {
+    alert(lang === 'he' ? 'טוען... נסו שוב בעוד רגע' : 'Loading... please try again in a moment.');
+    return;
+  }
   try {
     const user = await _mpEnsureAuth();
     const { addDoc, collection, setDoc, doc, serverTimestamp } = window._fbFns;
@@ -9571,6 +9575,7 @@ async function createMultiplayerRoom() {
     if (window._logEvent) window._logEvent('mp_room_create', { difficulty, region });
   } catch (e) {
     console.error('Failed to create multiplayer room:', e);
+    alert(lang === 'he' ? 'לא הצלחנו ליצור חדר. נסו שוב.' : 'Could not create room. Please try again.');
   }
 }
 
@@ -9628,6 +9633,7 @@ async function _mpJoinRoom(roomId) {
     if (window._logEvent) window._logEvent('mp_room_join', { roomId });
   } catch (e) {
     console.error('Failed to join multiplayer room:', e);
+    alert(lang === 'he' ? 'לא הצלחנו להצטרף לחדר. נסו שוב.' : 'Could not join room. Please try again.');
   }
 }
 
