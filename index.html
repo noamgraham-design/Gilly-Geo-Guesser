@@ -9490,6 +9490,7 @@ async function _mpEnsureAuth() {
 
 // ── Room Creation (Host) ───────────────────────────────────────────────────
 async function createMultiplayerRoom() {
+  if (!_checkRate('mp_create', 10000)) return; // 10s cooldown
   try {
     const user = await _mpEnsureAuth();
     const { addDoc, collection, setDoc, doc, serverTimestamp } = window._fbFns;
@@ -9540,9 +9541,12 @@ async function createMultiplayerRoom() {
 
 // ── Room Joining (via URL) ─────────────────────────────────────────────────
 async function _mpJoinRoom(roomId) {
+  if (!_checkRate('mp_join', 5000)) return; // 5s cooldown
+  // Validate roomId format (Firestore auto-generated IDs are 20 alphanumeric chars)
+  if (!roomId || roomId.length > 40 || !/^[a-zA-Z0-9]+$/.test(roomId)) return;
   try {
     const user = await _mpEnsureAuth();
-    const { getDoc, doc, setDoc, updateDoc, serverTimestamp } = window._fbFns;
+    const { getDoc, doc, setDoc, serverTimestamp } = window._fbFns;
 
     _mpRoomId = roomId;
     _mpRoomRef = doc(window._fbDb, 'rooms', roomId);
@@ -9553,6 +9557,11 @@ async function _mpJoinRoom(roomId) {
       return;
     }
     const data = snap.data();
+    // Reject stale rooms (older than 2 hours)
+    if (data.createdAt && data.createdAt.toDate && (Date.now() - data.createdAt.toDate().getTime()) > 2 * 60 * 60 * 1000) {
+      alert(t('mp_room_gone'));
+      return;
+    }
     if (data.status !== 'lobby') {
       alert(t('mp_game_started'));
       return;
@@ -9567,17 +9576,12 @@ async function _mpJoinRoom(roomId) {
     difficulty = data.difficulty || 'easy';
     region = data.region || 'all';
 
-    // Add self to players subcollection
+    // Add self to players subcollection (host's listener will sync playerCount)
     await setDoc(doc(window._fbDb, 'rooms', roomId, 'players', user.uid), {
       nickname: _mpGetNickname(),
       score: 0,
       answeredRound: -1,
       joinedAt: serverTimestamp()
-    });
-
-    // Increment player count
-    await updateDoc(_mpRoomRef, {
-      playerCount: (data.playerCount || 1) + 1
     });
 
     _mpStartListeners();
@@ -9640,6 +9644,15 @@ function _mpStartListeners() {
       _mpPlayers = {};
       snap.forEach(d => { _mpPlayers[d.id] = d.data(); });
       _mpUpdatePlayersUI();
+
+      // Host: sync playerCount on room doc when players join/leave
+      if (_mpIsHost && _mpRoomData) {
+        const count = Object.keys(_mpPlayers).length;
+        if (count !== _mpRoomData.playerCount) {
+          const { updateDoc } = window._fbFns;
+          updateDoc(_mpRoomRef, { playerCount: count }).catch(() => {});
+        }
+      }
 
       // Host: check if all players answered this round
       if (_mpIsHost && _mpRoomData && _mpRoomData.status === 'playing') {
@@ -9737,6 +9750,7 @@ function mpCopyLink() {
 // ── Start Game (Host) ──────────────────────────────────────────────────────
 async function mpStartGame() {
   if (!_mpIsHost) return;
+  if (!_checkRate('mp_start', 5000)) return; // 5s cooldown
   const { updateDoc } = window._fbFns;
 
   // Build town sequence (same logic as startGame)
@@ -9856,6 +9870,7 @@ function _mpStopCountdown() {
 // ── Player Answers ─────────────────────────────────────────────────────────
 async function _mpSubmitAnswer(pts, hit, distKm, town) {
   if (_mpAnsweredThisRound) return;
+  if (!_checkRate('mp_answer', 2000)) return; // 2s cooldown
   _mpAnsweredThisRound = true;
 
   const { updateDoc, doc } = window._fbFns;
@@ -9899,6 +9914,7 @@ function _mpHostCheckAllAnswered() {
 
 async function _mpHostAdvanceRound() {
   if (!_mpIsHost) return;
+  if (!_checkRate('mp_advance', 2000)) return; // 2s cooldown
   clearTimeout(_mpRoundTimer);
   const { updateDoc } = window._fbFns;
   const nextRound = (_mpRoomData.currentRound || 0) + 1;
@@ -9983,6 +9999,7 @@ function _mpShowLeaderboard() {
 // ── Play Again (reopen lobby for same room) ───────────────────────────────
 async function mpPlayAgain() {
   if (!_mpRoomId || !window._fbFns || !window._fbDb) return;
+  if (!_checkRate('mp_play_again', 5000)) return; // 5s cooldown
   const { updateDoc, doc, setDoc, serverTimestamp } = window._fbFns;
   const uid = window._fbUser?.uid;
 
