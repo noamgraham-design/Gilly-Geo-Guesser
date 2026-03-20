@@ -9605,7 +9605,8 @@ function _mpGenerateRoomCode() {
 }
 
 function _mpGetNickname() {
-  return window._userNickname || generateRandomNickname();
+  if (!window._userNickname) window._userNickname = generateRandomNickname();
+  return window._userNickname;
 }
 
 let _mpNickSaveTimer = null;
