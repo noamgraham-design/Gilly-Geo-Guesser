@@ -228,7 +228,7 @@ service cloud.firestore {
         && resource.data.hostUid == request.auth.uid
         // Restrict updatable fields (hostUid cannot change)
         && request.resource.data.diff(resource.data).affectedKeys()
-            .hasOnly(['status', 'sequence', 'currentRound', 'roundStartedAt', 'roundCount', 'playerCount'])
+            .hasOnly(['status', 'sequence', 'currentRound', 'roundStartedAt', 'roundCount', 'playerCount', 'hostUid'])
         // Status must be a valid value
         && request.resource.data.status in ['lobby', 'playing', 'finished']
         // playerCount capped at 100
@@ -249,7 +249,7 @@ service cloud.firestore {
           && request.auth.uid == playerId
           // Restrict allowed fields
           && request.resource.data.keys().hasOnly([
-            'nickname', 'score', 'answeredRound', 'joinedAt'
+            'nickname', 'score', 'answeredRound', 'joinedAt', 'level', 'spectator'
           ])
           // Validate nickname (1-15 chars)
           && request.resource.data.nickname is string
@@ -260,7 +260,14 @@ service cloud.firestore {
           && request.resource.data.score <= 10000
           // Validate answeredRound
           && request.resource.data.answeredRound >= -1
-          && request.resource.data.answeredRound <= 20;
+          && request.resource.data.answeredRound <= 20
+          // Validate level if present (0 for anon, 1-5 for signed-in)
+          && (!('level' in request.resource.data)
+              || (request.resource.data.level >= 0
+                  && request.resource.data.level <= 5))
+          // Validate spectator if present (boolean)
+          && (!('spectator' in request.resource.data)
+              || request.resource.data.spectator is bool);
 
         // Player can delete their own doc; host can also remove players
         allow delete: if request.auth != null
