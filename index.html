@@ -1087,9 +1087,8 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
     background: transparent;
     border: 2px solid #7c3aed;
     color: #7c3aed;
-    font-size: 0.82rem;
-    padding: 4px 20px;
-    min-width: 180px;
+    font-size: 0.95rem;
+    padding: 8px 28px;
     text-align: center;
     transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
   }
@@ -1105,8 +1104,6 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
     box-shadow: 0 4px 14px rgba(217,119,6,0.35);
     font-size: 0.95rem;
     padding: 8px 28px;
-    min-width: 180px;
-    width: 100%;
     text-align: center;
   }
   .btn-mp-orange:hover {
@@ -2239,6 +2236,14 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
     font-weight: 700;
   }
 
+  /* Main menu buttons wrapper — sizes all buttons to widest text */
+  .menu-main-btns {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
   /* Start button */
   .btn-start-gold {
     background: linear-gradient(135deg, #1a6fd4, #1558b0);
@@ -2247,8 +2252,6 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
     box-shadow: 0 4px 14px rgba(26,111,212,0.35);
     font-size: 0.95rem;
     padding: 8px 28px;
-    min-width: 180px;
-    width: 100%;
     text-align: center;
   }
   .btn-start-gold:hover {
@@ -2346,14 +2349,9 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
     .region-label {
       font-size: 0.82rem;
     }
-    .btn-start-gold {
+    .menu-main-btns .btn {
       font-size: 1rem;
       padding: 8px 30px;
-      min-width: 200px;
-    }
-    .btn-learn {
-      font-size: 0.92rem;
-      padding: 6px 22px;
     }
     .menu-logo {
       max-width: 380px;
@@ -3753,6 +3751,7 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
   }
   .mp-player-you { color:var(--muted); font-size:0.82rem; }
   #mp-lobby-actions { display:flex; flex-direction:column; gap:10px; margin-bottom:14px; }
+  #mp-lobby-actions .btn, .mp-lb-actions .btn { width:100%; }
   #mp-lobby-code {
     font-family:monospace; font-size:1.3rem; letter-spacing:3px;
     background:rgba(0,0,0,0.06); padding:8px 16px; border-radius:10px;
@@ -4200,9 +4199,11 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
         <div class="region-label" id="r-south-label">דרום</div>
       </div>
     </div>
-    <button id="start-btn" class="btn btn-start-gold" onclick="startGame()">← התחל משחק</button>
-    <button id="mp-btn" class="btn btn-mp-orange" onclick="createMultiplayerRoom()">👥 משחק קבוצתי</button>
-    <button id="learn-btn" class="btn btn-learn" onclick="startLearning()">🗺️ מצב למידה</button>
+    <div class="menu-main-btns">
+      <button id="start-btn" class="btn btn-start-gold" onclick="startGame()">← התחל משחק</button>
+      <button id="mp-btn" class="btn btn-mp-orange" onclick="createMultiplayerRoom()">👥 משחק קבוצתי</button>
+      <button id="learn-btn" class="btn btn-learn" onclick="startLearning()">🗺️ מצב למידה</button>
+    </div>
     <div id="accessibility-footer-bar" dir="rtl">
       <a href="accessibility.html" id="accessibility-footer-link">הצהרת נגישות</a>
       <span id="accessibility-contact-label" dir="rtl">צור קשר:</span>
