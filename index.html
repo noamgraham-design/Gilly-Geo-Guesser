@@ -9868,6 +9868,13 @@ function _mpOnGameStart() {
   hintsLeft = 3;
   _mpAnsweredThisRound = false;
 
+  // Reset own answeredRound so host doesn't think we already answered
+  const _uid = window._fbUser?.uid;
+  if (_uid) {
+    const { updateDoc, doc } = window._fbFns;
+    updateDoc(doc(window._fbDb, 'rooms', _mpRoomId, 'players', _uid), { answeredRound: -1 }).catch(() => {});
+  }
+
   // Hide menu, show game UI
   document.getElementById('overlay').style.display = 'none';
   document.getElementById('results-panel').className = '';
