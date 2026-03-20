@@ -226,7 +226,7 @@ service cloud.firestore {
       // Only the host can update the room (advance rounds, change status)
       allow update: if request.auth != null
         && resource.data.hostUid == request.auth.uid
-        // Restrict updatable fields (hostUid cannot change)
+        // Restrict updatable fields
         && request.resource.data.diff(resource.data).affectedKeys()
             .hasOnly(['status', 'sequence', 'currentRound', 'roundStartedAt', 'roundCount', 'playerCount', 'hostUid'])
         // Status must be a valid value
@@ -234,7 +234,10 @@ service cloud.firestore {
         // playerCount capped at 100
         && request.resource.data.playerCount <= 100
         // sequence max 20 rounds
-        && request.resource.data.sequence.size() <= 20;
+        && request.resource.data.sequence.size() <= 20
+        // hostUid must remain a non-empty string (prevents nullification)
+        && request.resource.data.hostUid is string
+        && request.resource.data.hostUid.size() > 0;
 
       // Host can delete the room
       allow delete: if request.auth != null
