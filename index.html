@@ -99,9 +99,12 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
     onSnapshot, updateDoc
   };
 
-  onAuthStateChanged(auth, user => {
-    window._fbUser = user || null;
-    if (window._onAuthChange) window._onAuthChange(user);
+  window._fbAuthReady = new Promise(resolve => {
+    onAuthStateChanged(auth, user => {
+      window._fbUser = user || null;
+      if (window._onAuthChange) window._onAuthChange(user);
+      resolve();
+    });
   });
 </script>
 <style>
@@ -9642,6 +9645,8 @@ function _mpGetRoomUrl() {
 
 // ── Ensure user is signed in (anonymous if needed) ─────────────────────────
 async function _mpEnsureAuth() {
+  // Wait for Firebase auth to resolve persistent session before checking
+  if (window._fbAuthReady) await window._fbAuthReady;
   if (window._fbUser) return window._fbUser;
   const { signInAnonymously } = window._fbFns;
   const cred = await signInAnonymously(window._fbAuth);
@@ -10459,10 +10464,10 @@ function _mpCleanup() {
 function _initMultiplayerMode() {
   const roomParam = new URLSearchParams(window.location.search).get('room');
   if (!roomParam) return;
-  // Wait for auth to be ready, then join
+  // Wait for Firebase and auth to be ready, then join
   const tryJoin = () => {
-    if (window._fbDb && window._fbFns) {
-      _mpJoinRoom(roomParam);
+    if (window._fbDb && window._fbFns && window._fbAuthReady) {
+      window._fbAuthReady.then(() => _mpJoinRoom(roomParam));
     } else {
       setTimeout(tryJoin, 300);
     }
