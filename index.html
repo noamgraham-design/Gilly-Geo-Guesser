@@ -10036,7 +10036,7 @@ function mpCopyLink() {
 async function mpStartGame() {
   if (!_mpIsHost) return;
   if (!_checkRate('mp_start', 5000)) return; // 5s cooldown
-  const { updateDoc } = window._fbFns;
+  const { updateDoc, writeBatch, doc } = window._fbFns;
 
   // Build town sequence (same logic as startGame)
   const tierFilter = TOWNS.filter(t => t.tier <= DIFF[difficulty].maxTier);
@@ -10051,6 +10051,13 @@ async function mpStartGame() {
     tier: t.tier, nameHe: t.nameHe, region: t.region,
     desc: t.desc, descHe: t.descHe
   }));
+
+  // Reset all player scores before starting
+  const batch = writeBatch(window._fbDb);
+  for (const pid of Object.keys(_mpPlayers)) {
+    batch.update(doc(window._fbDb, 'rooms', _mpRoomId, 'players', pid), { score: 0, answeredRound: -1 });
+  }
+  await batch.commit();
 
   await updateDoc(_mpRoomRef, {
     status: 'playing',
