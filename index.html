@@ -10059,7 +10059,7 @@ function _mpOnGameStart() {
   const _uid = window._fbUser?.uid;
   if (_uid) {
     const { updateDoc, doc } = window._fbFns;
-    updateDoc(doc(window._fbDb, 'rooms', _mpRoomId, 'players', _uid), { answeredRound: -1 }).catch(() => {});
+    updateDoc(doc(window._fbDb, 'rooms', _mpRoomId, 'players', _uid), { answeredRound: -1, score: 0 }).catch(() => {});
   }
 
   // Hide menu, show game UI
