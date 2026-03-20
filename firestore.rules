@@ -179,5 +179,36 @@ service cloud.firestore {
       allow delete: if isSignedIn()
         && request.auth.uid == resource.data.uid;
     }
+
+    // ── MULTIPLAYER ROOMS collection ──────────────────────────────────────
+    match /rooms/{roomId} {
+      // Anyone signed in (including anonymous) can read rooms
+      allow read: if request.auth != null;
+
+      // Anyone signed in can create a room (must set self as host)
+      allow create: if request.auth != null
+        && request.resource.data.hostUid == request.auth.uid;
+
+      // Any signed-in player can update (host advances rounds, players update count)
+      allow update: if request.auth != null;
+
+      // Host can delete the room
+      allow delete: if request.auth != null
+        && resource.data.hostUid == request.auth.uid;
+
+      // Player subcollection — each player writes only their own doc
+      match /players/{playerId} {
+        allow read: if request.auth != null;
+
+        // Players can only create/update their own player doc
+        allow create, update: if request.auth != null
+          && request.auth.uid == playerId;
+
+        // Player can delete their own doc; host can also remove players
+        allow delete: if request.auth != null
+          && (request.auth.uid == playerId
+              || get(/databases/$(database)/documents/rooms/$(roomId)).data.hostUid == request.auth.uid);
+      }
+    }
   }
 }
