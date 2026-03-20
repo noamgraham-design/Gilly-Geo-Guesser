@@ -4988,7 +4988,7 @@ const STRINGS = {
     mp_room_gone:     "Room not found",
     mp_host_label:    "Host",
     mp_you_label:     "(you)",
-    mp_wa_invite:     "Join my Gilly Israel Quiz game! 🇮🇱",
+    mp_wa_invite:     "Join a multiplayer game on Gilly's Israel Quiz! 🇮🇱",
     mp_joined:        "joined!",
     mp_round_of:      "of",
     mp_play_again:    "▶ Play Again",
@@ -5050,7 +5050,7 @@ const STRINGS = {
     mp_room_gone:     "החדר לא נמצא",
     mp_host_label:    "מארח",
     mp_you_label:     "(את/ה)",
-    mp_wa_invite:     "הצטרפו לחידון ישראל של גילי! 🇮🇱",
+    mp_wa_invite:     "הצטרפו למשחק משותף בחידון ישראל של גילי! 🇮🇱",
     mp_joined:        "הצטרף/ה!",
     mp_round_of:      "מתוך",
     mp_play_again:    "▶ שחק שוב",
@@ -9790,6 +9790,19 @@ function _mpStartListeners() {
     }
     const prev = _mpRoomData;
     _mpRoomData = snap.data();
+
+    // Detect hostUid changed to us (proactive transfer from departing host)
+    const _myUid = window._fbUser?.uid;
+    if (_myUid && prev && _mpRoomData.hostUid === _myUid && prev.hostUid !== _myUid && !_mpIsHost) {
+      _mpIsHost = true;
+      _mpShowAdminBanner();
+      if (_mpRoomData.status === 'lobby') _mpShowLobby();
+      if (_mpRoomData.status === 'playing') {
+        clearTimeout(_mpRoundTimer);
+        _mpRoundTimer = setTimeout(() => _mpHostAdvanceRound(), MP_ROUND_DURATION + 2000);
+      }
+      if (_mpRoomData.status === 'finished') _mpShowLeaderboard();
+    }
 
     // Lobby → playing transition
     if (_mpRoomData.status === 'playing' && (!prev || prev.status === 'lobby')) {
