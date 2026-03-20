@@ -10173,19 +10173,15 @@ async function _mpSubmitAnswer(pts, hit, distKm, town) {
 
   const { updateDoc, doc } = window._fbFns;
   const uid = window._fbUser.uid;
-  const currentScore = score + pts;
 
   try {
     await updateDoc(doc(window._fbDb, 'rooms', _mpRoomId, 'players', uid), {
-      score: currentScore,
+      score,
       answeredRound: _mpRoomData.currentRound
     });
   } catch (e) {
     console.error('Failed to submit multiplayer answer:', e);
   }
-
-  // Update local score
-  score = currentScore;
 
   // Show waiting overlay
   const waitEl = document.getElementById('mp-waiting-overlay');
