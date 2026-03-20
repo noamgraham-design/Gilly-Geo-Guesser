@@ -5289,6 +5289,7 @@ let _mpRoomData = null;            // latest room doc snapshot data
 let _mpIsSpectator = false;        // true if joined mid-game as spectator
 let _mpCountdownRaf = null;        // countdown animation frame
 let _mpCountdownStart = null;      // countdown start time
+let _mpWatchdogTimer = null;       // non-host watchdog to detect unresponsive host
 const MP_ROUND_DURATION = 20000;   // 20 seconds per round
 
 // ── Learning Mode State ───────────────────────────────────────────────────────
@@ -9795,6 +9796,7 @@ function _mpStartListeners() {
     const _myUid = window._fbUser?.uid;
     if (_myUid && prev && _mpRoomData.hostUid === _myUid && prev.hostUid !== _myUid && !_mpIsHost) {
       _mpIsHost = true;
+      clearTimeout(_mpWatchdogTimer);
       _mpShowAdminBanner();
       if (_mpRoomData.status === 'lobby') _mpShowLobby();
       if (_mpRoomData.status === 'playing') {
@@ -10118,6 +10120,12 @@ function _mpLoadRound(roundIdx) {
     _mpRoundTimer = setTimeout(() => _mpHostAdvanceRound(), MP_ROUND_DURATION + 2000);
     // Extra 2s buffer for network latency
   }
+
+  // Non-host: watchdog timer to detect unresponsive host
+  clearTimeout(_mpWatchdogTimer);
+  if (!_mpIsHost) {
+    _mpWatchdogTimer = setTimeout(() => _mpWatchdogTakeover(), MP_ROUND_DURATION + 8000);
+  }
 }
 
 // ── Countdown Bar ──────────────────────────────────────────────────────────
@@ -10212,9 +10220,41 @@ async function _mpHostAdvanceRound() {
   }
 }
 
+// ── Watchdog: Non-host takeover when host is unresponsive ──────────────────
+async function _mpWatchdogTakeover() {
+  if (_mpIsHost || !_mpRoomData || _mpRoomData.status !== 'playing') return;
+  const myUid = window._fbUser?.uid;
+  if (!myUid || !_mpPlayers[myUid]) return;
+
+  // Verify enough time has actually elapsed since round started
+  const elapsed = Date.now() - (_mpRoomData.roundStartedAt || 0);
+  if (elapsed < MP_ROUND_DURATION + 5000) return;
+
+  // Elect earliest-joined player, excluding the current (unresponsive) host
+  const sorted = Object.entries(_mpPlayers)
+    .filter(([id]) => id !== _mpRoomData.hostUid)
+    .sort((a, b) => (a[1].joinedAt?.seconds || 0) - (b[1].joinedAt?.seconds || 0));
+  if (sorted[0]?.[0] !== myUid) return; // only the elected player acts
+
+  // Take over as host
+  _mpIsHost = true;
+  const { updateDoc } = window._fbFns;
+  try {
+    await updateDoc(_mpRoomRef, { hostUid: myUid });
+  } catch (e) {
+    console.warn('Watchdog host transfer failed:', e);
+    _mpIsHost = false;
+    return;
+  }
+  _mpShowAdminBanner();
+  clearTimeout(_mpRoundTimer);
+  _mpHostAdvanceRound();
+}
+
 // ── Round Advance (all players) ────────────────────────────────────────────
 function _mpOnRoundAdvance(newRound) {
   _mpStopCountdown();
+  clearTimeout(_mpWatchdogTimer);
   document.getElementById('mp-waiting-overlay').classList.remove('show');
 
   // If the player didn't answer this round, skip it (time up)
@@ -10235,6 +10275,7 @@ function _mpOnRoundAdvance(newRound) {
 function _mpShowLeaderboard() {
   _mpStopCountdown();
   clearTimeout(_mpRoundTimer);
+  clearTimeout(_mpWatchdogTimer);
   document.getElementById('mp-waiting-overlay').classList.remove('show');
   document.getElementById('mp-players-bar').classList.remove('active');
   document.getElementById('mp-countdown-bar').classList.remove('active');
@@ -10395,6 +10436,7 @@ function _mpCleanup() {
   _mpStopListeners();
   _mpStopCountdown();
   clearTimeout(_mpRoundTimer);
+  clearTimeout(_mpWatchdogTimer);
   isMultiplayer = false;
   _mpRoomId = null;
   _mpRoomRef = null;
@@ -10404,6 +10446,7 @@ function _mpCleanup() {
   _mpRoomData = null;
   _mpAnsweredThisRound = false;
   _mpRoundTimer = null;
+  _mpWatchdogTimer = null;
 }
 
 // ── Init: check for ?room= param on page load ─────────────────────────────
@@ -10420,6 +10463,27 @@ function _initMultiplayerMode() {
   };
   tryJoin();
 }
+
+// ── Best-effort cleanup on tab close ───────────────────────────────────────
+window.addEventListener('beforeunload', () => {
+  if (!isMultiplayer || !_mpRoomId || !window._fbUser || !window._fbFns || !window._fbDb) return;
+  const uid = window._fbUser.uid;
+  const { deleteDoc, doc, updateDoc } = window._fbFns;
+
+  // If host, try to transfer host to next player before leaving
+  if (_mpIsHost) {
+    const others = Object.entries(_mpPlayers)
+      .filter(([id]) => id !== uid)
+      .sort((a, b) => (a[1].joinedAt?.seconds || 0) - (b[1].joinedAt?.seconds || 0));
+    const newHostUid = others[0]?.[0];
+    if (newHostUid) {
+      updateDoc(doc(window._fbDb, 'rooms', _mpRoomId), { hostUid: newHostUid }).catch(() => {});
+    }
+  }
+
+  // Delete own player doc (fire-and-forget)
+  deleteDoc(doc(window._fbDb, 'rooms', _mpRoomId, 'players', uid)).catch(() => {});
+});
 
 </script>
 
