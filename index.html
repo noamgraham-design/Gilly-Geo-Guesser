@@ -1098,6 +1098,37 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
     transform: translateY(-1px);
     box-shadow: 0 4px 14px rgba(124,58,237,0.2);
   }
+  .btn-mp-orange {
+    background: linear-gradient(135deg, #f97316, #ea580c);
+    color: #fff;
+    border: none;
+    box-shadow: 0 4px 14px rgba(249,115,22,0.35);
+    font-size: 0.95rem;
+    padding: 8px 28px;
+    min-width: 180px;
+    text-align: center;
+  }
+  .btn-mp-orange:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(249,115,22,0.5);
+    background: linear-gradient(135deg, #fb923c, #f97316);
+  }
+  .btn-whatsapp {
+    background: linear-gradient(135deg, #25d366, #128c7e);
+    color: #fff;
+    border: none;
+    box-shadow: 0 4px 14px rgba(37,211,102,0.35);
+    font-size: 0.95rem;
+    padding: 10px 28px;
+    min-width: 180px;
+    text-align: center;
+    width: 100%;
+  }
+  .btn-whatsapp:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(37,211,102,0.5);
+    background: linear-gradient(135deg, #34eb7a, #25d366);
+  }
   @keyframes gentlePulse {
     0%, 100% { box-shadow: 0 4px 14px rgba(26,111,212,0.35); }
     50%       { box-shadow: 0 4px 22px rgba(124,58,237,0.55); }
@@ -3658,12 +3689,16 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
     background:rgba(0,0,0,0.55); display:none;
     align-items:center; justify-content:center;
   }
-  #mp-lobby-modal.open { display:flex; }
+  #mp-lobby-modal.open { display:flex; animation: mpFadeIn 0.25s ease-out; }
+  @keyframes mpFadeIn { from { opacity:0; } to { opacity:1; } }
+  @keyframes mpSlideUp { from { opacity:0; transform:translateY(20px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }
   .mp-lobby-card {
     background:var(--card-bg, #fff); border-radius:18px; padding:28px 24px;
     max-width:420px; width:92%; max-height:85vh; overflow-y:auto;
     box-shadow:0 8px 32px rgba(0,0,0,0.25); text-align:center;
+    border-top:4px solid #f97316;
   }
+  #mp-lobby-modal.open .mp-lobby-card { animation: mpSlideUp 0.25s ease-out; }
   .mp-lobby-card h2 { margin:0 0 18px; font-size:1.4rem; }
   #mp-lobby-players {
     display:flex; flex-direction:column; gap:8px;
@@ -4093,7 +4128,7 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
       </div>
     </div>
     <button id="start-btn" class="btn btn-start-gold" onclick="startGame()">← התחל משחק</button>
-    <button id="mp-btn" class="btn btn-learn" onclick="createMultiplayerRoom()">👥 משחק קבוצתי</button>
+    <button id="mp-btn" class="btn btn-mp-orange" onclick="createMultiplayerRoom()">👥 משחק קבוצתי</button>
     <button id="learn-btn" class="btn btn-learn" onclick="startLearning()">🗺️ מצב למידה</button>
     <div id="accessibility-footer-bar" dir="rtl">
       <a href="accessibility.html" id="accessibility-footer-link">הצהרת נגישות</a>
@@ -4114,7 +4149,7 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
     <div id="mp-lobby-players"></div>
     <div id="mp-lobby-waiting" style="display:none"></div>
     <div id="mp-lobby-actions">
-      <button id="mp-invite-btn" class="btn btn-learn" onclick="mpShareWhatsApp()">📲 הזמינו חברים בוואטסאפ</button>
+      <button id="mp-invite-btn" class="btn btn-whatsapp" onclick="mpShareWhatsApp()">📲 הזמינו חברים בוואטסאפ</button>
       <button id="mp-copy-btn" class="btn-secondary" onclick="mpCopyLink()" style="width:100%;text-align:center;padding:9px 16px">📋 העתק קישור</button>
       <button id="mp-start-btn" class="btn btn-start-gold" onclick="mpStartGame()" style="display:none">← התחל משחק</button>
     </div>
@@ -4839,14 +4874,14 @@ const STRINGS = {
     region_names:     { North:"North", Center:"Center", Jerusalem:"Jerusalem", South:"South", "West Bank":"West Bank" },
     mp_btn:           "👥 Multiplayer",
     mp_lobby_title:   "Game Room",
-    mp_invite:        "📲 Invite via WhatsApp",
+    mp_invite:        "📤 Invite friends via WhatsApp",
     mp_copy_link:     "📋 Copy link",
     mp_start:         "Start Game →",
     mp_waiting:       "Waiting for host to start…",
     mp_players:       "Players",
     mp_leaderboard:   "🏆 Leaderboard",
     mp_share_results: "📲 Share Results",
-    mp_back:          "← Menu",
+    mp_back:          "Menu →",
     mp_round_wait:    "Waiting for others…",
     mp_time_up:       "Time's up!",
     mp_room_full:     "Room is full",
@@ -4900,7 +4935,7 @@ const STRINGS = {
     region_names:     { North:"צפון", Center:"מרכז", Jerusalem:"ירושלים", South:"דרום", "West Bank":"יהודה ושומרון" },
     mp_btn:           "👥 משחק קבוצתי",
     mp_lobby_title:   "חדר משחק",
-    mp_invite:        "📲 הזמינו חברים בוואטסאפ",
+    mp_invite:        "📤 הזמינו חברים בוואטסאפ",
     mp_copy_link:     "📋 העתק קישור",
     mp_start:         "← התחל משחק",
     mp_waiting:       "ממתינים שהמארח יתחיל…",
