@@ -3673,6 +3673,7 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
     display:flex; align-items:center; gap:10px;
     padding:8px 12px; border-radius:10px;
     background:rgba(0,0,0,0.04); font-size:0.95rem;
+    direction:ltr;
   }
   .mp-player-avatar {
     width:34px; height:34px; border-radius:50%;
@@ -3691,7 +3692,7 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
   #mp-lobby-code {
     font-family:monospace; font-size:1.3rem; letter-spacing:3px;
     background:rgba(0,0,0,0.06); padding:8px 16px; border-radius:10px;
-    margin:0 0 14px; user-select:all;
+    margin:0 0 14px; user-select:all; direction:ltr;
   }
   #mp-lobby-waiting {
     font-size:0.9rem; color:var(--muted); margin:0 0 14px;
@@ -3704,13 +3705,13 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
     background:rgba(255,255,255,0.92); border-radius:24px;
     box-shadow:0 2px 12px rgba(0,0,0,0.15);
     backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
-    max-width:95vw; overflow-x:auto;
+    max-width:95vw; overflow-x:auto; direction:ltr;
   }
   #mp-players-bar.active { display:flex; }
   .mp-bar-player {
     display:flex; align-items:center; gap:4px;
     padding:3px 8px; border-radius:16px; font-size:0.78rem;
-    white-space:nowrap; transition:background 0.3s;
+    white-space:nowrap; transition:background 0.3s; direction:ltr;
   }
   .mp-bar-player.answered { background:rgba(26,127,55,0.12); }
   .mp-bar-player .mp-bar-avatar {
@@ -3758,12 +3759,12 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
   .mp-lb-row {
     display:flex; align-items:center; gap:10px;
     padding:10px 12px; border-radius:10px; margin-bottom:6px;
-    background:rgba(0,0,0,0.03); font-size:0.95rem;
+    background:rgba(0,0,0,0.03); font-size:0.95rem; direction:ltr;
   }
   .mp-lb-row.is-me { background:rgba(26,111,212,0.08); }
-  .mp-lb-rank { font-weight:800; font-size:1.2rem; min-width:28px; }
+  .mp-lb-rank { font-weight:800; font-size:1.2rem; min-width:28px; text-align:center; }
   .mp-lb-name { flex:1; text-align:start; font-weight:500; }
-  .mp-lb-score { font-weight:700; color:var(--accent, #1a6fd4); }
+  .mp-lb-score { font-weight:700; color:var(--accent, #1a6fd4); white-space:nowrap; }
   .mp-lb-actions { display:flex; flex-direction:column; gap:10px; margin-top:18px; }
   .mp-lb-row:first-child { background:rgba(255,215,0,0.12); }
   .mp-lb-row:nth-child(2) { background:rgba(192,192,192,0.12); }
@@ -4136,7 +4137,8 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
     <h2 id="mp-lb-title">🏆 לוח תוצאות</h2>
     <div id="mp-lb-list"></div>
     <div class="mp-lb-actions">
-      <button class="btn btn-learn" onclick="mpShareResults()">📲 שתף תוצאות</button>
+      <button class="btn btn-start-gold" onclick="mpPlayAgain()" id="mp-lb-play-again-btn">▶ שחק שוב</button>
+      <button class="btn btn-learn" onclick="mpShareResults()" id="mp-lb-share-btn">📲 שתף תוצאות</button>
       <button class="btn-secondary" onclick="mpLeaveGame()" style="width:100%;text-align:center;padding:9px 16px" id="mp-lb-menu-btn">← תפריט</button>
     </div>
   </div>
@@ -4855,6 +4857,7 @@ const STRINGS = {
     mp_wa_invite:     "Join my Gilly Israel Quiz game! 🇮🇱",
     mp_joined:        "joined!",
     mp_round_of:      "of",
+    mp_play_again:    "▶ Play Again",
   },
   he: {
     title:            "חידון ישראל של גילי",
@@ -4915,6 +4918,7 @@ const STRINGS = {
     mp_wa_invite:     "הצטרפו לחידון ישראל של גילי! 🇮🇱",
     mp_joined:        "הצטרף/ה!",
     mp_round_of:      "מתוך",
+    mp_play_again:    "▶ שחק שוב",
   },
 };
 
@@ -9616,6 +9620,17 @@ function _mpStartListeners() {
     else if (_mpRoomData.status === 'finished' && (!prev || prev.status !== 'finished')) {
       _mpShowLeaderboard();
     }
+    // Finished/playing → lobby (Play Again)
+    else if (_mpRoomData.status === 'lobby' && prev && prev.status !== 'lobby') {
+      // Another player clicked Play Again — close leaderboard and show lobby
+      document.getElementById('mp-leaderboard-panel').classList.remove('show');
+      document.getElementById('mp-players-bar').classList.remove('active');
+      document.getElementById('mp-countdown-bar').classList.remove('active');
+      document.getElementById('mp-waiting-overlay').classList.remove('show');
+      _mpAnsweredThisRound = false;
+      score = 0; streak = 0; results = []; currentIdx = 0; waiting = false;
+      _mpShowLobby();
+    }
   });
 
   // Listen to players subcollection
@@ -9860,8 +9875,10 @@ async function _mpSubmitAnswer(pts, hit, distKm, town) {
   score = currentScore;
 
   // Show waiting overlay
-  document.getElementById('mp-waiting-overlay').textContent = t('mp_round_wait');
-  document.getElementById('mp-waiting-overlay').classList.add('show');
+  const waitEl = document.getElementById('mp-waiting-overlay');
+  waitEl.textContent = t('mp_round_wait');
+  waitEl.dir = lang === 'he' ? 'rtl' : 'ltr';
+  waitEl.classList.add('show');
 
   results.push({ town, hit, distKm: distKm.toFixed(1), pts });
   updateHUD();
@@ -9950,6 +9967,8 @@ function _mpShowLeaderboard() {
   const card = document.getElementById('mp-lb-card');
   card.dir = lang === 'he' ? 'rtl' : 'ltr';
   document.getElementById('mp-lb-title').textContent = t('mp_leaderboard');
+  document.getElementById('mp-lb-play-again-btn').textContent = t('mp_play_again');
+  document.getElementById('mp-lb-share-btn').textContent = t('mp_share_results');
   document.getElementById('mp-lb-menu-btn').textContent = t('mp_back');
   document.getElementById('mp-leaderboard-panel').classList.add('show');
 
@@ -9959,6 +9978,47 @@ function _mpShowLeaderboard() {
   if (window._logEvent) window._logEvent('mp_game_complete', {
     players: players.length, score: Math.floor(score)
   });
+}
+
+// ── Play Again (reopen lobby for same room) ───────────────────────────────
+async function mpPlayAgain() {
+  if (!_mpRoomId || !window._fbFns || !window._fbDb) return;
+  const { updateDoc, doc, setDoc, serverTimestamp } = window._fbFns;
+  const uid = window._fbUser?.uid;
+
+  // Close leaderboard
+  document.getElementById('mp-leaderboard-panel').classList.remove('show');
+
+  // Reset local game state
+  score = 0;
+  streak = 0;
+  results = [];
+  currentIdx = 0;
+  waiting = false;
+  _mpAnsweredThisRound = false;
+
+  // Reset own player doc
+  if (uid) {
+    await setDoc(doc(window._fbDb, 'rooms', _mpRoomId, 'players', uid), {
+      nickname: _mpGetNickname(),
+      score: 0,
+      answeredRound: -1,
+      joinedAt: serverTimestamp()
+    });
+  }
+
+  // If host, reset the room to lobby; otherwise just show lobby and wait
+  if (_mpIsHost) {
+    await updateDoc(_mpRoomRef, {
+      status: 'lobby',
+      sequence: [],
+      currentRound: -1,
+      roundStartedAt: 0
+    });
+  }
+
+  // Show the lobby (listeners are still active, they'll pick up room state)
+  _mpShowLobby();
 }
 
 // ── Share Results ──────────────────────────────────────────────────────────
