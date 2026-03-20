@@ -4222,10 +4222,7 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
     <h2 id="mp-lobby-title">חדר משחק</h2>
     <div id="mp-lobby-nick-row">
       <label id="mp-lobby-nick-label" style="font-size:0.82rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px">הכינוי שלך</label>
-      <div style="display:flex;gap:6px">
-        <input id="mp-lobby-nick-input" class="login-input" type="text" maxlength="15" pattern="[A-Za-z0-9_]{1,15}" style="flex:1;margin:0;direction:ltr" />
-        <button id="mp-lobby-nick-save" class="btn-secondary" onclick="_mpSaveNickname()" style="padding:8px 14px;white-space:nowrap">✓</button>
-      </div>
+      <input id="mp-lobby-nick-input" class="login-input" type="text" maxlength="15" pattern="[A-Za-z0-9_]{1,15}" style="margin:0;direction:ltr" />
     </div>
     <div style="font-size:0.82rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:600;margin-bottom:8px" id="mp-lobby-players-label">שחקנים</div>
     <div id="mp-lobby-players"></div>
@@ -9607,10 +9604,11 @@ function _mpGetNickname() {
   return window._userNickname || generateRandomNickname();
 }
 
+let _mpNickSaveTimer = null;
 async function _mpSaveNickname() {
   const input = document.getElementById('mp-lobby-nick-input');
   const nickname = input.value.trim();
-  if (!nickname || !isValidNickname(nickname)) { showNicknameError(); return; }
+  if (!nickname || !isValidNickname(nickname)) { if (nickname) showNicknameError(); return; }
   if (nickname === window._userNickname) return; // no change
 
   window._userNickname = nickname;
@@ -9625,12 +9623,6 @@ async function _mpSaveNickname() {
     if (user && !user.isAnonymous) {
       setDoc(doc(window._fbDb, 'users', user.uid), { nickname, updatedAt: new Date() }, { merge: true });
     }
-    // Visual confirmation
-    const btn = document.getElementById('mp-lobby-nick-save');
-    const orig = btn.textContent;
-    btn.textContent = lang === 'he' ? '\u2713' : '\u2713';
-    btn.style.background = 'rgba(34,197,94,0.2)';
-    setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 1500);
   } catch (e) {
     console.error('Failed to save nickname:', e);
   }
@@ -9936,8 +9928,8 @@ function _mpShowLobby() {
   document.getElementById('mp-lobby-nick-label').textContent = t('mp_your_nick');
   const nickInput = document.getElementById('mp-lobby-nick-input');
   nickInput.value = _mpGetNickname();
-  nickInput.onkeydown = (e) => { if (e.key === 'Enter') _mpSaveNickname(); };
-  nickInput.onblur = () => _mpSaveNickname();
+  nickInput.oninput = () => { clearTimeout(_mpNickSaveTimer); _mpNickSaveTimer = setTimeout(_mpSaveNickname, 800); };
+  nickInput.onblur = () => { clearTimeout(_mpNickSaveTimer); _mpSaveNickname(); };
   document.getElementById('mp-invite-btn').textContent = t('mp_invite');
   document.getElementById('mp-copy-btn').textContent = t('mp_copy_link');
   document.getElementById('mp-leave-btn').textContent = t('mp_back');
