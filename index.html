@@ -9598,6 +9598,8 @@ async function _mpJoinRoom(roomId) {
 
 // ── Firestore Listeners ────────────────────────────────────────────────────
 function _mpStartListeners() {
+  // Guard against double-subscription
+  if (_mpUnsubRoom || _mpUnsubPlayers) _mpStopListeners();
   const { onSnapshot, doc, collection, query } = window._fbFns;
 
   // Listen to room doc
