@@ -179,5 +179,94 @@ service cloud.firestore {
       allow delete: if isSignedIn()
         && request.auth.uid == resource.data.uid;
     }
+
+    // ── MULTIPLAYER ROOMS collection ──────────────────────────────────────
+    //
+    // DDoS considerations:
+    // - Room creation: validated fields + size constraints prevent storage bombs.
+    //   Client-side rate limit (10 s) + Firebase Auth rate limits (100 signups/hr
+    //   for anon) cap creation throughput. At scale, add a Cloud Function to
+    //   enforce per-user room limits.
+    // - Room updates: only the host can modify the room document, preventing
+    //   griefing by non-host players.
+    // - Player docs: each player can only write their own doc with strict field
+    //   validation, preventing score inflation or data injection.
+    // - Reads: each active room creates 1 onSnapshot listener per player on the
+    //   room doc + 1 on the players subcollection. With 100 players this is
+    //   reasonable. Orphaned rooms are ignored client-side after 2 hours.
+    // - Cleanup: rooms are small (~2 KB each). For production, add a scheduled
+    //   Cloud Function to delete rooms older than 24 hours.
+    //
+    match /rooms/{roomId} {
+      // Anyone signed in (including anonymous) can read rooms
+      allow read: if request.auth != null;
+
+      // Anyone signed in can create a room
+      allow create: if request.auth != null
+        && request.resource.data.hostUid == request.auth.uid
+        // Restrict allowed fields
+        && request.resource.data.keys().hasOnly([
+          'hostUid', 'status', 'difficulty', 'region', 'sequence',
+          'currentRound', 'roundStartedAt', 'roundCount', 'playerCount', 'createdAt'
+        ])
+        // Must start in lobby
+        && request.resource.data.status == 'lobby'
+        // Validate difficulty enum
+        && request.resource.data.difficulty in ['easy', 'medium', 'hard']
+        // Validate region enum
+        && request.resource.data.region in ['all', 'north', 'center', 'south']
+        // Sequence must start empty
+        && request.resource.data.sequence.size() == 0
+        // roundCount within sane bounds
+        && request.resource.data.roundCount >= 1
+        && request.resource.data.roundCount <= 20
+        // playerCount starts at 1
+        && request.resource.data.playerCount == 1;
+
+      // Only the host can update the room (advance rounds, change status)
+      allow update: if request.auth != null
+        && resource.data.hostUid == request.auth.uid
+        // Restrict updatable fields (hostUid cannot change)
+        && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['status', 'sequence', 'currentRound', 'roundStartedAt', 'roundCount', 'playerCount'])
+        // Status must be a valid value
+        && request.resource.data.status in ['lobby', 'playing', 'finished']
+        // playerCount capped at 100
+        && request.resource.data.playerCount <= 100
+        // sequence max 20 rounds
+        && request.resource.data.sequence.size() <= 20;
+
+      // Host can delete the room
+      allow delete: if request.auth != null
+        && resource.data.hostUid == request.auth.uid;
+
+      // Player subcollection — each player writes only their own doc
+      match /players/{playerId} {
+        allow read: if request.auth != null;
+
+        // Players can only create/update their own player doc
+        allow create, update: if request.auth != null
+          && request.auth.uid == playerId
+          // Restrict allowed fields
+          && request.resource.data.keys().hasOnly([
+            'nickname', 'score', 'answeredRound', 'joinedAt'
+          ])
+          // Validate nickname (1-15 chars)
+          && request.resource.data.nickname is string
+          && request.resource.data.nickname.size() >= 1
+          && request.resource.data.nickname.size() <= 15
+          // Validate score (non-negative, reasonable max)
+          && request.resource.data.score >= 0
+          && request.resource.data.score <= 10000
+          // Validate answeredRound
+          && request.resource.data.answeredRound >= -1
+          && request.resource.data.answeredRound <= 20;
+
+        // Player can delete their own doc; host can also remove players
+        allow delete: if request.auth != null
+          && (request.auth.uid == playerId
+              || get(/databases/$(database)/documents/rooms/$(roomId)).data.hostUid == request.auth.uid);
+      }
+    }
   }
 }

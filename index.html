@@ -60,7 +60,8 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
            query, where, orderBy, limit,
            getDocs, serverTimestamp,
            setDoc, getDoc, doc,
-           deleteDoc, writeBatch }             from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+           deleteDoc, writeBatch,
+           onSnapshot, updateDoc }             from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import { getAnalytics, logEvent }            from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
 
   const firebaseConfig = {
@@ -94,7 +95,8 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
     updateProfile, collection, addDoc, query, where,
     orderBy, limit, getDocs, serverTimestamp,
     setDoc, getDoc, doc,
-    deleteDoc, writeBatch, deleteUser
+    deleteDoc, writeBatch, deleteUser,
+    onSnapshot, updateDoc
   };
 
   onAuthStateChanged(auth, user => {
@@ -3649,6 +3651,129 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
   .pwa-ios-steps { font-size:0.88rem; color:var(--text); line-height:1.7; text-align:left; }
   [dir="rtl"] .pwa-ios-steps { text-align:right; }
   .pwa-ios-steps .step-icon { font-size:1.1rem; vertical-align:middle; }
+
+  /* ── Multiplayer ──────────────────────────────────────────────────────────── */
+  #mp-lobby-modal {
+    position:fixed; inset:0; z-index:9000;
+    background:rgba(0,0,0,0.55); display:none;
+    align-items:center; justify-content:center;
+  }
+  #mp-lobby-modal.open { display:flex; }
+  .mp-lobby-card {
+    background:var(--card-bg, #fff); border-radius:18px; padding:28px 24px;
+    max-width:420px; width:92%; max-height:85vh; overflow-y:auto;
+    box-shadow:0 8px 32px rgba(0,0,0,0.25); text-align:center;
+  }
+  .mp-lobby-card h2 { margin:0 0 18px; font-size:1.4rem; }
+  #mp-lobby-players {
+    display:flex; flex-direction:column; gap:8px;
+    margin:0 0 18px; text-align:start;
+  }
+  .mp-player-row {
+    display:flex; align-items:center; gap:10px;
+    padding:8px 12px; border-radius:10px;
+    background:rgba(0,0,0,0.04); font-size:0.95rem;
+    direction:ltr;
+  }
+  .mp-player-avatar {
+    width:34px; height:34px; border-radius:50%;
+    background:var(--accent, #1a6fd4); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:0.85rem; flex-shrink:0;
+  }
+  .mp-player-name { flex:1; font-weight:500; }
+  .mp-player-badge {
+    font-size:0.75rem; padding:2px 8px; border-radius:20px;
+    background:rgba(26,111,212,0.12); color:var(--accent, #1a6fd4);
+    font-weight:600;
+  }
+  .mp-player-you { color:var(--muted); font-size:0.82rem; }
+  #mp-lobby-actions { display:flex; flex-direction:column; gap:10px; margin-bottom:14px; }
+  #mp-lobby-code {
+    font-family:monospace; font-size:1.3rem; letter-spacing:3px;
+    background:rgba(0,0,0,0.06); padding:8px 16px; border-radius:10px;
+    margin:0 0 14px; user-select:all; direction:ltr;
+  }
+  #mp-lobby-waiting {
+    font-size:0.9rem; color:var(--muted); margin:0 0 14px;
+  }
+
+  /* In-game multiplayer player bar */
+  #mp-players-bar {
+    position:fixed; bottom:12px; left:50%; transform:translateX(-50%);
+    display:none; gap:6px; z-index:600; padding:6px 12px;
+    background:rgba(255,255,255,0.92); border-radius:24px;
+    box-shadow:0 2px 12px rgba(0,0,0,0.15);
+    backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+    max-width:95vw; overflow-x:auto; direction:ltr;
+  }
+  #mp-players-bar.active { display:flex; }
+  .mp-bar-player {
+    display:flex; align-items:center; gap:4px;
+    padding:3px 8px; border-radius:16px; font-size:0.78rem;
+    white-space:nowrap; transition:background 0.3s; direction:ltr;
+  }
+  .mp-bar-player.answered { background:rgba(26,127,55,0.12); }
+  .mp-bar-player .mp-bar-avatar {
+    width:22px; height:22px; border-radius:50%;
+    background:var(--accent, #1a6fd4); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-size:0.65rem; font-weight:700;
+  }
+  .mp-bar-player .mp-bar-check { color:#1a7f37; font-weight:700; }
+  .mp-bar-player .mp-bar-score { color:var(--muted); font-size:0.72rem; }
+
+  /* Multiplayer countdown bar */
+  #mp-countdown-bar {
+    position:fixed; top:0; left:0; width:100%; height:5px;
+    z-index:700; display:none;
+  }
+  #mp-countdown-bar.active { display:block; }
+  #mp-countdown-fill {
+    height:100%; width:100%; background:#1a7f37;
+    transition:width 0.1s linear;
+  }
+
+  /* Multiplayer waiting overlay */
+  #mp-waiting-overlay {
+    position:fixed; bottom:70px; left:50%; transform:translateX(-50%);
+    background:rgba(0,0,0,0.75); color:#fff; padding:10px 20px;
+    border-radius:12px; font-size:0.9rem; z-index:650;
+    display:none; backdrop-filter:blur(4px);
+  }
+  #mp-waiting-overlay.show { display:block; }
+
+  /* Multiplayer leaderboard */
+  #mp-leaderboard-panel {
+    position:fixed; inset:0; z-index:8000;
+    background:rgba(0,0,0,0.55); display:none;
+    align-items:center; justify-content:center;
+  }
+  #mp-leaderboard-panel.show { display:flex; }
+  .mp-lb-card {
+    background:var(--card-bg, #fff); border-radius:18px; padding:28px 24px;
+    max-width:440px; width:92%; max-height:85vh; overflow-y:auto;
+    box-shadow:0 8px 32px rgba(0,0,0,0.25); text-align:center;
+  }
+  .mp-lb-card h2 { margin:0 0 18px; font-size:1.4rem; }
+  .mp-lb-row {
+    display:flex; align-items:center; gap:10px;
+    padding:10px 12px; border-radius:10px; margin-bottom:6px;
+    background:rgba(0,0,0,0.03); font-size:0.95rem; direction:ltr;
+  }
+  .mp-lb-row.is-me { background:rgba(26,111,212,0.08); }
+  .mp-lb-rank { font-weight:800; font-size:1.2rem; min-width:28px; text-align:center; }
+  .mp-lb-name { flex:1; text-align:start; font-weight:500; }
+  .mp-lb-score { font-weight:700; color:var(--accent, #1a6fd4); white-space:nowrap; }
+  .mp-lb-actions { display:flex; flex-direction:column; gap:10px; margin-top:18px; }
+  .mp-lb-row:first-child { background:rgba(255,215,0,0.12); }
+  .mp-lb-row:nth-child(2) { background:rgba(192,192,192,0.12); }
+  .mp-lb-row:nth-child(3) { background:rgba(205,127,50,0.12); }
+
+  @media (max-width:768px) {
+    .mp-lobby-card, .mp-lb-card { padding:20px 16px; }
+    #mp-players-bar { bottom:8px; padding:4px 8px; }
+  }
 </style>
 </head>
 <body>
@@ -3968,6 +4093,7 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
       </div>
     </div>
     <button id="start-btn" class="btn btn-start-gold" onclick="startGame()">← התחל משחק</button>
+    <button id="mp-btn" class="btn btn-learn" onclick="createMultiplayerRoom()">👥 משחק קבוצתי</button>
     <button id="learn-btn" class="btn btn-learn" onclick="startLearning()">🗺️ מצב למידה</button>
     <div id="accessibility-footer-bar" dir="rtl">
       <a href="accessibility.html" id="accessibility-footer-link">הצהרת נגישות</a>
@@ -3978,6 +4104,45 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
 
 </div><!-- /#overlay-scroll-area -->
 </div><!-- /#overlay -->
+
+<!-- ── Multiplayer Lobby Modal ──────────────────────────────────────────────── -->
+<div id="mp-lobby-modal">
+  <div class="mp-lobby-card" id="mp-lobby-card">
+    <h2 id="mp-lobby-title">חדר משחק</h2>
+    <div id="mp-lobby-code"></div>
+    <div style="font-size:0.82rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:600;margin-bottom:8px" id="mp-lobby-players-label">שחקנים</div>
+    <div id="mp-lobby-players"></div>
+    <div id="mp-lobby-waiting" style="display:none"></div>
+    <div id="mp-lobby-actions">
+      <button id="mp-invite-btn" class="btn btn-learn" onclick="mpShareWhatsApp()">📲 הזמינו חברים בוואטסאפ</button>
+      <button id="mp-copy-btn" class="btn-secondary" onclick="mpCopyLink()" style="width:100%;text-align:center;padding:9px 16px">📋 העתק קישור</button>
+      <button id="mp-start-btn" class="btn btn-start-gold" onclick="mpStartGame()" style="display:none">← התחל משחק</button>
+    </div>
+    <button class="btn-secondary" onclick="mpLeaveLobby()" style="width:100%;text-align:center;padding:9px 16px;margin-top:8px" id="mp-leave-btn">← חזרה</button>
+  </div>
+</div>
+
+<!-- Multiplayer in-game player status bar -->
+<div id="mp-players-bar"></div>
+
+<!-- Multiplayer countdown bar -->
+<div id="mp-countdown-bar"><div id="mp-countdown-fill"></div></div>
+
+<!-- Multiplayer waiting overlay (shown after player answers, waiting for others) -->
+<div id="mp-waiting-overlay"></div>
+
+<!-- Multiplayer Leaderboard -->
+<div id="mp-leaderboard-panel">
+  <div class="mp-lb-card" id="mp-lb-card">
+    <h2 id="mp-lb-title">🏆 לוח תוצאות</h2>
+    <div id="mp-lb-list"></div>
+    <div class="mp-lb-actions">
+      <button class="btn btn-start-gold" onclick="mpPlayAgain()" id="mp-lb-play-again-btn">▶ שחק שוב</button>
+      <button class="btn btn-learn" onclick="mpShareResults()" id="mp-lb-share-btn">📲 שתף תוצאות</button>
+      <button class="btn-secondary" onclick="mpLeaveGame()" style="width:100%;text-align:center;padding:9px 16px" id="mp-lb-menu-btn">← תפריט</button>
+    </div>
+  </div>
+</div>
 
 <div id="results-panel">
   <div id="results-card">
@@ -4672,6 +4837,27 @@ const STRINGS = {
     menu_btn:         "Menu",
     back_btn:         "← Menu",
     region_names:     { North:"North", Center:"Center", Jerusalem:"Jerusalem", South:"South", "West Bank":"West Bank" },
+    mp_btn:           "👥 Multiplayer",
+    mp_lobby_title:   "Game Room",
+    mp_invite:        "📲 Invite via WhatsApp",
+    mp_copy_link:     "📋 Copy link",
+    mp_start:         "Start Game →",
+    mp_waiting:       "Waiting for host to start…",
+    mp_players:       "Players",
+    mp_leaderboard:   "🏆 Leaderboard",
+    mp_share_results: "📲 Share Results",
+    mp_back:          "← Menu",
+    mp_round_wait:    "Waiting for others…",
+    mp_time_up:       "Time's up!",
+    mp_room_full:     "Room is full",
+    mp_game_started:  "Game already started",
+    mp_room_gone:     "Room not found",
+    mp_host_label:    "Host",
+    mp_you_label:     "(you)",
+    mp_wa_invite:     "Join my Gilly Israel Quiz game! 🇮🇱",
+    mp_joined:        "joined!",
+    mp_round_of:      "of",
+    mp_play_again:    "▶ Play Again",
   },
   he: {
     title:            "חידון ישראל של גילי",
@@ -4712,6 +4898,27 @@ const STRINGS = {
     menu_btn:         "תפריט",
     back_btn:         "← תפריט",
     region_names:     { North:"צפון", Center:"מרכז", Jerusalem:"ירושלים", South:"דרום", "West Bank":"יהודה ושומרון" },
+    mp_btn:           "👥 משחק קבוצתי",
+    mp_lobby_title:   "חדר משחק",
+    mp_invite:        "📲 הזמינו חברים בוואטסאפ",
+    mp_copy_link:     "📋 העתק קישור",
+    mp_start:         "← התחל משחק",
+    mp_waiting:       "ממתינים שהמארח יתחיל…",
+    mp_players:       "שחקנים",
+    mp_leaderboard:   "🏆 לוח תוצאות",
+    mp_share_results: "📲 שתף תוצאות",
+    mp_back:          "← תפריט",
+    mp_round_wait:    "ממתינים לשאר השחקנים…",
+    mp_time_up:       "נגמר הזמן!",
+    mp_room_full:     "החדר מלא",
+    mp_game_started:  "המשחק כבר התחיל",
+    mp_room_gone:     "החדר לא נמצא",
+    mp_host_label:    "מארח",
+    mp_you_label:     "(את/ה)",
+    mp_wa_invite:     "הצטרפו לחידון ישראל של גילי! 🇮🇱",
+    mp_joined:        "הצטרף/ה!",
+    mp_round_of:      "מתוך",
+    mp_play_again:    "▶ שחק שוב",
   },
 };
 
@@ -4912,6 +5119,8 @@ function applyLang() {
     }
   }
   updateArabVillageLabels();
+  // Multiplayer UI labels
+  document.getElementById('mp-btn').textContent = t('mp_btn');
 }
 
 let lang = "he";
@@ -4930,6 +5139,21 @@ let _challengeTown = null;        // town object for the active challenge link
 let _challengeResult = null;      // {distKm, perfect} stored after the guess
 let challengePickedTown = null;   // town selected in the share popup creator
 let hintsLeft = 3, hintAnimFrame = null;
+
+// ── Multiplayer State ────────────────────────────────────────────────────────
+let isMultiplayer = false;
+let _mpRoomId = null;              // current room document ID
+let _mpRoomRef = null;             // Firestore doc reference
+let _mpUnsubRoom = null;           // onSnapshot unsubscribe for room doc
+let _mpUnsubPlayers = null;        // onSnapshot unsubscribe for players subcollection
+let _mpIsHost = false;             // true if this player created the room
+let _mpPlayers = {};               // local cache: { uid: { nickname, score, answeredRound } }
+let _mpRoundTimer = null;          // 20s countdown timeout
+let _mpAnsweredThisRound = false;
+let _mpRoomData = null;            // latest room doc snapshot data
+let _mpCountdownRaf = null;        // countdown animation frame
+let _mpCountdownStart = null;      // countdown start time
+const MP_ROUND_DURATION = 20000;   // 20 seconds per round
 
 // ── Learning Mode State ───────────────────────────────────────────────────────
 let isLearningMode = false;
@@ -6153,7 +6377,8 @@ function loadTown() {
   if (currentLayer === 'street') toggleMapLayer(true);
   updateHintBtn();
   updateHUD();
-  if (!isLearningMode) startQuizCountdown();
+  if (isMultiplayer) { /* multiplayer uses its own countdown */ }
+  else if (!isLearningMode) startQuizCountdown();
 }
 
 function updateHintBtn() {
@@ -6333,6 +6558,7 @@ function initPlaneAnimation() {
 function showMenu() {
   isLearningMode = false;
   isDailyChallenge = false;
+  if (isMultiplayer) _mpCleanup();
   if (_nextRoundTimer) { clearTimeout(_nextRoundTimer); _nextRoundTimer = null; }
   stopQuizCountdown();
   clearLearningPreview();
@@ -6351,6 +6577,12 @@ function showMenu() {
   document.getElementById('scoreboard-panel').className = '';
   document.body.classList.remove('sb-mobile-hide-play-again');
   document.getElementById('quiz-progress-popup').classList.remove('show');
+  // Clean up multiplayer UI
+  document.getElementById('mp-lobby-modal').classList.remove('open');
+  document.getElementById('mp-players-bar').classList.remove('active');
+  document.getElementById('mp-countdown-bar').classList.remove('active');
+  document.getElementById('mp-waiting-overlay').classList.remove('show');
+  document.getElementById('mp-leaderboard-panel').classList.remove('show');
   cancelLocationPick();
   document.getElementById('btn-back').style.display = 'none';
   closeMobileTools();
@@ -7205,6 +7437,7 @@ function onMapClick(e) {
   if (isLearningMode && learningPreviewActive) { endLearningPreview(); return; }
   if (isDailyChallenge && dailyChallengePreviewActive) { endDailyChallengePreview(sequence[0]); return; }
   if (waiting) return;
+  if (isMultiplayer && _mpAnsweredThisRound) return;
   if (isLearningMode) { handleLearningClick(e); return; }
 
   // If confirmation mode is on (logged-in users only), show a pending marker and await user confirmation
@@ -7331,6 +7564,12 @@ function _processMapClick(e) {
 
   updateHUD();
 
+  // ── Multiplayer: submit answer to Firestore, don't auto-advance ──
+  if (isMultiplayer) {
+    _mpSubmitAnswer(scorePts, perfect, distKm, town);
+    return;
+  }
+
   _nextRoundTimer = setTimeout(() => {
     _nextRoundTimer = null;
     clearMapFeedback();
@@ -7402,6 +7641,9 @@ applyLang();
 // Detect and launch challenge mode if URL param is present
 _initChallengeMode();
 if (isChallengeMode) showChallengeIntro();
+
+// Detect and launch multiplayer mode if ?room= param is present
+_initMultiplayerMode();
 
 // ── RANDOM DEFAULT NICKNAME ────────────────────────────────────────────────
 function generateRandomNickname() {
@@ -9214,6 +9456,661 @@ function exitChallengeMode() {
   window.history.replaceState({}, '', url.toString());
   showMenu();
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MULTIPLAYER MODE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+function _mpGenerateRoomCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i = 0; i < 5; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
+}
+
+function _mpGetNickname() {
+  return window._userNickname || generateRandomNickname();
+}
+
+function _mpGetRoomUrl() {
+  let url = window.location.origin + window.location.pathname + '?room=' + encodeURIComponent(_mpRoomId);
+  if (lang === 'en') url += '&lang=en';
+  return url;
+}
+
+// ── Ensure user is signed in (anonymous if needed) ─────────────────────────
+async function _mpEnsureAuth() {
+  if (window._fbUser) return window._fbUser;
+  const { signInAnonymously } = window._fbFns;
+  const cred = await signInAnonymously(window._fbAuth);
+  window._fbUser = cred.user;
+  if (!window._userNickname) window._userNickname = generateRandomNickname();
+  return cred.user;
+}
+
+// ── Room Creation (Host) ───────────────────────────────────────────────────
+async function createMultiplayerRoom() {
+  if (!_checkRate('mp_create', 10000)) return; // 10s cooldown
+  try {
+    const user = await _mpEnsureAuth();
+    const { addDoc, collection, setDoc, doc, serverTimestamp } = window._fbFns;
+
+    // Sync difficulty & region from the DOM (same as startGame)
+    if (document.getElementById('d-easy').classList.contains('active-easy')) difficulty = 'easy';
+    else if (document.getElementById('d-hard').classList.contains('active-hard')) difficulty = 'hard';
+    else difficulty = 'medium';
+    region = 'all';
+    for (const k of ['north','center','south']) {
+      if (document.getElementById(`r-${k}`).classList.contains('active')) { region = k; break; }
+    }
+
+    const roomDoc = await addDoc(collection(window._fbDb, 'rooms'), {
+      hostUid: user.uid,
+      status: 'lobby',
+      difficulty,
+      region,
+      sequence: [],
+      currentRound: -1,
+      roundStartedAt: 0,
+      roundCount: 8,
+      playerCount: 1,
+      createdAt: serverTimestamp()
+    });
+
+    _mpRoomId = roomDoc.id;
+    _mpRoomRef = doc(window._fbDb, 'rooms', _mpRoomId);
+    _mpIsHost = true;
+    isMultiplayer = true;
+
+    // Add self to players subcollection
+    await setDoc(doc(window._fbDb, 'rooms', _mpRoomId, 'players', user.uid), {
+      nickname: _mpGetNickname(),
+      score: 0,
+      answeredRound: -1,
+      joinedAt: serverTimestamp()
+    });
+
+    _mpStartListeners();
+    _mpShowLobby();
+
+    if (window._logEvent) window._logEvent('mp_room_create', { difficulty, region });
+  } catch (e) {
+    console.error('Failed to create multiplayer room:', e);
+  }
+}
+
+// ── Room Joining (via URL) ─────────────────────────────────────────────────
+async function _mpJoinRoom(roomId) {
+  if (!_checkRate('mp_join', 5000)) return; // 5s cooldown
+  // Validate roomId format (Firestore auto-generated IDs are 20 alphanumeric chars)
+  if (!roomId || roomId.length > 40 || !/^[a-zA-Z0-9]+$/.test(roomId)) return;
+  try {
+    const user = await _mpEnsureAuth();
+    const { getDoc, doc, setDoc, serverTimestamp } = window._fbFns;
+
+    _mpRoomId = roomId;
+    _mpRoomRef = doc(window._fbDb, 'rooms', roomId);
+
+    const snap = await getDoc(_mpRoomRef);
+    if (!snap.exists()) {
+      alert(t('mp_room_gone'));
+      return;
+    }
+    const data = snap.data();
+    // Reject stale rooms (older than 2 hours)
+    if (data.createdAt && data.createdAt.toDate && (Date.now() - data.createdAt.toDate().getTime()) > 2 * 60 * 60 * 1000) {
+      alert(t('mp_room_gone'));
+      return;
+    }
+    if (data.status !== 'lobby') {
+      alert(t('mp_game_started'));
+      return;
+    }
+    if (data.playerCount >= 100) {
+      alert(t('mp_room_full'));
+      return;
+    }
+
+    _mpIsHost = (data.hostUid === user.uid);
+    isMultiplayer = true;
+    difficulty = data.difficulty || 'easy';
+    region = data.region || 'all';
+
+    // Add self to players subcollection (host's listener will sync playerCount)
+    await setDoc(doc(window._fbDb, 'rooms', roomId, 'players', user.uid), {
+      nickname: _mpGetNickname(),
+      score: 0,
+      answeredRound: -1,
+      joinedAt: serverTimestamp()
+    });
+
+    _mpStartListeners();
+    _mpShowLobby();
+
+    // Hide main menu
+    document.getElementById('overlay').style.display = 'none';
+
+    if (window._logEvent) window._logEvent('mp_room_join', { roomId });
+  } catch (e) {
+    console.error('Failed to join multiplayer room:', e);
+  }
+}
+
+// ── Firestore Listeners ────────────────────────────────────────────────────
+function _mpStartListeners() {
+  // Guard against double-subscription
+  if (_mpUnsubRoom || _mpUnsubPlayers) _mpStopListeners();
+  const { onSnapshot, doc, collection, query } = window._fbFns;
+
+  // Listen to room doc
+  _mpUnsubRoom = onSnapshot(_mpRoomRef, (snap) => {
+    if (!snap.exists()) {
+      // Room deleted
+      _mpCleanup();
+      showMenu();
+      return;
+    }
+    const prev = _mpRoomData;
+    _mpRoomData = snap.data();
+
+    // Lobby → playing transition
+    if (_mpRoomData.status === 'playing' && (!prev || prev.status === 'lobby')) {
+      _mpOnGameStart();
+    }
+    // Round advance
+    else if (_mpRoomData.status === 'playing' && prev && prev.status === 'playing'
+             && _mpRoomData.currentRound !== prev.currentRound) {
+      _mpOnRoundAdvance(_mpRoomData.currentRound);
+    }
+    // Game finished
+    else if (_mpRoomData.status === 'finished' && (!prev || prev.status !== 'finished')) {
+      _mpShowLeaderboard();
+    }
+    // Finished/playing → lobby (Play Again)
+    else if (_mpRoomData.status === 'lobby' && prev && prev.status !== 'lobby') {
+      // Another player clicked Play Again — close leaderboard and show lobby
+      document.getElementById('mp-leaderboard-panel').classList.remove('show');
+      document.getElementById('mp-players-bar').classList.remove('active');
+      document.getElementById('mp-countdown-bar').classList.remove('active');
+      document.getElementById('mp-waiting-overlay').classList.remove('show');
+      _mpAnsweredThisRound = false;
+      score = 0; streak = 0; results = []; currentIdx = 0; waiting = false;
+      _mpShowLobby();
+    }
+  });
+
+  // Listen to players subcollection
+  _mpUnsubPlayers = onSnapshot(
+    collection(window._fbDb, 'rooms', _mpRoomId, 'players'),
+    (snap) => {
+      _mpPlayers = {};
+      snap.forEach(d => { _mpPlayers[d.id] = d.data(); });
+      _mpUpdatePlayersUI();
+
+      // Host: sync playerCount on room doc when players join/leave
+      if (_mpIsHost && _mpRoomData) {
+        const count = Object.keys(_mpPlayers).length;
+        if (count !== _mpRoomData.playerCount) {
+          const { updateDoc } = window._fbFns;
+          updateDoc(_mpRoomRef, { playerCount: count }).catch(() => {});
+        }
+      }
+
+      // Host: check if all players answered this round
+      if (_mpIsHost && _mpRoomData && _mpRoomData.status === 'playing') {
+        _mpHostCheckAllAnswered();
+      }
+    }
+  );
+}
+
+function _mpStopListeners() {
+  if (_mpUnsubRoom) { _mpUnsubRoom(); _mpUnsubRoom = null; }
+  if (_mpUnsubPlayers) { _mpUnsubPlayers(); _mpUnsubPlayers = null; }
+}
+
+// ── Lobby UI ───────────────────────────────────────────────────────────────
+function _mpShowLobby() {
+  const modal = document.getElementById('mp-lobby-modal');
+  const card = document.getElementById('mp-lobby-card');
+  card.dir = lang === 'he' ? 'rtl' : 'ltr';
+  document.getElementById('mp-lobby-title').textContent = t('mp_lobby_title');
+  document.getElementById('mp-lobby-players-label').textContent = t('mp_players');
+  document.getElementById('mp-lobby-code').textContent = _mpRoomId.slice(-5).toUpperCase();
+  document.getElementById('mp-invite-btn').textContent = t('mp_invite');
+  document.getElementById('mp-copy-btn').textContent = t('mp_copy_link');
+  document.getElementById('mp-leave-btn').textContent = t('mp_back');
+
+  if (_mpIsHost) {
+    document.getElementById('mp-start-btn').style.display = '';
+    document.getElementById('mp-start-btn').textContent = t('mp_start');
+    document.getElementById('mp-lobby-waiting').style.display = 'none';
+  } else {
+    document.getElementById('mp-start-btn').style.display = 'none';
+    document.getElementById('mp-lobby-waiting').style.display = '';
+    document.getElementById('mp-lobby-waiting').textContent = t('mp_waiting');
+  }
+
+  modal.classList.add('open');
+}
+
+function _mpUpdatePlayersUI() {
+  const container = document.getElementById('mp-lobby-players');
+  const uid = window._fbUser?.uid;
+  const players = Object.entries(_mpPlayers);
+
+  // Lobby view
+  if (_mpRoomData && _mpRoomData.status === 'lobby') {
+    container.innerHTML = players.map(([id, p]) => {
+      const initial = (p.nickname || '?').charAt(0).toUpperCase();
+      const isHost = _mpRoomData && _mpRoomData.hostUid === id;
+      const isMe = id === uid;
+      return `<div class="mp-player-row">
+        <div class="mp-player-avatar">${initial}</div>
+        <span class="mp-player-name">${esc(p.nickname || 'Player')}</span>
+        ${isHost ? `<span class="mp-player-badge">${t('mp_host_label')}</span>` : ''}
+        ${isMe ? `<span class="mp-player-you">${t('mp_you_label')}</span>` : ''}
+      </div>`;
+    }).join('');
+  }
+
+  // In-game player bar
+  if (_mpRoomData && _mpRoomData.status === 'playing') {
+    const bar = document.getElementById('mp-players-bar');
+    const currentRound = _mpRoomData.currentRound;
+    bar.innerHTML = players.map(([id, p]) => {
+      const initial = (p.nickname || '?').charAt(0).toUpperCase();
+      const answered = p.answeredRound >= currentRound;
+      return `<div class="mp-bar-player ${answered ? 'answered' : ''}">
+        <div class="mp-bar-avatar">${initial}</div>
+        <span>${esc(p.nickname || '?')}</span>
+        ${answered ? '<span class="mp-bar-check">✓</span>' : ''}
+        <span class="mp-bar-score">${Math.floor(p.score)}</span>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ── WhatsApp Invite ────────────────────────────────────────────────────────
+function mpShareWhatsApp() {
+  const url = _mpGetRoomUrl();
+  const text = t('mp_wa_invite') + '\n' + url;
+  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+}
+
+function mpCopyLink() {
+  const url = _mpGetRoomUrl();
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).catch(() => {});
+  }
+  const btn = document.getElementById('mp-copy-btn');
+  const orig = btn.textContent;
+  btn.textContent = lang === 'he' ? '✅ הועתק!' : '✅ Copied!';
+  setTimeout(() => { btn.textContent = orig; }, 2000);
+}
+
+// ── Start Game (Host) ──────────────────────────────────────────────────────
+async function mpStartGame() {
+  if (!_mpIsHost) return;
+  if (!_checkRate('mp_start', 5000)) return; // 5s cooldown
+  const { updateDoc } = window._fbFns;
+
+  // Build town sequence (same logic as startGame)
+  const tierFilter = TOWNS.filter(t => t.tier <= DIFF[difficulty].maxTier);
+  const regionFilter = REGION_GROUPS[region];
+  const pool = regionFilter
+    ? tierFilter.filter(t => regionFilter.includes(t.region))
+    : tierFilter;
+
+  const selected = shuffle([...pool]).slice(0, 8);
+  const seq = selected.map(t => ({
+    name: t.name, lat: t.lat, lng: t.lng,
+    tier: t.tier, nameHe: t.nameHe, region: t.region,
+    desc: t.desc, descHe: t.descHe
+  }));
+
+  await updateDoc(_mpRoomRef, {
+    status: 'playing',
+    sequence: seq,
+    currentRound: 0,
+    roundCount: seq.length,
+    roundStartedAt: Date.now()
+  });
+}
+
+// ── Game Start (all players) ───────────────────────────────────────────────
+function _mpOnGameStart() {
+  // Close lobby
+  document.getElementById('mp-lobby-modal').classList.remove('open');
+
+  // Set up local game state from room data
+  const rd = _mpRoomData;
+  sequence = rd.sequence.map(s => {
+    // Find matching town from TOWNS for full data, or use what we have
+    const full = TOWNS.find(t => t.name === s.name);
+    return full || s;
+  });
+  roundCount = rd.roundCount;
+  currentIdx = 0;
+  score = 0;
+  streak = 0;
+  results = [];
+  waiting = false;
+  hintsLeft = 3;
+  _mpAnsweredThisRound = false;
+
+  // Hide menu, show game UI
+  document.getElementById('overlay').style.display = 'none';
+  document.getElementById('results-panel').className = '';
+  document.body.classList.remove('postgame');
+  document.getElementById('btn-back').style.display = 'inline-block';
+
+  // Show multiplayer UI
+  document.getElementById('mp-players-bar').classList.add('active');
+
+  if (currentLayer === 'street') toggleMapLayer(true);
+  const v = REGION_VIEWS[region];
+  map.setView(v.center, v.zoom);
+
+  clearAllMarkers();
+  _mpLoadRound(0);
+}
+
+// ── Load Round ─────────────────────────────────────────────────────────────
+function _mpLoadRound(roundIdx) {
+  currentIdx = roundIdx;
+  _mpAnsweredThisRound = false;
+  waiting = false;
+
+  // Clear previous round visuals
+  clearMapFeedback();
+  document.getElementById('mp-waiting-overlay').classList.remove('show');
+
+  // Load the town
+  loadTown();
+
+  // Start countdown
+  _mpStartCountdown();
+
+  // Host: set a fallback timer to advance round after 20s
+  if (_mpIsHost) {
+    clearTimeout(_mpRoundTimer);
+    _mpRoundTimer = setTimeout(() => _mpHostAdvanceRound(), MP_ROUND_DURATION + 2000);
+    // Extra 2s buffer for network latency
+  }
+}
+
+// ── Countdown Bar ──────────────────────────────────────────────────────────
+function _mpStartCountdown() {
+  _mpStopCountdown();
+  const bar = document.getElementById('mp-countdown-bar');
+  const fill = document.getElementById('mp-countdown-fill');
+  bar.classList.add('active');
+  fill.style.width = '100%';
+  fill.style.backgroundColor = '#1a7f37';
+  _mpCountdownStart = performance.now();
+
+  function tick(now) {
+    const elapsed = now - _mpCountdownStart;
+    const linear = Math.max(0, 1 - elapsed / MP_ROUND_DURATION);
+    fill.style.width = (linear * 100) + '%';
+    // Color: green → yellow → red
+    const hue = Math.round(120 * linear);
+    fill.style.backgroundColor = `hsl(${hue}, 70%, 42%)`;
+    if (linear > 0 && isMultiplayer && _mpRoomData?.status === 'playing') {
+      _mpCountdownRaf = requestAnimationFrame(tick);
+    }
+  }
+  _mpCountdownRaf = requestAnimationFrame(tick);
+}
+
+function _mpStopCountdown() {
+  if (_mpCountdownRaf) { cancelAnimationFrame(_mpCountdownRaf); _mpCountdownRaf = null; }
+  document.getElementById('mp-countdown-bar').classList.remove('active');
+}
+
+// ── Player Answers ─────────────────────────────────────────────────────────
+async function _mpSubmitAnswer(pts, hit, distKm, town) {
+  if (_mpAnsweredThisRound) return;
+  if (!_checkRate('mp_answer', 2000)) return; // 2s cooldown
+  _mpAnsweredThisRound = true;
+
+  const { updateDoc, doc } = window._fbFns;
+  const uid = window._fbUser.uid;
+  const currentScore = (_mpPlayers[uid]?.score || 0) + pts;
+
+  try {
+    await updateDoc(doc(window._fbDb, 'rooms', _mpRoomId, 'players', uid), {
+      score: currentScore,
+      answeredRound: _mpRoomData.currentRound
+    });
+  } catch (e) {
+    console.error('Failed to submit multiplayer answer:', e);
+  }
+
+  // Update local score
+  score = currentScore;
+
+  // Show waiting overlay
+  const waitEl = document.getElementById('mp-waiting-overlay');
+  waitEl.textContent = t('mp_round_wait');
+  waitEl.dir = lang === 'he' ? 'rtl' : 'ltr';
+  waitEl.classList.add('show');
+
+  results.push({ town, hit, distKm: distKm.toFixed(1), pts });
+  updateHUD();
+}
+
+// ── Host: Check All Answered ───────────────────────────────────────────────
+function _mpHostCheckAllAnswered() {
+  if (!_mpIsHost || !_mpRoomData || _mpRoomData.status !== 'playing') return;
+  const currentRound = _mpRoomData.currentRound;
+  const players = Object.values(_mpPlayers);
+  const allAnswered = players.every(p => p.answeredRound >= currentRound);
+  if (allAnswered && players.length > 0) {
+    // Short delay for UI feedback, then advance
+    clearTimeout(_mpRoundTimer);
+    _mpRoundTimer = setTimeout(() => _mpHostAdvanceRound(), 1500);
+  }
+}
+
+async function _mpHostAdvanceRound() {
+  if (!_mpIsHost) return;
+  if (!_checkRate('mp_advance', 2000)) return; // 2s cooldown
+  clearTimeout(_mpRoundTimer);
+  const { updateDoc } = window._fbFns;
+  const nextRound = (_mpRoomData.currentRound || 0) + 1;
+
+  if (nextRound >= _mpRoomData.roundCount) {
+    // Game over
+    await updateDoc(_mpRoomRef, { status: 'finished' });
+  } else {
+    await updateDoc(_mpRoomRef, {
+      currentRound: nextRound,
+      roundStartedAt: Date.now()
+    });
+  }
+}
+
+// ── Round Advance (all players) ────────────────────────────────────────────
+function _mpOnRoundAdvance(newRound) {
+  _mpStopCountdown();
+  document.getElementById('mp-waiting-overlay').classList.remove('show');
+
+  // If the player didn't answer this round, skip it (time up)
+  if (!_mpAnsweredThisRound) {
+    const town = sequence[currentIdx];
+    results.push({ town, hit: false, distKm: '999', pts: 0 });
+  }
+
+  // Brief pause then load next round
+  clearMapFeedback();
+  waiting = false;
+  const v = REGION_VIEWS[region];
+  map.setView(v.center, v.zoom);
+  _mpLoadRound(newRound);
+}
+
+// ── Leaderboard ────────────────────────────────────────────────────────────
+function _mpShowLeaderboard() {
+  _mpStopCountdown();
+  clearTimeout(_mpRoundTimer);
+  document.getElementById('mp-waiting-overlay').classList.remove('show');
+  document.getElementById('mp-players-bar').classList.remove('active');
+  document.getElementById('mp-countdown-bar').classList.remove('active');
+
+  // If the player didn't answer the last round
+  if (!_mpAnsweredThisRound && _mpRoomData && currentIdx < sequence.length) {
+    const town = sequence[currentIdx];
+    results.push({ town, hit: false, distKm: '999', pts: 0 });
+  }
+
+  const uid = window._fbUser?.uid;
+  const players = Object.entries(_mpPlayers)
+    .map(([id, p]) => ({ ...p, uid: id }))
+    .sort((a, b) => b.score - a.score);
+
+  const medals = ['🥇', '🥈', '🥉'];
+  const list = document.getElementById('mp-lb-list');
+  list.innerHTML = players.map((p, i) => {
+    const isMe = p.uid === uid;
+    const rank = i < 3 ? medals[i] : `${i + 1}`;
+    return `<div class="mp-lb-row ${isMe ? 'is-me' : ''}">
+      <span class="mp-lb-rank">${rank}</span>
+      <span class="mp-lb-name">${esc(p.nickname || 'Player')}${isMe ? ' ' + t('mp_you_label') : ''}</span>
+      <span class="mp-lb-score">${Math.floor(p.score)} ${lang === 'he' ? 'נק\'' : 'pts'}</span>
+    </div>`;
+  }).join('');
+
+  const card = document.getElementById('mp-lb-card');
+  card.dir = lang === 'he' ? 'rtl' : 'ltr';
+  document.getElementById('mp-lb-title').textContent = t('mp_leaderboard');
+  document.getElementById('mp-lb-play-again-btn').textContent = t('mp_play_again');
+  document.getElementById('mp-lb-share-btn').textContent = t('mp_share_results');
+  document.getElementById('mp-lb-menu-btn').textContent = t('mp_back');
+  document.getElementById('mp-leaderboard-panel').classList.add('show');
+
+  // Switch to street view for review
+  if (currentLayer === 'satellite') toggleMapLayer(true);
+
+  if (window._logEvent) window._logEvent('mp_game_complete', {
+    players: players.length, score: Math.floor(score)
+  });
+}
+
+// ── Play Again (reopen lobby for same room) ───────────────────────────────
+async function mpPlayAgain() {
+  if (!_mpRoomId || !window._fbFns || !window._fbDb) return;
+  if (!_checkRate('mp_play_again', 5000)) return; // 5s cooldown
+  const { updateDoc, doc, setDoc, serverTimestamp } = window._fbFns;
+  const uid = window._fbUser?.uid;
+
+  // Close leaderboard
+  document.getElementById('mp-leaderboard-panel').classList.remove('show');
+
+  // Reset local game state
+  score = 0;
+  streak = 0;
+  results = [];
+  currentIdx = 0;
+  waiting = false;
+  _mpAnsweredThisRound = false;
+
+  // Reset own player doc
+  if (uid) {
+    await setDoc(doc(window._fbDb, 'rooms', _mpRoomId, 'players', uid), {
+      nickname: _mpGetNickname(),
+      score: 0,
+      answeredRound: -1,
+      joinedAt: serverTimestamp()
+    });
+  }
+
+  // If host, reset the room to lobby; otherwise just show lobby and wait
+  if (_mpIsHost) {
+    await updateDoc(_mpRoomRef, {
+      status: 'lobby',
+      sequence: [],
+      currentRound: -1,
+      roundStartedAt: 0
+    });
+  }
+
+  // Show the lobby (listeners are still active, they'll pick up room state)
+  _mpShowLobby();
+}
+
+// ── Share Results ──────────────────────────────────────────────────────────
+function mpShareResults() {
+  const players = Object.entries(_mpPlayers)
+    .map(([id, p]) => ({ ...p, uid: id }))
+    .sort((a, b) => b.score - a.score);
+
+  const medals = ['🥇', '🥈', '🥉'];
+  const lines = players.map((p, i) => {
+    const medal = i < 3 ? medals[i] : `${i + 1}.`;
+    return `${medal} ${p.nickname} — ${Math.floor(p.score)} ${lang === 'he' ? 'נק\'' : 'pts'}`;
+  });
+
+  const url = window.location.origin + window.location.pathname + (lang === 'en' ? '?lang=en' : '');
+  const header = lang === 'he' ? 'תוצאות חידון ישראל של גילי! 🇮🇱' : "Gilly's Israel Quiz results! 🇮🇱";
+  const text = header + '\n\n' + lines.join('\n') + '\n\n' + url;
+  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+}
+
+// ── Leave / Cleanup ────────────────────────────────────────────────────────
+function mpLeaveLobby() {
+  _mpCleanup();
+  document.getElementById('mp-lobby-modal').classList.remove('open');
+  // Clean room param from URL
+  const url = new URL(window.location.href);
+  url.searchParams.delete('room');
+  window.history.replaceState({}, '', url.toString());
+  showMenu();
+}
+
+function mpLeaveGame() {
+  _mpCleanup();
+  document.getElementById('mp-leaderboard-panel').classList.remove('show');
+  document.getElementById('mp-players-bar').classList.remove('active');
+  document.getElementById('mp-countdown-bar').classList.remove('active');
+  document.getElementById('mp-waiting-overlay').classList.remove('show');
+  // Clean room param from URL
+  const url = new URL(window.location.href);
+  url.searchParams.delete('room');
+  window.history.replaceState({}, '', url.toString());
+  showMenu();
+}
+
+function _mpCleanup() {
+  _mpStopListeners();
+  _mpStopCountdown();
+  clearTimeout(_mpRoundTimer);
+  isMultiplayer = false;
+  _mpRoomId = null;
+  _mpRoomRef = null;
+  _mpIsHost = false;
+  _mpPlayers = {};
+  _mpRoomData = null;
+  _mpAnsweredThisRound = false;
+  _mpRoundTimer = null;
+}
+
+// ── Init: check for ?room= param on page load ─────────────────────────────
+function _initMultiplayerMode() {
+  const roomParam = new URLSearchParams(window.location.search).get('room');
+  if (!roomParam) return;
+  // Wait for auth to be ready, then join
+  const tryJoin = () => {
+    if (window._fbDb && window._fbFns) {
+      _mpJoinRoom(roomParam);
+    } else {
+      setTimeout(tryJoin, 300);
+    }
+  };
+  tryJoin();
+}
+
 </script>
 
 <!-- PWA Install Prompt -->
