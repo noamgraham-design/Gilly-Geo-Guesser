@@ -3730,6 +3730,7 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
   #mp-lobby-players {
     display:flex; flex-direction:column; gap:8px;
     margin:0 0 18px; text-align:start;
+    max-height:200px; overflow-y:auto;
   }
   .mp-player-row {
     display:flex; align-items:center; gap:10px;
@@ -3752,10 +3753,11 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
   .mp-player-you { color:var(--muted); font-size:0.82rem; }
   #mp-lobby-actions { display:flex; flex-direction:column; gap:10px; margin-bottom:14px; }
   #mp-lobby-actions .btn, .mp-lb-actions .btn { width:100%; }
-  #mp-lobby-code {
-    font-family:monospace; font-size:1.3rem; letter-spacing:3px;
-    background:rgba(0,0,0,0.06); padding:8px 16px; border-radius:10px;
-    margin:0 0 14px; user-select:all; direction:ltr;
+  #mp-lobby-nick-row {
+    margin:0 0 14px; text-align:start;
+  }
+  #mp-lobby-nick-input {
+    font-size:0.95rem; padding:8px 12px; direction:ltr;
   }
   #mp-lobby-waiting {
     font-size:0.9rem; color:var(--muted); margin:0 0 14px;
@@ -4218,7 +4220,13 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
 <div id="mp-lobby-modal">
   <div class="mp-lobby-card" id="mp-lobby-card">
     <h2 id="mp-lobby-title">חדר משחק</h2>
-    <div id="mp-lobby-code"></div>
+    <div id="mp-lobby-nick-row">
+      <label id="mp-lobby-nick-label" style="font-size:0.82rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px">הכינוי שלך</label>
+      <div style="display:flex;gap:6px">
+        <input id="mp-lobby-nick-input" class="login-input" type="text" maxlength="15" pattern="[A-Za-z0-9_]{1,15}" style="flex:1;margin:0;direction:ltr" />
+        <button id="mp-lobby-nick-save" class="btn-secondary" onclick="_mpSaveNickname()" style="padding:8px 14px;white-space:nowrap">✓</button>
+      </div>
+    </div>
     <div style="font-size:0.82rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:600;margin-bottom:8px" id="mp-lobby-players-label">שחקנים</div>
     <div id="mp-lobby-players"></div>
     <div id="mp-lobby-waiting" style="display:none"></div>
@@ -4968,6 +4976,7 @@ const STRINGS = {
     mp_start:         "Start Game →",
     mp_waiting:       "Waiting for host to start…",
     mp_players:       "Players",
+    mp_your_nick:     "Your nickname",
     mp_leaderboard:   "🏆 Leaderboard",
     mp_share_results: "📤 Share Results",
     mp_back:          "Menu →",
@@ -5029,6 +5038,7 @@ const STRINGS = {
     mp_start:         "התחל משחק ←",
     mp_waiting:       "ממתינים שהמארח יתחיל…",
     mp_players:       "שחקנים",
+    mp_your_nick:     "הכינוי שלך",
     mp_leaderboard:   "🏆 לוח תוצאות",
     mp_share_results: "📤 שתף תוצאות",
     mp_back:          "תפריט ←",
@@ -9597,6 +9607,35 @@ function _mpGetNickname() {
   return window._userNickname || generateRandomNickname();
 }
 
+async function _mpSaveNickname() {
+  const input = document.getElementById('mp-lobby-nick-input');
+  const nickname = input.value.trim();
+  if (!nickname || !isValidNickname(nickname)) { showNicknameError(); return; }
+  if (nickname === window._userNickname) return; // no change
+
+  window._userNickname = nickname;
+  const { updateDoc, setDoc, doc } = window._fbFns;
+  const user = window._fbUser;
+  try {
+    // Update player doc in room so other players see the change
+    if (_mpRoomId && user) {
+      await updateDoc(doc(window._fbDb, 'rooms', _mpRoomId, 'players', user.uid), { nickname });
+    }
+    // Persist to user profile for logged-in users
+    if (user && !user.isAnonymous) {
+      setDoc(doc(window._fbDb, 'users', user.uid), { nickname, updatedAt: new Date() }, { merge: true });
+    }
+    // Visual confirmation
+    const btn = document.getElementById('mp-lobby-nick-save');
+    const orig = btn.textContent;
+    btn.textContent = lang === 'he' ? '\u2713' : '\u2713';
+    btn.style.background = 'rgba(34,197,94,0.2)';
+    setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 1500);
+  } catch (e) {
+    console.error('Failed to save nickname:', e);
+  }
+}
+
 function _mpGetRoomUrl() {
   let url = window.location.origin + window.location.pathname + '?room=' + encodeURIComponent(_mpRoomId);
   if (lang === 'en') url += '&lang=en';
@@ -9894,7 +9933,11 @@ function _mpShowLobby() {
   card.dir = lang === 'he' ? 'rtl' : 'ltr';
   document.getElementById('mp-lobby-title').textContent = t('mp_lobby_title');
   document.getElementById('mp-lobby-players-label').textContent = t('mp_players');
-  document.getElementById('mp-lobby-code').textContent = _mpRoomId.slice(-5).toUpperCase();
+  document.getElementById('mp-lobby-nick-label').textContent = t('mp_your_nick');
+  const nickInput = document.getElementById('mp-lobby-nick-input');
+  nickInput.value = _mpGetNickname();
+  nickInput.onkeydown = (e) => { if (e.key === 'Enter') _mpSaveNickname(); };
+  nickInput.onblur = () => _mpSaveNickname();
   document.getElementById('mp-invite-btn').textContent = t('mp_invite');
   document.getElementById('mp-copy-btn').textContent = t('mp_copy_link');
   document.getElementById('mp-leave-btn').textContent = t('mp_back');
