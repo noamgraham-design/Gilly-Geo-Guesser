@@ -9844,7 +9844,7 @@ function _mpStartListeners() {
           if (newHostUid === myUid) {
             _mpIsHost = true;
             const { updateDoc } = window._fbFns;
-            updateDoc(_mpRoomRef, { hostUid: myUid }).catch(() => {});
+            updateDoc(_mpRoomRef, { hostUid: myUid }).catch(e => console.warn('Host transfer failed:', e));
             _mpShowAdminBanner();
             // Refresh lobby UI to show start button if in lobby
             if (_mpRoomData.status === 'lobby') _mpShowLobby();
@@ -9853,6 +9853,8 @@ function _mpStartListeners() {
               clearTimeout(_mpRoundTimer);
               _mpRoundTimer = setTimeout(() => _mpHostAdvanceRound(), MP_ROUND_DURATION + 2000);
             }
+            // If game finished, refresh leaderboard so new host can use Play Again
+            if (_mpRoomData.status === 'finished') _mpShowLeaderboard();
           }
         }
       }
@@ -10328,16 +10330,27 @@ function mpShareResults() {
 }
 
 // ── Leave / Cleanup ────────────────────────────────────────────────────────
-function _mpRemoveSelfFromRoom() {
+async function _mpRemoveSelfFromRoom() {
   const uid = window._fbUser?.uid;
-  if (uid && _mpRoomId && window._fbFns && window._fbDb) {
-    const { deleteDoc, doc } = window._fbFns;
-    deleteDoc(doc(window._fbDb, 'rooms', _mpRoomId, 'players', uid)).catch(() => {});
+  if (!uid || !_mpRoomId || !window._fbFns || !window._fbDb) return;
+  const { deleteDoc, doc, updateDoc } = window._fbFns;
+
+  // If we're the host and other players exist, transfer host before leaving
+  if (_mpIsHost && _mpRoomRef) {
+    const others = Object.entries(_mpPlayers)
+      .filter(([id]) => id !== uid)
+      .sort((a, b) => (a[1].joinedAt?.seconds || 0) - (b[1].joinedAt?.seconds || 0));
+    const newHostUid = others[0]?.[0];
+    if (newHostUid) {
+      try { await updateDoc(_mpRoomRef, { hostUid: newHostUid }); } catch (e) { /* best effort */ }
+    }
   }
+
+  deleteDoc(doc(window._fbDb, 'rooms', _mpRoomId, 'players', uid)).catch(() => {});
 }
 
-function mpLeaveLobby() {
-  _mpRemoveSelfFromRoom();
+async function mpLeaveLobby() {
+  await _mpRemoveSelfFromRoom();
   _mpCleanup();
   document.getElementById('mp-lobby-modal').classList.remove('open');
   document.getElementById('mp-standby-modal').classList.remove('open');
@@ -10348,8 +10361,8 @@ function mpLeaveLobby() {
   showMenu();
 }
 
-function mpLeaveGame() {
-  _mpRemoveSelfFromRoom();
+async function mpLeaveGame() {
+  await _mpRemoveSelfFromRoom();
   _mpCleanup();
   document.getElementById('mp-leaderboard-panel').classList.remove('show');
   document.getElementById('mp-standby-modal').classList.remove('open');
