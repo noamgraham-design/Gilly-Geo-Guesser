@@ -7711,7 +7711,7 @@ let _pendingGoogleUser = null; // set while new Google user hasn't yet accepted 
 window._onAuthChange = function(user) {
   const avatar = document.getElementById('auth-avatar');
   const label  = document.getElementById('auth-label');
-  if (user) {
+  if (user && !user.isAnonymous) {
     label.textContent = user.displayName ? user.displayName.split(' ')[0] : 'Account';
     if (user.photoURL) {
       avatar.innerHTML = `<img src="${esc(user.photoURL)}" alt="avatar"/>`;
@@ -7803,7 +7803,7 @@ window._onAuthChange = function(user) {
 };
 
 function handleAuthBtnClick() {
-  if (window._fbUser) { toggleAuthDropdown(); } else { openLoginModal(); }
+  if (window._fbUser && !window._fbUser.isAnonymous) { toggleAuthDropdown(); } else { openLoginModal(); }
 }
 function toggleAuthDropdown() {
   const dd = document.getElementById('auth-dropdown');
