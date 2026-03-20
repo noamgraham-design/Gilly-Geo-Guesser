@@ -9798,6 +9798,9 @@ function _mpStartListeners() {
       _mpIsHost = true;
       clearTimeout(_mpWatchdogTimer);
       _mpShowAdminBanner();
+      // Delete old host's player doc (they left but doc may still exist)
+      const { deleteDoc: _delDoc, doc: _docRef } = window._fbFns;
+      _delDoc(_docRef(window._fbDb, 'rooms', _mpRoomId, 'players', prev.hostUid)).catch(() => {});
       if (_mpRoomData.status === 'lobby') _mpShowLobby();
       if (_mpRoomData.status === 'playing') {
         clearTimeout(_mpRoundTimer);
@@ -10238,7 +10241,8 @@ async function _mpWatchdogTakeover() {
 
   // Take over as host
   _mpIsHost = true;
-  const { updateDoc } = window._fbFns;
+  const oldHostUid = _mpRoomData.hostUid; // capture before updateDoc
+  const { updateDoc, deleteDoc, doc } = window._fbFns;
   try {
     await updateDoc(_mpRoomRef, { hostUid: myUid });
   } catch (e) {
@@ -10246,6 +10250,8 @@ async function _mpWatchdogTakeover() {
     _mpIsHost = false;
     return;
   }
+  // Clean up dead host's player doc so they don't block future answer checks
+  if (oldHostUid) deleteDoc(doc(window._fbDb, 'rooms', _mpRoomId, 'players', oldHostUid)).catch(() => {});
   _mpShowAdminBanner();
   clearTimeout(_mpRoundTimer);
   _mpHostAdvanceRound();
