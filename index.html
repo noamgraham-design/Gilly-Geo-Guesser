@@ -10019,7 +10019,7 @@ function _mpShowLeaderboard() {
     return `<div class="mp-lb-row ${isMe ? 'is-me' : ''}">
       <span class="mp-lb-rank">${rank}</span>
       <span class="mp-lb-name">${esc(p.nickname || 'Player')}${isMe ? ' ' + t('mp_you_label') : ''}</span>
-      <span class="mp-lb-score">${Math.floor(p.score)} ${lang === 'he' ? 'נק\'' : 'pts'}</span>
+      <span class="mp-lb-score">${Math.floor(p.score)} ${lang === 'he' ? 'נקודות' : 'pts'}</span>
     </div>`;
   }).join('');
 
@@ -10090,7 +10090,7 @@ function mpShareResults() {
   const medals = ['🥇', '🥈', '🥉'];
   const lines = players.map((p, i) => {
     const medal = i < 3 ? medals[i] : `${i + 1}.`;
-    return `${medal} ${p.nickname} — ${Math.floor(p.score)} ${lang === 'he' ? 'נק\'' : 'pts'}`;
+    return `${medal} ${p.nickname} — ${Math.floor(p.score)} ${lang === 'he' ? 'נקודות' : 'pts'}`;
   });
 
   const url = window.location.origin + window.location.pathname + (lang === 'en' ? '?lang=en' : '');
