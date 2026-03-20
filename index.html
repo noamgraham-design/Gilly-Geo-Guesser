@@ -3780,6 +3780,26 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
   }
   #mp-waiting-overlay.show { display:block; }
 
+  /* Multiplayer admin transfer banner */
+  #mp-admin-banner {
+    position:fixed; top:24px; left:50%; transform:translateX(-50%) translateY(-80px);
+    background:linear-gradient(135deg, #1a6fd4, #1558b0); color:#fff;
+    padding:14px 28px; border-radius:14px; font-size:0.95rem; font-weight:600;
+    z-index:9000; display:none; box-shadow:0 6px 24px rgba(26,111,212,0.35);
+    text-align:center; white-space:nowrap; pointer-events:none;
+    font-family:'Source Serif 4','Alef',serif;
+  }
+  #mp-admin-banner.show {
+    display:block;
+    animation: mpBannerSlide 3.5s ease forwards;
+  }
+  @keyframes mpBannerSlide {
+    0%   { transform:translateX(-50%) translateY(-80px); opacity:0; }
+    12%  { transform:translateX(-50%) translateY(0); opacity:1; }
+    75%  { transform:translateX(-50%) translateY(0); opacity:1; }
+    100% { transform:translateX(-50%) translateY(-80px); opacity:0; }
+  }
+
   /* Multiplayer leaderboard */
   #mp-leaderboard-panel {
     position:fixed; inset:0; z-index:8000;
@@ -4191,6 +4211,9 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
 
 <!-- Multiplayer waiting overlay (shown after player answers, waiting for others) -->
 <div id="mp-waiting-overlay"></div>
+
+<!-- Multiplayer admin transfer banner -->
+<div id="mp-admin-banner"></div>
 
 <!-- Multiplayer Leaderboard -->
 <div id="mp-leaderboard-panel">
@@ -9716,6 +9739,30 @@ function _mpStartListeners() {
       snap.forEach(d => { _mpPlayers[d.id] = d.data(); });
       _mpUpdatePlayersUI();
 
+      // Detect host departure and transfer host to next player
+      if (_mpRoomData && _mpRoomData.hostUid && !_mpPlayers[_mpRoomData.hostUid]) {
+        const myUid = window._fbUser?.uid;
+        if (myUid && _mpPlayers[myUid]) {
+          // Pick the earliest-joined remaining player as new host
+          const sorted = Object.entries(_mpPlayers)
+            .sort((a, b) => (a[1].joinedAt?.seconds || 0) - (b[1].joinedAt?.seconds || 0));
+          const newHostUid = sorted[0]?.[0];
+          if (newHostUid === myUid) {
+            _mpIsHost = true;
+            const { updateDoc } = window._fbFns;
+            updateDoc(_mpRoomRef, { hostUid: myUid }).catch(() => {});
+            _mpShowAdminBanner();
+            // Refresh lobby UI to show start button if in lobby
+            if (_mpRoomData.status === 'lobby') _mpShowLobby();
+            // If mid-game, start the host fallback timer for the current round
+            if (_mpRoomData.status === 'playing') {
+              clearTimeout(_mpRoundTimer);
+              _mpRoundTimer = setTimeout(() => _mpHostAdvanceRound(), MP_ROUND_DURATION + 2000);
+            }
+          }
+        }
+      }
+
       // Host: sync playerCount on room doc when players join/leave
       if (_mpIsHost && _mpRoomData) {
         const count = Object.keys(_mpPlayers).length;
@@ -9731,6 +9778,16 @@ function _mpStartListeners() {
       }
     }
   );
+}
+
+function _mpShowAdminBanner() {
+  const el = document.getElementById('mp-admin-banner');
+  el.textContent = lang === 'he' ? 'אתה כעת מנהל המשחק 👑' : 'You are now the game admin 👑';
+  el.dir = lang === 'he' ? 'rtl' : 'ltr';
+  el.classList.remove('show');
+  void el.offsetWidth; // force reflow to restart animation
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3600);
 }
 
 function _mpStopListeners() {
@@ -10138,7 +10195,16 @@ function mpShareResults() {
 }
 
 // ── Leave / Cleanup ────────────────────────────────────────────────────────
+function _mpRemoveSelfFromRoom() {
+  const uid = window._fbUser?.uid;
+  if (uid && _mpRoomId && window._fbFns && window._fbDb) {
+    const { deleteDoc, doc } = window._fbFns;
+    deleteDoc(doc(window._fbDb, 'rooms', _mpRoomId, 'players', uid)).catch(() => {});
+  }
+}
+
 function mpLeaveLobby() {
+  _mpRemoveSelfFromRoom();
   _mpCleanup();
   document.getElementById('mp-lobby-modal').classList.remove('open');
   // Clean room param from URL
@@ -10149,6 +10215,7 @@ function mpLeaveLobby() {
 }
 
 function mpLeaveGame() {
+  _mpRemoveSelfFromRoom();
   _mpCleanup();
   document.getElementById('mp-leaderboard-panel').classList.remove('show');
   document.getElementById('mp-players-bar').classList.remove('active');
