@@ -7775,8 +7775,8 @@ function showResults() {
 
 setDiff('easy');
 setRegion('all');
-// Apply English language if ?lang=en is in the URL
-if (new URLSearchParams(window.location.search).get('lang') === 'en') lang = 'en';
+// Apply English language if ?lang=en is in the URL (takes precedence over saved profile)
+if (new URLSearchParams(window.location.search).get('lang') === 'en') { lang = 'en'; window._langFromUrl = true; }
 applyLang();
 
 // Detect and launch challenge mode if URL param is present
@@ -7834,7 +7834,7 @@ window._onAuthChange = function(user) {
         if (snap.exists()) {
           const data = snap.data();
           if (data.pwaDismissed) window._fbPwaDismissedTs = data.pwaDismissed;
-          if (data.language) setLang(data.language);
+          if (data.language && !window._langFromUrl) setLang(data.language);
           if (data.gender) {
             // Update in-memory state and gender button UI without triggering a save.
             // saveSettings() must not run here: the settings modal is closed and the
