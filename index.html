@@ -7611,10 +7611,10 @@ function _processMapClick(e) {
     : (polyFeature && perfect) ? (streetUsedThisRound ? Math.min(20, Math.round(DIFF[difficulty].maxPts * (TIER_MULTIPLIER[town.tier] ?? 1))) : Math.round(DIFF[difficulty].maxPts * (TIER_MULTIPLIER[town.tier] ?? 1))) : calcPts(distKm, d, hintUsed, town.tier);
   // Time bonus: only awarded when you score any points (no reward for a fast miss)
   const elapsedMs = Date.now() - roundStartTime;
-  const timeBonus = basePts > 0 && !streetUsedThisRound && elapsedMs < 10000 ? calcTimeBonus(elapsedMs) : 0;
+  const timeBonus = perfect && !streetUsedThisRound && elapsedMs < 10000 ? calcTimeBonus(elapsedMs) : 0;
   const pts = basePts + timeBonus;
   // Daily challenge: ms-precision time bonus for leaderboard differentiation
-  const scorePts = isDailyChallenge && basePts > 0 && !streetUsedThisRound
+  const scorePts = isDailyChallenge && perfect && !streetUsedThisRound
     ? basePts + calcTimeBonusMs(elapsedMs)
     : pts;
   const closeEnough = distKm < 10;
