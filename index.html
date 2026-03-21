@@ -4759,6 +4759,7 @@ const PLAYER_LEVEL_NAMES = {
   4: { en: 'Trail King', he: 'מלך השבילים'   },
   5: { en: 'Legend of the Land',  he: 'אגדת הארץ'    },
 };
+const LEVEL_EMOJIS = { 1: '🚗🗺️', 2: '🦊🏘️', 3: '🛰️🧠', 4: '🥾👑', 5: '🧔🦯' };
 
 // Cumulative points required for each level (index = level number)
 const LEVEL_POINTS = [0, 0, 3000, 10000, 30000, 100000];
@@ -8299,8 +8300,7 @@ function renderPlayerRow(p, globalRank) {
 
   const lvl = PLAYER_LEVEL_NAMES[p.level] || PLAYER_LEVEL_NAMES[1];
   const lvlText = lang === 'he' ? lvl.he : lvl.en;
-  const SB_LEVEL_EMOJIS = { 1: '🚗🗺️', 2: '🦊🏘️', 3: '🛰️🧠', 4: '🥾👑', 5: '🧔🦯' };
-  const lvlEmoji = SB_LEVEL_EMOJIS[p.level] || '🚗🗺️';
+  const lvlEmoji = LEVEL_EMOJIS[p.level] || '🚗🗺️';
   return `
     <div class="sb-row ${p.isMe ? 'sb-me' : ''}">
       ${rankHtml}
@@ -9988,9 +9988,12 @@ function _mpUpdatePlayersUI() {
       const initial = (p.nickname || '?').charAt(0).toUpperCase();
       const isHost = _mpRoomData && _mpRoomData.hostUid === id;
       const isMe = id === uid;
+      const lvl = p.level && PLAYER_LEVEL_NAMES[p.level];
+      const levelHtml = lvl ? `<span class="mp-lb-level">${LEVEL_EMOJIS[p.level] || ''} ${lvl[lang] || lvl.en}</span>` : '';
       return `<div class="mp-player-row">
         <div class="mp-player-avatar">${initial}</div>
         <span class="mp-player-name">${esc(p.nickname || 'Player')}</span>
+        ${levelHtml}
         ${isHost ? `<span class="mp-player-badge">${t('mp_host_label')}</span>` : ''}
         ${isMe ? `<span class="mp-player-you">${t('mp_you_label')}</span>` : ''}
       </div>`;
@@ -10306,7 +10309,7 @@ function _mpShowLeaderboard() {
     const isMe = p.uid === uid;
     const rank = i < 3 ? medals[i] : `${i + 1}`;
     const lvl = p.level && PLAYER_LEVEL_NAMES[p.level];
-    const levelHtml = lvl ? `<span class="mp-lb-level">${lvl[lang] || lvl.en}</span>` : '';
+    const levelHtml = lvl ? `<span class="mp-lb-level">${LEVEL_EMOJIS[p.level] || ''} ${lvl[lang] || lvl.en}</span>` : '';
     return `<div class="mp-lb-row ${isMe ? 'is-me' : ''}">
       <span class="mp-lb-rank">${rank}</span>
       <span class="mp-lb-name">${esc(p.nickname || 'Player')}${isMe ? ' ' + t('mp_you_label') : ''}${levelHtml}</span>
