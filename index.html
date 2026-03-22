@@ -5294,6 +5294,7 @@ let _mpIsSpectator = false;        // true if joined mid-game as spectator
 let _mpCountdownRaf = null;        // countdown animation frame
 let _mpCountdownStart = null;      // countdown start time
 let _mpWatchdogTimer = null;       // non-host watchdog to detect unresponsive host
+let _mpIsRejoining = false;        // true when player is rejoining mid-game (skip _mpOnGameStart)
 const MP_ROUND_DURATION = 20000;   // 20 seconds per round
 
 // ── Learning Mode State ───────────────────────────────────────────────────────
@@ -9744,26 +9745,78 @@ async function _mpJoinRoom(roomId) {
       return;
     }
 
-    const joiningMidGame = data.status === 'playing';
-    _mpIsSpectator = joiningMidGame;
+    const midGame = data.status === 'playing';
     _mpIsHost = (data.hostUid === user.uid);
     isMultiplayer = true;
     difficulty = data.difficulty || 'easy';
     region = data.region || 'all';
 
-    // Add self to players subcollection
-    await setDoc(doc(window._fbDb, 'rooms', roomId, 'players', user.uid), {
-      nickname: _mpGetNickname(),
-      score: 0,
-      answeredRound: -1,
-      level: user.isAnonymous ? 0 : getPlayerLevel(),
-      spectator: joiningMidGame,
-      joinedAt: serverTimestamp()
-    });
+    // Check if this user already has a player doc (rejoin scenario)
+    let isRejoining = false;
+    let savedScore = 0;
+    if (midGame) {
+      const existingSnap = await getDoc(doc(window._fbDb, 'rooms', roomId, 'players', user.uid));
+      if (existingSnap.exists()) {
+        const existingData = existingSnap.data();
+        if (!existingData.spectator) {
+          isRejoining = true;
+          savedScore = existingData.score || 0;
+        }
+      }
+    }
+
+    _mpIsSpectator = midGame && !isRejoining;
+
+    if (isRejoining) {
+      // Returning player: update nickname/level but preserve score and joinedAt
+      const { updateDoc } = window._fbFns;
+      await updateDoc(doc(window._fbDb, 'rooms', roomId, 'players', user.uid), {
+        nickname: _mpGetNickname(),
+        level: user.isAnonymous ? 0 : getPlayerLevel()
+      });
+    } else {
+      // New player: create fresh player doc
+      await setDoc(doc(window._fbDb, 'rooms', roomId, 'players', user.uid), {
+        nickname: _mpGetNickname(),
+        score: 0,
+        answeredRound: -1,
+        level: user.isAnonymous ? 0 : getPlayerLevel(),
+        spectator: midGame,
+        joinedAt: serverTimestamp()
+      });
+    }
 
     _mpStartListeners();
 
-    if (joiningMidGame) {
+    if (isRejoining) {
+      // Rejoin: restore local state and jump into the current round
+      // Flag prevents the initial room snapshot from triggering _mpOnGameStart
+      _mpIsRejoining = true;
+      score = savedScore;
+      sequence = data.sequence.map(s => {
+        const full = TOWNS.find(t => t.name === s.name);
+        return full || s;
+      });
+      roundCount = data.roundCount;
+      currentIdx = data.currentRound || 0;
+      streak = 0;
+      results = [];
+      waiting = false;
+      hintsLeft = 3;
+      _mpAnsweredThisRound = false;
+
+      document.getElementById('overlay').style.display = 'none';
+      document.getElementById('results-panel').className = '';
+      document.body.classList.remove('postgame');
+      document.getElementById('btn-back').style.display = 'inline-block';
+      document.getElementById('mp-players-bar').classList.add('active');
+
+      if (currentLayer === 'street') toggleMapLayer(true);
+      const v = REGION_VIEWS[region];
+      map.setView(v.center, v.zoom);
+      clearAllMarkers();
+      _mpLoadRound(currentIdx);
+    } else if (midGame) {
       _mpShowStandby();
     } else {
       _mpShowLobby();
@@ -9816,7 +9869,8 @@ function _mpStartListeners() {
 
     // Lobby → playing transition
     if (_mpRoomData.status === 'playing' && (!prev || prev.status === 'lobby')) {
-      if (!_mpIsSpectator) _mpOnGameStart();
+      if (_mpIsRejoining) { _mpIsRejoining = false; } // skip — rejoin already set up game state
+      else if (!_mpIsSpectator) _mpOnGameStart();
     }
     // Round advance
     else if (_mpRoomData.status === 'playing' && prev && prev.status === 'playing'
@@ -10457,6 +10511,7 @@ function _mpCleanup() {
   _mpAnsweredThisRound = false;
   _mpRoundTimer = null;
   _mpWatchdogTimer = null;
+  _mpIsRejoining = false;
 }
 
 // ── Init: check for ?room= param on page load ─────────────────────────────
@@ -10491,8 +10546,11 @@ window.addEventListener('beforeunload', () => {
     }
   }
 
-  // Delete own player doc (fire-and-forget)
-  deleteDoc(doc(window._fbDb, 'rooms', _mpRoomId, 'players', uid)).catch(() => {});
+  // Delete own player doc only if not mid-game (preserve for rejoin)
+  const gameInProgress = _mpRoomData && _mpRoomData.status === 'playing';
+  if (!gameInProgress) {
+    deleteDoc(doc(window._fbDb, 'rooms', _mpRoomId, 'players', uid)).catch(() => {});
+  }
 });
 
 </script>
