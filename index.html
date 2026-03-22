@@ -9856,9 +9856,8 @@ function _mpStartListeners() {
       _mpIsHost = true;
       clearTimeout(_mpWatchdogTimer);
       _mpShowAdminBanner();
-      // Delete old host's player doc (they left but doc may still exist)
-      const { deleteDoc: _delDoc, doc: _docRef } = window._fbFns;
-      _delDoc(_docRef(window._fbDb, 'rooms', _mpRoomId, 'players', prev.hostUid)).catch(() => {});
+      // Don't delete old host's player doc here — they may rejoin.
+      // The watchdog timer handles cleanup of truly dead hosts (28s timeout).
       if (_mpRoomData.status === 'lobby') _mpShowLobby();
       if (_mpRoomData.status === 'playing') {
         clearTimeout(_mpRoundTimer);
