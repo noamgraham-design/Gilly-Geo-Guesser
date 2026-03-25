@@ -166,7 +166,10 @@ function show(id) {
   if(id) document.getElementById(id).classList.add('active');
 }
 
+var gameStarted = false;
 function startGame() {
+  if (gameStarted) return;
+  gameStarted = true;
   show(null);
   document.getElementById('map-header').classList.add('visible');
   document.getElementById('tap-hint').classList.add('visible');
@@ -180,6 +183,7 @@ function startGame() {
     handleGuess(e.latlng);
   });
 }
+setTimeout(startGame, 4000);
 
 function handleGuess(guess) {
   var d = distKm(guess, JER);
