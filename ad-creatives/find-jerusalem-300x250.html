@@ -57,7 +57,12 @@ body{width:300px;height:250px;overflow:hidden;font-family:system-ui,-apple-syste
 /* ── RESULT ── */
 #result{background:rgba(13,31,56,.95);z-index:1003;padding:10px 16px;gap:0}
 #result .result-card{background:rgba(255,255,255,.07);border-radius:16px;padding:14px 16px 12px;width:100%;display:flex;flex-direction:column;align-items:center;border:1px solid rgba(255,255,255,.1)}
-#result .r-emoji{font-size:34px;line-height:1;display:inline-block}
+.r-emoji-wrap{display:inline-block}
+#result.active .r-emoji-wrap{animation:emojiFloat 2s ease-in-out .4s infinite}
+@keyframes emojiFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+#result .r-emoji{font-size:34px;line-height:1;display:inline-block;transform:scale(0);opacity:0}
+#result.active .r-emoji{animation:emojiPop .4s ease-out .1s forwards}
+@keyframes emojiPop{0%{transform:scale(0);opacity:0}60%{transform:scale(1.15);opacity:1}100%{transform:scale(1);opacity:1}}
 #result .r-grade{font-family:Georgia,serif;font-size:16px;font-weight:900;line-height:1.1;margin:2px 0}
 #result .r-dist{font-family:Georgia,serif;font-size:24px;font-weight:900;line-height:1;margin:2px 0}
 #result .r-label{font-size:10px;color:#94a3b8;font-weight:600;margin-bottom:6px}
@@ -114,7 +119,7 @@ var clickTag = "https://gilly.co.il/?lang=en&utm_source=google_ads&utm_medium=di
 <!-- State 3: Result -->
 <div id="result" class="screen">
   <div class="result-card">
-    <div class="r-emoji" id="r-emoji"></div>
+    <div class="r-emoji-wrap"><div class="r-emoji" id="r-emoji"></div></div>
     <div class="r-grade" id="r-grade"></div>
     <div class="r-dist" id="r-dist"></div>
     <div class="r-label" id="r-label"></div>
