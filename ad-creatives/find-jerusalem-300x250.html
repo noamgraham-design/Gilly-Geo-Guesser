@@ -38,10 +38,6 @@ body{width:300px;height:250px;overflow:hidden;font-family:system-ui,-apple-syste
 .map-header .pin{margin-right:4px;font-size:13px}
 .crosshair-hint{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);z-index:1002;background:rgba(0,0,0,.6);color:#fff;font-size:10px;padding:4px 12px;border-radius:12px;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(4px)}
 .crosshair-hint.visible{opacity:1}
-/* Layer toggle */
-.layer-btn{position:absolute;top:32px;right:6px;z-index:1002;width:28px;height:28px;border-radius:6px;border:none;background:rgba(255,255,255,.9);box-shadow:0 1px 4px rgba(0,0,0,.3);cursor:pointer;font-size:14px;line-height:28px;padding:0;opacity:0;pointer-events:none;transition:opacity .3s}
-.layer-btn.visible{opacity:1;pointer-events:auto}
-.layer-btn:hover{background:#fff}
 
 /* ── MID-GAME POPUP (like the real game) ── */
 #mid-popup{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);z-index:1003;pointer-events:none;text-align:center;opacity:0;white-space:nowrap}
@@ -85,9 +81,6 @@ var clickTag = "https://noamgraham-design.github.io/gilly-geo-guesser/?utm_sourc
 <div id="map-header" class="map-header">
   <span class="pin">📍</span> Find Jerusalem!
 </div>
-
-<!-- Layer toggle -->
-<button id="layer-btn" class="layer-btn" onclick="toggleLayer()">🗺️</button>
 
 <!-- Tap hint -->
 <div id="tap-hint" class="crosshair-hint">Tap the map to guess!</div>
@@ -133,12 +126,12 @@ map = L.map('map', {
   center: [31.4, 35.0],
   zoom: 8,
   minZoom: 7,
-  maxZoom: 9,
+  maxZoom: 14,
   zoomControl: false,
-  dragging: false,
-  scrollWheelZoom: false,
-  doubleClickZoom: false,
-  touchZoom: false,
+  dragging: true,
+  scrollWheelZoom: true,
+  doubleClickZoom: true,
+  touchZoom: true,
   boxZoom: false,
   keyboard: false,
   attributionControl: false,
@@ -146,30 +139,10 @@ map = L.map('map', {
   maxBoundsViscosity: 1.0
 });
 
-var satelliteLayer = L.tileLayer(
+L.tileLayer(
   'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
   {maxZoom: 18}
-);
-var streetLayer = L.tileLayer(
-  'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-  {maxZoom: 19}
-);
-var currentLayer = 'satellite';
-satelliteLayer.addTo(map);
-
-function toggleLayer() {
-  if (currentLayer === 'satellite') {
-    map.removeLayer(satelliteLayer);
-    streetLayer.addTo(map);
-    currentLayer = 'street';
-    document.getElementById('layer-btn').textContent = '🛰️';
-  } else {
-    map.removeLayer(streetLayer);
-    satelliteLayer.addTo(map);
-    currentLayer = 'satellite';
-    document.getElementById('layer-btn').textContent = '🗺️';
-  }
-}
+).addTo(map);
 
 function distKm(a, b) {
   var R=6371, dLat=(b.lat-a.lat)*Math.PI/180, dLng=(b.lng-a.lng)*Math.PI/180;
@@ -186,7 +159,6 @@ function startGame() {
   show(null);
   document.getElementById('map-header').classList.add('visible');
   document.getElementById('tap-hint').classList.add('visible');
-  document.getElementById('layer-btn').classList.add('visible');
 
   map.getContainer().style.cursor = 'crosshair';
 
@@ -255,7 +227,6 @@ function handleGuess(guess) {
   // Show result card after popup animation
   setTimeout(function() {
     document.getElementById('map-header').classList.remove('visible');
-    document.getElementById('layer-btn').classList.remove('visible');
     document.getElementById('r-emoji').textContent = emoji;
     document.getElementById('r-grade').textContent = grade;
     document.getElementById('r-grade').style.color = color;
