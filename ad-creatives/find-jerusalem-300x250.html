@@ -38,6 +38,10 @@ body{width:300px;height:250px;overflow:hidden;font-family:system-ui,-apple-syste
 .map-header .pin{margin-right:4px;font-size:13px}
 .crosshair-hint{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);z-index:1002;background:rgba(0,0,0,.6);color:#fff;font-size:10px;padding:4px 12px;border-radius:12px;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(4px)}
 .crosshair-hint.visible{opacity:1}
+/* Layer toggle */
+.layer-btn{position:absolute;top:32px;right:6px;z-index:1002;width:28px;height:28px;border-radius:6px;border:none;background:rgba(255,255,255,.9);box-shadow:0 1px 4px rgba(0,0,0,.3);cursor:pointer;font-size:14px;line-height:28px;padding:0;opacity:0;pointer-events:none;transition:opacity .3s}
+.layer-btn.visible{opacity:1;pointer-events:auto}
+.layer-btn:hover{background:#fff}
 
 /* ── MID-GAME POPUP (like the real game) ── */
 #mid-popup{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);z-index:1003;pointer-events:none;text-align:center;opacity:0;white-space:nowrap}
@@ -51,8 +55,9 @@ body{width:300px;height:250px;overflow:hidden;font-family:system-ui,-apple-syste
 #result{background:rgba(13,31,56,.92);backdrop-filter:blur(8px);z-index:1003;padding:10px 16px;gap:0}
 #result .result-card{background:rgba(255,255,255,.07);border-radius:16px;padding:14px 16px 12px;width:100%;display:flex;flex-direction:column;align-items:center;border:1px solid rgba(255,255,255,.1)}
 #result .r-emoji{font-size:34px;line-height:1}
-@keyframes emojiPop{0%{transform:scale(0) rotate(-10deg)}50%{transform:scale(1.3) rotate(5deg)}70%{transform:scale(.9)}100%{transform:scale(1) rotate(0)}}
-#result.active .r-emoji{animation:emojiPop .5s cubic-bezier(.34,1.56,.64,1) .1s both}
+@keyframes emojiEntrance{0%{transform:scale(0) rotate(-15deg);opacity:0}40%{transform:scale(1.4) rotate(8deg);opacity:1}60%{transform:scale(.85) rotate(-3deg)}80%{transform:scale(1.1) rotate(1deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes emojiBounce{0%,100%{transform:translateY(0) scale(1)}30%{transform:translateY(-6px) scale(1.08)}60%{transform:translateY(2px) scale(.97)}}
+#result.active .r-emoji{animation:emojiEntrance .6s cubic-bezier(.34,1.56,.64,1) .1s both,emojiBounce 2s ease-in-out 1s infinite}
 #result .r-grade{font-family:Georgia,serif;font-size:16px;font-weight:900;line-height:1.1;margin:2px 0}
 #result .r-dist{font-family:Georgia,serif;font-size:24px;font-weight:900;line-height:1;margin:2px 0}
 #result .r-label{font-size:10px;color:#94a3b8;font-weight:600;margin-bottom:6px}
@@ -80,6 +85,9 @@ var clickTag = "https://noamgraham-design.github.io/gilly-geo-guesser/?utm_sourc
 <div id="map-header" class="map-header">
   <span class="pin">📍</span> Find Jerusalem!
 </div>
+
+<!-- Layer toggle -->
+<button id="layer-btn" class="layer-btn" onclick="toggleLayer()">🗺️</button>
 
 <!-- Tap hint -->
 <div id="tap-hint" class="crosshair-hint">Tap the map to guess!</div>
@@ -113,7 +121,7 @@ var clickTag = "https://noamgraham-design.github.io/gilly-geo-guesser/?utm_sourc
     <div class="r-label" id="r-label"></div>
     <div class="bar-wrap"><div class="bar-fill" id="bar-fill"></div></div>
     <a id="cta-btn" class="cta-btn" href="#" target="_blank">Play the Full Game →</a>
-    <div class="cta-sub">130+ cities & towns to discover</div>
+    <div class="cta-sub">Many more cities & towns to discover!</div>
   </div>
 </div>
 
@@ -122,10 +130,10 @@ var JER = {lat:31.7788, lng:35.2258};
 var map, hasGuessed = false;
 
 map = L.map('map', {
-  center: [31.3, 34.8],
+  center: [31.4, 35.0],
   zoom: 8,
-  minZoom: 8,
-  maxZoom: 8,
+  minZoom: 7,
+  maxZoom: 9,
   zoomControl: false,
   dragging: false,
   scrollWheelZoom: false,
@@ -138,10 +146,30 @@ map = L.map('map', {
   maxBoundsViscosity: 1.0
 });
 
-L.tileLayer(
+var satelliteLayer = L.tileLayer(
   'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
   {maxZoom: 18}
-).addTo(map);
+);
+var streetLayer = L.tileLayer(
+  'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+  {maxZoom: 19}
+);
+var currentLayer = 'satellite';
+satelliteLayer.addTo(map);
+
+function toggleLayer() {
+  if (currentLayer === 'satellite') {
+    map.removeLayer(satelliteLayer);
+    streetLayer.addTo(map);
+    currentLayer = 'street';
+    document.getElementById('layer-btn').textContent = '🛰️';
+  } else {
+    map.removeLayer(streetLayer);
+    satelliteLayer.addTo(map);
+    currentLayer = 'satellite';
+    document.getElementById('layer-btn').textContent = '🗺️';
+  }
+}
 
 function distKm(a, b) {
   var R=6371, dLat=(b.lat-a.lat)*Math.PI/180, dLng=(b.lng-a.lng)*Math.PI/180;
@@ -158,6 +186,7 @@ function startGame() {
   show(null);
   document.getElementById('map-header').classList.add('visible');
   document.getElementById('tap-hint').classList.add('visible');
+  document.getElementById('layer-btn').classList.add('visible');
 
   map.getContainer().style.cursor = 'crosshair';
 
@@ -226,6 +255,7 @@ function handleGuess(guess) {
   // Show result card after popup animation
   setTimeout(function() {
     document.getElementById('map-header').classList.remove('visible');
+    document.getElementById('layer-btn').classList.remove('visible');
     document.getElementById('r-emoji').textContent = emoji;
     document.getElementById('r-grade').textContent = grade;
     document.getElementById('r-grade').style.color = color;
