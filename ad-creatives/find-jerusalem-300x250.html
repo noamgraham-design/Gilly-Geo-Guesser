@@ -66,6 +66,11 @@ body{width:300px;height:250px;overflow:hidden;font-family:system-ui,-apple-syste
 /* Accuracy bar */
 .bar-wrap{width:100%;height:6px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden;margin-bottom:8px}
 .bar-fill{height:100%;border-radius:99px;width:0%;transition:width 1s cubic-bezier(.34,1.2,.64,1)}
+/* City label tooltip (same as full game) */
+.city-label{background:rgba(255,255,255,.75)!important;border:none!important;border-radius:10px!important;padding:0!important;box-shadow:0 3px 14px rgba(0,0,0,.18)!important;white-space:nowrap!important;overflow:hidden!important}
+.city-label::before{display:none!important}
+.tooltip-inner{display:flex;align-items:center;gap:8px;padding:5px 10px}
+.tooltip-name{font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:700;color:#1a1e27;letter-spacing:.01em}
 /* CTA */
 .cta-btn{background:linear-gradient(90deg,#1a6fd4,#7c3aed);color:#fff;border:none;padding:10px 22px;border-radius:22px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 3px 16px rgba(26,111,212,.5);transition:transform .15s,box-shadow .15s;display:inline-block;text-decoration:none;text-align:center;letter-spacing:.3px;width:100%}
 .cta-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(26,111,212,.6)}
@@ -209,19 +214,14 @@ function handleGuess(guess) {
     radius:6, color:'#fff', weight:2.5, fillColor:'#ef4444', fillOpacity:1
   }).addTo(map);
 
-  // Target marker
-  L.circleMarker([JER.lat, JER.lng], {
-    radius:6, color:'#fff', weight:2.5, fillColor:'#22c55e', fillOpacity:1
+  // Target marker + label (same style as full game)
+  var targetMarker = L.circleMarker([JER.lat, JER.lng], {
+    radius:9, color:color, weight:2, fillColor:color, fillOpacity:.9
   }).addTo(map);
-
-  // Jerusalem label
-  L.marker([JER.lat, JER.lng], {
-    icon: L.divIcon({
-      className:'',
-      html:'<div style="color:#22c55e;font-size:10px;font-weight:800;font-family:system-ui;text-shadow:0 0 6px rgba(0,0,0,.9),0 0 2px rgba(0,0,0,.9);white-space:nowrap;margin-left:10px;margin-top:-7px">Jerusalem ✡</div>',
-      iconSize:[0,0]
-    })
-  }).addTo(map);
+  targetMarker.bindTooltip(
+    '<div class="tooltip-inner"><span class="tooltip-name">Jerusalem</span></div>',
+    {permanent:true, direction:'top', offset:[0,-10], className:'city-label'}
+  ).openTooltip();
 
   // Dashed line
   L.polyline([[guess.lat,guess.lng],[JER.lat,JER.lng]], {
