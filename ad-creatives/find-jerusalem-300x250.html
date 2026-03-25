@@ -4,49 +4,50 @@
 <meta charset="utf-8">
 <meta name="ad.size" content="width=300,height=250">
 <title>Find Jerusalem - Gilly's Israel Quiz</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{width:300px;height:250px;overflow:hidden;font-family:system-ui,-apple-system,sans-serif;background:#f0f4ff;position:relative}
-.screen{position:absolute;top:0;left:0;width:300px;height:250px;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s ease}
+body{width:300px;height:250px;overflow:hidden;font-family:system-ui,-apple-system,sans-serif;background:#0b1a2e;position:relative}
+
+/* Screens */
+.screen{position:absolute;top:0;left:0;width:300px;height:250px;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s ease;z-index:1000}
 .screen.active{opacity:1;pointer-events:auto}
 
-/* State 1: Intro */
-#intro{background:linear-gradient(160deg,#f0f4ff 0%,#dbeafe 100%)}
-#intro .silhouette{width:60px;height:160px;position:absolute;right:30px;top:45px;opacity:.08}
-#intro h1{font-family:Georgia,'Times New Roman',serif;font-size:22px;color:#1a3a5c;text-align:center;line-height:1.2;margin-bottom:4px}
-#intro h1 span{color:#1a6fd4;display:block;font-size:26px}
-#intro .brand{font-size:12px;color:#7c3aed;font-weight:600;letter-spacing:.5px;margin-bottom:16px}
-.play-btn{background:linear-gradient(90deg,#1a6fd4,#7c3aed);color:#fff;border:none;padding:10px 28px;border-radius:20px;font-size:14px;font-weight:600;cursor:pointer;animation:pulse 2s ease-in-out infinite;box-shadow:0 2px 12px rgba(26,111,212,.35)}
-@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+/* Intro */
+#intro{background:linear-gradient(160deg,#0b1a2e 0%,#132e4a 60%,#1a3f5c 100%);z-index:1001}
+#intro h1{font-family:Georgia,'Times New Roman',serif;font-size:21px;color:#e2e8f0;text-align:center;line-height:1.25;margin-bottom:4px;text-shadow:0 1px 8px rgba(0,0,0,.4)}
+#intro h1 span{color:#60a5fa;display:block;font-size:27px;margin-top:2px}
+#intro .brand{font-size:11px;color:#a78bfa;font-weight:600;letter-spacing:.8px;margin-bottom:18px;text-transform:uppercase}
+#intro .tagline{font-size:11px;color:#94a3b8;margin-bottom:14px}
+.play-btn{background:linear-gradient(90deg,#1a6fd4,#7c3aed);color:#fff;border:none;padding:11px 30px;border-radius:22px;font-size:14px;font-weight:700;cursor:pointer;animation:pulse 2s ease-in-out infinite;box-shadow:0 2px 16px rgba(26,111,212,.45);letter-spacing:.3px}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
 
-/* State 2: Map */
-#game{background:#f0f4ff}
-#game .header{width:100%;height:32px;background:linear-gradient(90deg,#1a6fd4,#2d5aa0);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600;letter-spacing:.3px;flex-shrink:0}
-#game .header .pin{margin-right:5px}
-#game .map-area{flex:1;width:100%;position:relative;cursor:crosshair;display:flex;align-items:center;justify-content:center}
-#game svg{height:195px}
-.land{fill:#dbeafe;stroke:#1a6fd4;stroke-width:1.5;stroke-linejoin:round;cursor:crosshair;transition:fill .15s}
-.land:hover{fill:#bfdbfe}
-.city-dot{fill:#94a3b8;stroke:#fff;stroke-width:1}
-.city-label{font-size:7px;fill:#64748b;font-family:system-ui,sans-serif}
-.guess-marker{display:none}
+/* Map */
+#map{position:absolute;top:0;left:0;width:300px;height:250px;z-index:500}
+#map .leaflet-container{cursor:crosshair!important}
+.map-header{position:absolute;top:0;left:0;right:0;height:30px;background:linear-gradient(90deg,rgba(26,111,212,.92),rgba(45,90,160,.92));display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700;letter-spacing:.3px;z-index:1002;backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .3s}
+.map-header.visible{opacity:1;pointer-events:auto}
+.map-header .pin{margin-right:5px;font-size:14px}
 
-/* State 3: Result */
-#result{background:linear-gradient(160deg,#f0f4ff 0%,#dbeafe 100%);padding:12px}
-#result .grade{font-size:28px;margin-bottom:2px}
-#result .dist-text{font-size:15px;font-weight:700;color:#1a3a5c;margin-bottom:2px}
-#result .msg{font-size:12px;color:#64748b;margin-bottom:10px}
-#result .mini-map{height:100px;margin-bottom:10px}
-.result-line{stroke:#ef4444;stroke-width:1;stroke-dasharray:3,2;opacity:.6}
-.marker-guess{fill:#ef4444;stroke:#fff;stroke-width:1.2}
-.marker-target{fill:#22c55e;stroke:#fff;stroke-width:1.2}
-.target-label{font-size:6.5px;fill:#15803d;font-weight:700;font-family:system-ui,sans-serif}
-.cta-btn{background:linear-gradient(90deg,#1a6fd4,#7c3aed);color:#fff;border:none;padding:10px 24px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 2px 12px rgba(26,111,212,.35);transition:transform .15s;display:block;text-decoration:none;text-align:center}
+/* Result overlay */
+#result{background:rgba(11,26,46,.88);backdrop-filter:blur(6px);z-index:1003;padding:14px}
+#result .grade{font-size:32px;margin-bottom:2px}
+#result .dist-text{font-size:16px;font-weight:700;color:#f1f5f9;margin-bottom:2px}
+#result .msg{font-size:12px;color:#94a3b8;margin-bottom:14px}
+.cta-btn{background:linear-gradient(90deg,#1a6fd4,#7c3aed);color:#fff;border:none;padding:11px 26px;border-radius:22px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 2px 16px rgba(26,111,212,.45);transition:transform .15s;display:inline-block;text-decoration:none;text-align:center;letter-spacing:.3px}
 .cta-btn:hover{transform:scale(1.04)}
-.cta-sub{font-size:9px;color:#94a3b8;margin-top:4px}
+.cta-sub{font-size:9px;color:#64748b;margin-top:6px}
 
-/* Border */
-body::after{content:'';position:absolute;inset:0;border:1px solid #cbd5e1;pointer-events:none;border-radius:2px}
+/* Arrow animation for result */
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+#result.active{animation:fadeIn .4s ease}
+
+/* Ad border (Google requirement) */
+body::after{content:'';position:absolute;inset:0;border:1px solid rgba(255,255,255,.15);pointer-events:none;border-radius:2px;z-index:9999}
+
+/* Hide Leaflet controls for clean ad look */
+.leaflet-control-zoom,.leaflet-control-attribution{display:none!important}
 </style>
 <script>
 var clickTag = "https://noamgraham-design.github.io/gilly-geo-guesser/?utm_source=google_ads&utm_medium=display&utm_campaign=find_jerusalem";
@@ -54,31 +55,20 @@ var clickTag = "https://noamgraham-design.github.io/gilly-geo-guesser/?utm_sourc
 </head>
 <body>
 
-<!-- State 1: Intro -->
-<div id="intro" class="screen active">
-  <svg class="silhouette" viewBox="100 28 90 196" xmlns="http://www.w3.org/2000/svg">
-    <path d="M114.6,129.5L126.3,161.2L127.2,168.5L128.9,170.4L128.3,174.6L131.3,176.6L141.1,206.8L142.5,212.4L142.4,217.6L143.6,220.0L145.6,217.3L146.6,217.6L148.9,206.0L151.2,200.5L150.7,197.4L152.5,195.2L151.8,194.3L154.4,188.9L153.7,180.9L155.6,177.8L154.4,173.1L156.1,166.1L159.9,159.6L160.0,157.2L161.7,155.4L161.5,152.2L162.5,149.9L165.1,147.8L166.8,140.5L166.8,137.9L164.4,133.0L167.4,126.3L167.7,116.9L171.2,107.8L169.6,94.1L171.5,85.0L172.0,64.9L173.3,62.6L175.7,62.5L179.6,59.5L183.0,55.2L185.4,49.4L183.7,41.5L182.4,40.5L183.5,38.2L182.1,34.1L180.5,33.0L182.1,30.9L180.5,30.0L177.6,30.3L173.4,34.2L171.5,32.1L168.7,42.0L166.3,42.0L165.7,43.2L163.4,43.7L161.0,41.3L152.0,41.8Z" fill="#1a6fd4"/>
-  </svg>
-  <h1>Can You Find<span>Jerusalem?</span></h1>
-  <div class="brand">GILLY'S ISRAEL QUIZ</div>
-  <button class="play-btn" onclick="startGame()">Click to Play</button>
+<!-- Leaflet map (always present behind overlays) -->
+<div id="map"></div>
+
+<!-- Header bar (shown during game) -->
+<div id="map-header" class="map-header">
+  <span class="pin">📍</span> Find Jerusalem!
 </div>
 
-<!-- State 2: Map -->
-<div id="game" class="screen">
-  <div class="header"><span class="pin">📍</span> Find Jerusalem!</div>
-  <div class="map-area">
-    <svg id="map-svg" viewBox="100 25 92 200" xmlns="http://www.w3.org/2000/svg">
-      <path class="land" d="M114.6,129.5L126.3,161.2L127.2,168.5L128.9,170.4L128.3,174.6L131.3,176.6L141.1,206.8L142.5,212.4L142.4,217.6L143.6,220.0L145.6,217.3L146.6,217.6L148.9,206.0L151.2,200.5L150.7,197.4L152.5,195.2L151.8,194.3L154.4,188.9L153.7,180.9L155.6,177.8L154.4,173.1L156.1,166.1L159.9,159.6L160.0,157.2L161.7,155.4L161.5,152.2L162.5,149.9L165.1,147.8L166.8,140.5L166.8,137.9L164.4,133.0L167.4,126.3L167.7,116.9L171.2,107.8L169.6,94.1L171.5,85.0L172.0,64.9L173.3,62.6L175.7,62.5L179.6,59.5L183.0,55.2L185.4,49.4L183.7,41.5L182.4,40.5L183.5,38.2L182.1,34.1L180.5,33.0L182.1,30.9L180.5,30.0L177.6,30.3L173.4,34.2L171.5,32.1L168.7,42.0L166.3,42.0L165.7,43.2L163.4,43.7L161.0,41.3L152.0,41.8Z"/>
-      <!-- Reference cities -->
-      <circle class="city-dot" cx="138.3" cy="91.8" r="2.2"/>
-      <text class="city-label" x="130" y="90">Tel Aviv</text>
-      <circle class="city-dot" cx="147.1" cy="56.8" r="2.2"/>
-      <text class="city-label" x="149.5" y="55">Haifa</text>
-      <!-- Guess marker (hidden until click) -->
-      <circle id="guess-dot" class="guess-marker marker-guess" cx="0" cy="0" r="4"/>
-    </svg>
-  </div>
+<!-- State 1: Intro -->
+<div id="intro" class="screen active">
+  <h1>Can You Find<span>Jerusalem?</span></h1>
+  <div class="brand">Gilly's Israel Quiz</div>
+  <div class="tagline">Tap the map to guess its location</div>
+  <button class="play-btn" onclick="startGame()">Play Now</button>
 </div>
 
 <!-- State 3: Result -->
@@ -86,95 +76,113 @@ var clickTag = "https://noamgraham-design.github.io/gilly-geo-guesser/?utm_sourc
   <div class="grade" id="grade-emoji"></div>
   <div class="dist-text" id="dist-text"></div>
   <div class="msg" id="grade-msg"></div>
-  <svg id="result-map" class="mini-map" viewBox="100 25 92 200" xmlns="http://www.w3.org/2000/svg">
-    <path class="land" d="M114.6,129.5L126.3,161.2L127.2,168.5L128.9,170.4L128.3,174.6L131.3,176.6L141.1,206.8L142.5,212.4L142.4,217.6L143.6,220.0L145.6,217.3L146.6,217.6L148.9,206.0L151.2,200.5L150.7,197.4L152.5,195.2L151.8,194.3L154.4,188.9L153.7,180.9L155.6,177.8L154.4,173.1L156.1,166.1L159.9,159.6L160.0,157.2L161.7,155.4L161.5,152.2L162.5,149.9L165.1,147.8L166.8,140.5L166.8,137.9L164.4,133.0L167.4,126.3L167.7,116.9L171.2,107.8L169.6,94.1L171.5,85.0L172.0,64.9L173.3,62.6L175.7,62.5L179.6,59.5L183.0,55.2L185.4,49.4L183.7,41.5L182.4,40.5L183.5,38.2L182.1,34.1L180.5,33.0L182.1,30.9L180.5,30.0L177.6,30.3L173.4,34.2L171.5,32.1L168.7,42.0L166.3,42.0L165.7,43.2L163.4,43.7L161.0,41.3L152.0,41.8Z" style="fill:#e2e8f0;stroke:#94a3b8;stroke-width:1"/>
-    <line id="result-line" class="result-line" x1="0" y1="0" x2="0" y2="0"/>
-    <circle id="result-guess" class="marker-guess" cx="0" cy="0" r="3.5"/>
-    <circle class="marker-target" cx="157.1" cy="106.9" r="3.5"/>
-    <text class="target-label" x="160" y="105">Jerusalem</text>
-  </svg>
   <a id="cta-btn" class="cta-btn" href="#" target="_blank">Play the Full Game!</a>
   <div class="cta-sub">130+ cities & towns to discover</div>
 </div>
 
 <script>
-// Projection constants
-var LAT_MIN=29.4922,LAT_MAX=33.3351,LNG_MIN=34.2188,LNG_MAX=35.8978;
-var cosCorr=Math.cos((LAT_MIN+LAT_MAX)/2*Math.PI/180);
-var latSpan=LAT_MAX-LAT_MIN;
-var MAP_H=190,MAP_W=MAP_H*((LNG_MAX-LNG_MIN)*cosCorr/latSpan);
-var OX=(300-MAP_W)/2, OY=30;
+var JER_LAT = 31.7788, JER_LNG = 35.2258;
+var map, guessMarker, targetMarker, resultLine, hasGuessed = false;
 
-// Jerusalem
-var JER_LAT=31.7788,JER_LNG=35.2258;
-var JER_X=157.1,JER_Y=106.9;
+// Initialize Leaflet map (hidden behind intro)
+map = L.map('map', {
+  center: [31.5, 34.9],
+  zoom: 7,
+  minZoom: 7,
+  maxZoom: 7,
+  zoomControl: false,
+  dragging: false,
+  scrollWheelZoom: false,
+  doubleClickZoom: false,
+  touchZoom: false,
+  boxZoom: false,
+  keyboard: false,
+  attributionControl: false,
+  maxBounds: L.latLngBounds(L.latLng(29.0, 33.5), L.latLng(33.8, 36.3)),
+  maxBoundsViscosity: 1.0
+});
 
-function svgToLatLng(svgX,svgY){
-  var lng=(svgX-OX)/(MAP_H*cosCorr/latSpan)+LNG_MIN;
-  var lat=LAT_MAX-(svgY-OY)/MAP_H*latSpan;
-  return{lat:lat,lng:lng};
+// Satellite tiles — same as the real game
+L.tileLayer(
+  'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+  { maxZoom: 18 }
+).addTo(map);
+
+function distKm(lat1, lng1, lat2, lng2) {
+  var R = 6371, dLat = (lat2-lat1)*Math.PI/180, dLng = (lng2-lng1)*Math.PI/180;
+  var x = dLng * Math.cos((lat1+lat2)/2*Math.PI/180);
+  return R * Math.sqrt(dLat*dLat + x*x);
 }
 
-function distKm(lat1,lng1,lat2,lng2){
-  var R=6371,dLat=(lat2-lat1)*Math.PI/180,dLng=(lng2-lng1)*Math.PI/180;
-  var x=dLng*Math.cos((lat1+lat2)/2*Math.PI/180);
-  return R*Math.sqrt(dLat*dLat+x*x);
+function show(id) {
+  var screens = document.querySelectorAll('.screen');
+  for (var i = 0; i < screens.length; i++) screens[i].classList.remove('active');
+  if (id) document.getElementById(id).classList.add('active');
 }
 
-function show(id){
-  var screens=document.querySelectorAll('.screen');
-  for(var i=0;i<screens.length;i++) screens[i].classList.remove('active');
-  document.getElementById(id).classList.add('active');
+function startGame() {
+  show(null); // hide all overlays — reveal the map
+  document.getElementById('map-header').classList.add('visible');
+
+  map.on('click', function(e) {
+    if (hasGuessed) return;
+    hasGuessed = true;
+    handleGuess(e.latlng.lat, e.latlng.lng);
+  });
 }
 
-function startGame(){
-  show('game');
-  var svg=document.getElementById('map-svg');
-  var land=svg.querySelector('.land');
-  land.addEventListener('click',function(e){
-    var pt=svg.createSVGPoint();
-    pt.x=e.clientX;pt.y=e.clientY;
-    var svgPt=pt.matrixTransform(svg.getScreenCTM().inverse());
-    handleGuess(svgPt.x,svgPt.y);
-  },{once:true});
-}
+function handleGuess(lat, lng) {
+  var d = distKm(lat, lng, JER_LAT, JER_LNG);
+  var km = Math.round(d);
 
-function handleGuess(sx,sy){
-  var guess=svgToLatLng(sx,sy);
-  var d=distKm(guess.lat,guess.lng,JER_LAT,JER_LNG);
-  var km=Math.round(d);
+  // Show guess marker (red)
+  guessMarker = L.circleMarker([lat, lng], {
+    radius: 7, color: '#fff', weight: 2, fillColor: '#ef4444', fillOpacity: 1
+  }).addTo(map);
+
+  // Show target marker (green) for Jerusalem
+  targetMarker = L.circleMarker([JER_LAT, JER_LNG], {
+    radius: 7, color: '#fff', weight: 2, fillColor: '#22c55e', fillOpacity: 1
+  }).addTo(map);
+
+  // Label for Jerusalem
+  L.marker([JER_LAT, JER_LNG], {
+    icon: L.divIcon({
+      className: '',
+      html: '<div style="color:#22c55e;font-size:10px;font-weight:700;font-family:system-ui,sans-serif;text-shadow:0 0 4px rgba(0,0,0,.8);white-space:nowrap;margin-left:10px;margin-top:-6px">Jerusalem</div>',
+      iconSize: [0, 0]
+    })
+  }).addTo(map);
+
+  // Draw line between guess and target
+  resultLine = L.polyline([[lat, lng], [JER_LAT, JER_LNG]], {
+    color: '#f87171', weight: 2, dashArray: '6,4', opacity: 0.8
+  }).addTo(map);
 
   // Determine grade
-  var emoji,msg;
-  if(km<20){emoji='🎯';msg='Amazing! You nailed it!';}
-  else if(km<50){emoji='🌟';msg='So close! Great job!';}
-  else if(km<100){emoji='👏';msg='Not bad at all!';}
-  else{emoji='🗺️';msg='Keep practicing!';}
+  var emoji, msg;
+  if (km < 20) { emoji = '🎯'; msg = 'Amazing! You nailed it!'; }
+  else if (km < 50) { emoji = '🌟'; msg = 'So close! Great job!'; }
+  else if (km < 100) { emoji = '👏'; msg = 'Not bad at all!'; }
+  else { emoji = '🗺️'; msg = 'Keep practicing!'; }
 
-  // Update result screen
-  document.getElementById('grade-emoji').textContent=emoji;
-  document.getElementById('dist-text').textContent='You were '+km+' km away!';
-  document.getElementById('grade-msg').textContent=msg;
-
-  // Position markers on result map
-  document.getElementById('result-guess').setAttribute('cx',sx);
-  document.getElementById('result-guess').setAttribute('cy',sy);
-  var line=document.getElementById('result-line');
-  line.setAttribute('x1',sx);line.setAttribute('y1',sy);
-  line.setAttribute('x2',JER_X);line.setAttribute('y2',JER_Y);
-
-  // Set CTA link
-  document.getElementById('cta-btn').href=clickTag;
-
-  show('result');
+  // Show result after a short delay to let user see the markers
+  setTimeout(function() {
+    document.getElementById('grade-emoji').textContent = emoji;
+    document.getElementById('dist-text').textContent = 'You were ' + km + ' km away!';
+    document.getElementById('grade-msg').textContent = msg;
+    document.getElementById('cta-btn').href = clickTag;
+    document.getElementById('map-header').classList.remove('visible');
+    show('result');
+  }, 1200);
 }
 
 // Google Ads: stop all animations after 30s
-setTimeout(function(){
-  var s=document.createElement('style');
-  s.textContent='*{animation:none!important;transition:none!important}';
+setTimeout(function() {
+  var s = document.createElement('style');
+  s.textContent = '*{animation:none!important;transition:none!important}';
   document.head.appendChild(s);
-},30000);
+}, 30000);
 </script>
 </body>
 </html>
