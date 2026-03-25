@@ -41,20 +41,26 @@ body{width:300px;height:250px;overflow:hidden;font-family:system-ui,-apple-syste
 .crosshair-hint.visible{opacity:1}
 
 /* ── MID-GAME POPUP (like the real game) ── */
-#mid-popup{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);z-index:1003;pointer-events:none;text-align:center;opacity:0;white-space:nowrap}
-#mid-popup .mid-emoji{font-size:38px;line-height:1;display:block;filter:drop-shadow(0 2px 10px rgba(0,0,0,.4))}
-#mid-popup .mid-text{font-family:Georgia,serif;font-weight:900;font-size:18px;line-height:1.1;display:block;margin-top:4px;text-shadow:-2px -2px 0 #fff,2px -2px 0 #fff,-2px 2px 0 #fff,2px 2px 0 #fff,-3px 0 0 #fff,3px 0 0 #fff,0 -3px 0 #fff,0 3px 0 #fff}
-#mid-popup .mid-dist{font-size:11px;font-weight:700;display:block;margin-top:2px;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.6)}
-@keyframes midPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(-5deg)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.2) rotate(2deg)}40%{transform:translate(-50%,-50%) scale(.95) rotate(0)}60%{transform:translate(-50%,-50%) scale(1.05)}80%{opacity:1;transform:translate(-50%,-50%) scale(1) translateY(0)}100%{opacity:0;transform:translate(-50%,calc(-50% - 40px)) scale(1.05)}}
-#mid-popup.show{animation:midPop 2.4s cubic-bezier(.34,1.4,.64,1) forwards}
+/* Mid-game popup — matches full game pts-popup */
+#mid-popup{position:absolute;left:50%;top:30%;transform:translate(-50%,-50%);z-index:1003;pointer-events:none;text-align:center;opacity:0;white-space:nowrap;max-width:90%}
+.pts-number{font-family:Georgia,'Times New Roman',serif;font-weight:900;line-height:1;display:block;filter:drop-shadow(0 2px 12px rgba(0,0,0,.35));text-shadow:-2px -2px 0 #fff,2px -2px 0 #fff,-2px 2px 0 #fff,2px 2px 0 #fff,-3px 0 0 #fff,3px 0 0 #fff,0 -3px 0 #fff,0 3px 0 #fff}
+.pts-label{font-family:Georgia,'Times New Roman',serif;font-weight:700;letter-spacing:2px;text-transform:uppercase;display:block;margin-top:4px;opacity:.95;text-shadow:-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff,1px 1px 0 #fff,-2px 0 0 #fff,2px 0 0 #fff,0 -2px 0 #fff,0 2px 0 #fff}
+@keyframes ptsMiss{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.05)}75%{opacity:1;transform:translate(-50%,-50%) scale(1) translateY(0)}100%{opacity:0;transform:translate(-50%,calc(-50% - 30px)) scale(.9)}}
+@keyframes ptsGood{0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}25%{opacity:1;transform:translate(-50%,-50%) scale(1.12)}55%{opacity:1;transform:translate(-50%,-50%) scale(1)}85%{opacity:1;transform:translate(-50%,-50%) scale(1) translateY(0)}100%{opacity:0;transform:translate(-50%,calc(-50% - 50px)) scale(.95)}}
+@keyframes ptsPerfect{0%{opacity:0;transform:translate(-50%,-50%) scale(.2) rotate(-8deg)}18%{opacity:1;transform:translate(-50%,-50%) scale(1.35) rotate(3deg)}30%{opacity:1;transform:translate(-50%,-50%) scale(.95) rotate(-1deg)}45%{opacity:1;transform:translate(-50%,-50%) scale(1.08) rotate(1deg)}60%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0)}85%{opacity:1;transform:translate(-50%,calc(-50% - 20px)) scale(1)}100%{opacity:0;transform:translate(-50%,calc(-50% - 80px)) scale(1.1)}}
+@keyframes ptsPulseGlow{0%,100%{text-shadow:-2px -2px 0 #fff,2px -2px 0 #fff,-2px 2px 0 #fff,2px 2px 0 #fff,-3px 0 0 #fff,3px 0 0 #fff,0 -3px 0 #fff,0 3px 0 #fff,0 0 20px currentColor,0 0 40px currentColor}50%{text-shadow:-2px -2px 0 #fff,2px -2px 0 #fff,-2px 2px 0 #fff,2px 2px 0 #fff,-3px 0 0 #fff,3px 0 0 #fff,0 -3px 0 #fff,0 3px 0 #fff,0 0 40px currentColor,0 0 80px currentColor,0 0 120px currentColor}}
+#mid-popup.show-miss{animation:ptsMiss 1.8s cubic-bezier(.4,0,.6,1) forwards}
+#mid-popup.show-good{animation:ptsGood 2.2s cubic-bezier(.34,1.2,.64,1) forwards}
+#mid-popup.show-perfect{animation:ptsPerfect 2.6s cubic-bezier(.34,1.56,.64,1) forwards}
+#mid-popup.show-perfect .pts-number{animation:ptsPulseGlow .7s ease-in-out .3s 3}
 
 /* ── RESULT ── */
 #result{background:rgba(13,31,56,.92);backdrop-filter:blur(8px);z-index:1003;padding:10px 16px;gap:0}
 #result .result-card{background:rgba(255,255,255,.07);border-radius:16px;padding:14px 16px 12px;width:100%;display:flex;flex-direction:column;align-items:center;border:1px solid rgba(255,255,255,.1)}
-#result .r-emoji{font-size:34px;line-height:1}
-@keyframes emojiEntrance{0%{transform:scale(0) rotate(-15deg);opacity:0}40%{transform:scale(1.4) rotate(8deg);opacity:1}60%{transform:scale(.85) rotate(-3deg)}80%{transform:scale(1.1) rotate(1deg)}100%{transform:scale(1) rotate(0)}}
-@keyframes emojiBounce{0%,100%{transform:translateY(0) scale(1)}30%{transform:translateY(-6px) scale(1.08)}60%{transform:translateY(2px) scale(.97)}}
-#result.active .r-emoji{animation:emojiEntrance .6s cubic-bezier(.34,1.56,.64,1) .1s both,emojiBounce 2s ease-in-out 1s infinite}
+#result .r-emoji{font-size:34px;line-height:1;display:inline-block}
+@keyframes emojiPop{0%{transform:scale(0);opacity:0}50%{transform:scale(1.2);opacity:1}100%{transform:scale(1)}}
+@keyframes emojiBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+#result.active .r-emoji{animation:emojiPop .4s ease-out .1s both,emojiBounce 1.8s ease-in-out .6s infinite}
 #result .r-grade{font-family:Georgia,serif;font-size:16px;font-weight:900;line-height:1.1;margin:2px 0}
 #result .r-dist{font-family:Georgia,serif;font-size:24px;font-weight:900;line-height:1;margin:2px 0}
 #result .r-label{font-size:10px;color:#94a3b8;font-weight:600;margin-bottom:6px}
@@ -86,11 +92,8 @@ var clickTag = "https://gilly.co.il/?lang=en&utm_source=google_ads&utm_medium=di
 <!-- Tap hint -->
 <div id="tap-hint" class="crosshair-hint">Tap the map to guess!</div>
 
-<!-- Mid-game popup -->
+<!-- Mid-game popup (same structure as full game) -->
 <div id="mid-popup">
-  <span class="mid-emoji" id="mid-emoji"></span>
-  <span class="mid-text" id="mid-text"></span>
-  <span class="mid-dist" id="mid-dist"></span>
 </div>
 
 <!-- State 1: Intro -->
@@ -222,13 +225,20 @@ function handleGuess(guess) {
     color:'#f87171', weight:2, dashArray:'6,4', opacity:.7
   }).addTo(map);
 
-  // Mid-game popup (game-style animated feedback over map)
-  var mp = document.getElementById('mid-popup');
-  document.getElementById('mid-emoji').textContent = emoji;
-  document.getElementById('mid-text').textContent = grade;
-  document.getElementById('mid-text').style.color = color;
-  document.getElementById('mid-dist').textContent = distDisplay + ' ' + distLabel;
-  mp.className = 'show';
+  // Mid-game popup (same as full game's showPtsPopup)
+  var el = document.getElementById('mid-popup');
+  el.className = '';
+  void el.offsetWidth; // force reflow
+
+  var label = emoji + ' ' + grade;
+  var perfect = km < 5;
+  var fontSize = perfect ? '3.5rem' : km <= 15 ? '2.8rem' : km <= 40 ? '2.2rem' : '1.8rem';
+  var labelSize = perfect ? '2rem' : km <= 15 ? '1.5rem' : km <= 40 ? '1.2rem' : '1rem';
+  var cls = perfect ? 'show-perfect' : km <= 40 ? 'show-good' : 'show-miss';
+
+  el.innerHTML = '<span class="pts-label" style="color:'+color+';font-size:'+labelSize+'">'+label+'</span>';
+  el.classList.add(cls);
+  el.addEventListener('animationend', function(){ el.className = ''; }, {once:true});
 
   // Accuracy for bar (100% = 0km, 0% = 200km+)
   var accuracy = Math.max(2, Math.round(100 * (1 - Math.min(d, 200) / 200)));
