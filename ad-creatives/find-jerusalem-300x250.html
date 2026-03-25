@@ -33,9 +33,10 @@ body{width:300px;height:250px;overflow:hidden;font-family:system-ui,-apple-syste
 /* ── MAP ── */
 #map{position:absolute;top:0;left:0;width:300px;height:250px;z-index:500}
 .leaflet-control-zoom,.leaflet-control-attribution{display:none!important}
-.map-header{position:absolute;top:0;left:0;right:0;height:28px;background:linear-gradient(90deg,rgba(26,111,212,.93),rgba(45,90,160,.93));display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;letter-spacing:.3px;z-index:1002;backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .3s}
+.map-header{position:absolute;top:0;left:0;right:0;height:34px;background:linear-gradient(135deg,#0038b8 0%,#1a6fd4 40%,#7c3aed 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;letter-spacing:.5px;z-index:1002;box-shadow:0 2px 12px rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .3s;text-shadow:0 1px 3px rgba(0,0,0,.3)}
 .map-header.visible{opacity:1;pointer-events:auto}
-.map-header .pin{margin-right:4px;font-size:13px}
+.map-header .pin{margin-right:5px;font-size:16px;display:inline-block;animation:pinBounce 1.5s ease-in-out infinite}
+@keyframes pinBounce{0%,100%{transform:translateY(0) scale(1)}30%{transform:translateY(-5px) scale(1.15)}50%{transform:translateY(0) scale(1)}70%{transform:translateY(-2px) scale(1.05)}}
 .crosshair-hint{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);z-index:1002;background:rgba(0,0,0,.6);color:#fff;font-size:10px;padding:4px 12px;border-radius:12px;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(4px)}
 .crosshair-hint.visible{opacity:1}
 
