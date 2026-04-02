@@ -7,9 +7,7 @@ A browser-based PWA geo-guessing game where players click on a map of Israel to 
 ```
 index.html          — Main game: ALL HTML, CSS, and JS in one file (~10,800 lines)
 towns.js            — Town data array (TOWNS), ~1,300 lines
-senior/             — Simplified version for older users
-  index.html        — Senior game (~7,400 lines, same single-file pattern)
-  towns.js          — Senior town data (~1,300 lines)
+senior/             — Simplified version for older users (DO NOT touch unless asked)
 sw.js               — Minimal service worker (PWA installability only)
 manifest.json       — PWA manifest
 firestore.rules     — Firestore security rules (multiplayer, scores, daily)
@@ -28,7 +26,7 @@ Each entry in the `TOWNS` array:
 ```
 - **Tiers**: 1 = major cities (easy), 2 = medium towns, 3 = small towns, 4 = villages/junctions
 - **Regions**: "Center", "North", "South", "Jerusalem"
-- Both `towns.js` and `senior/towns.js` define a global `TOWNS` array (not a module)
+- `towns.js` defines a global `TOWNS` array (not a module, loaded via `<script>` tag)
 
 ## Key Architecture Decisions
 
@@ -71,4 +69,15 @@ Each entry in the `TOWNS` array:
 - **Single-file architecture** — resist splitting index.html; the project intentionally keeps everything in one file
 - **Service worker is minimal** — only exists for PWA installability, no caching strategy
 - **Firebase config is in index.html** — these are client-side keys (public by design, secured by Firestore rules + App Check)
-- **senior/ is a separate copy** — not shared code; changes to the main game are not automatically reflected in senior mode
+- **Ignore senior/** — do NOT read, edit, or modify anything under `senior/` unless explicitly asked. It is a separate copy maintained independently
+
+## RTL / Hebrew UI Rules
+The app body is always `dir="ltr"`. Hebrew RTL is applied per-element, not globally. Follow these rules when touching Hebrew UI:
+
+1. **Inline `dir="rtl"`**: When generating HTML with Hebrew text, add `dir="rtl"` on the container element (e.g., `<div dir="rtl">...</div>`)
+2. **CSS `direction: rtl`**: For styled components that are always Hebrew (e.g., Hebrew-specific modals), use `direction: rtl; unicode-bidi: isolate;` in CSS
+3. **`[dir="rtl"]` selectors**: When a component needs different layout in Hebrew (flipped margins, text-align), use `[dir="rtl"] .my-class { ... }` CSS selectors — see PWA install card for examples (~line 3663)
+4. **Dynamic dir in JS**: When building HTML strings conditionally, use the pattern: `${lang === 'he' ? 'dir="rtl"' : ''}`
+5. **STRINGS object**: All new UI text must have both `en` and `he` keys in the `STRINGS` object and be accessed via `t('key')`
+6. **Town data**: Always provide both English (`name`, `desc`, `fact`) and Hebrew (`nameHe`, `descHe`, `factHe`) fields
+7. **Never set `document.body.dir = 'rtl'`** — the app explicitly keeps body LTR and handles RTL at the component level
