@@ -8969,7 +8969,7 @@ function showQuizProgress(pendingScore) {
     // Show points progress instead of known places table
     const ptsDisplay = lvl >= 5
       ? (isHe ? `${cumulativePoints.toLocaleString()} נקודות` : `${cumulativePoints.toLocaleString()} pts`)
-      : (isHe ? `${cumulativePoints.toLocaleString()} / ${nextThreshold.toLocaleString()}` : `${cumulativePoints.toLocaleString()} / ${nextThreshold.toLocaleString()}`);
+      : (isHe ? `${cumulativePoints.toLocaleString()} | ${nextThreshold.toLocaleString()}` : `${cumulativePoints.toLocaleString()} | ${nextThreshold.toLocaleString()}`);
     document.getElementById('qp-list').innerHTML = `<div style="text-align:center;padding:12px 0;font-size:0.95rem;color:var(--muted)">${ptsDisplay}</div>`;
 
     // Recommended difficulty tip
