@@ -66,11 +66,13 @@ Each entry in the `TOWNS` array:
 ## Deployment
 The game is deployed from a separate repo: `git@github.com:gillyisraelquiz/Gilly-Israel-Quiz.git`
 
-Use `deploy.sh` to push changes there — it copies `index.html`, `towns.js`, `sw.js`, and `manifest.json` then commits and pushes:
+Use `deploy.sh` to open a PR there — it uploads `index.html`, `towns.js`, `sw.js`, and `manifest.json` via the GitHub API and opens a PR for review:
 ```bash
-./deploy.sh                        # auto-generates message from latest commit
-./deploy.sh "Add daily challenge"  # custom message
+export DEPLOY_GITHUB_TOKEN=your_pat  # PAT for gillyisraelquiz (once, or add to ~/.bashrc)
+./deploy.sh                          # auto-generates PR title from latest commit
+./deploy.sh "Add daily challenge"    # custom PR title
 ```
+The PAT needs **Contents** (read/write) and **Pull Requests** (read/write) permissions on the deployment repo.
 
 ## Important Conventions
 - **No build system** — plain HTML/JS/CSS, edit files directly, no transpilation
