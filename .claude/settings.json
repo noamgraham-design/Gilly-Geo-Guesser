@@ -5,10 +5,11 @@
       "Bash(python3:*)",
       "Bash(python:*)",
       "Bash(ls:*)",
-      "Bash(cat:*)",
       "Bash(wc:*)",
-      "Bash(grep:*)",
-      "Bash(jq:*)"
+      "Bash(mkdir:*)",
+      "Read",
+      "Glob",
+      "Grep"
     ]
   }
 }
