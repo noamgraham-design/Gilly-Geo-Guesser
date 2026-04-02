@@ -7,7 +7,7 @@
 
 set -euo pipefail
 
-DEPLOY_REPO="https://github.com/gillyisraelquiz/Gilly-Israel-Quiz.git"
+DEPLOY_REPO="git@github.com:gillyisraelquiz/Gilly-Israel-Quiz.git"
 DEPLOY_FILES=(index.html towns.js sw.js manifest.json)
 TMPDIR_NAME="$(mktemp -d)"
 SOURCE_COMMIT="$(git rev-parse --short HEAD)"

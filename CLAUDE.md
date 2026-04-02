@@ -64,7 +64,7 @@ Each entry in the `TOWNS` array:
 - `append_localities.py` — Adds new localities from israel_localities.json
 
 ## Deployment
-The game is deployed from a separate repo: `https://github.com/gillyisraelquiz/Gilly-Israel-Quiz`
+The game is deployed from a separate repo: `git@github.com:gillyisraelquiz/Gilly-Israel-Quiz.git`
 
 Use `deploy.sh` to push changes there — it copies `index.html`, `towns.js`, `sw.js`, and `manifest.json` then commits and pushes:
 ```bash
