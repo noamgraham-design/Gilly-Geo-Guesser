@@ -63,6 +63,17 @@ Each entry in the `TOWNS` array:
 - `sync_towns_coords.py` — Syncs coordinates between towns.js and JSON data files
 - `append_localities.py` — Adds new localities from israel_localities.json
 
+## Deployment
+The game is deployed from a separate repo: `git@github.com:gillyisraelquiz/Gilly-Israel-Quiz.git`
+
+Use `deploy.sh` to open a PR there — it uploads `index.html`, `towns.js`, `sw.js`, and `manifest.json` via the GitHub API and opens a PR for review:
+```bash
+export DEPLOY_GITHUB_TOKEN=your_pat  # PAT for gillyisraelquiz (once, or add to ~/.bashrc)
+./deploy.sh                          # auto-generates PR title from latest commit
+./deploy.sh "Add daily challenge"    # custom PR title
+```
+The PAT needs **Contents** (read/write) and **Pull Requests** (read/write) permissions on the deployment repo.
+
 ## Important Conventions
 - **No build system** — plain HTML/JS/CSS, edit files directly, no transpilation
 - **No test suite** — test changes by opening in a browser
