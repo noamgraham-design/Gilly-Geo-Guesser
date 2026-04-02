@@ -2298,6 +2298,30 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
     body.postgame #topbar h1 { visibility: hidden; }
   }
 
+  /* Satellite toggle button — mobile postgame review only */
+  #btn-review-satellite {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2000;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.85);
+    background: var(--surface);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.28);
+    font-size: 1.25rem;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+  }
+  @media (max-width: 768px) {
+    body.postgame #btn-review-satellite { display: flex; }
+  }
+
   /* DESKTOP – enlarge menu card & contents */
   @media (min-width: 769px) {
     #overlay-scroll-area {
@@ -3983,6 +4007,7 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
   <div id="pts-popup" aria-live="assertive" aria-atomic="true"></div>
   <span id="main-content" aria-hidden="true" style="position:absolute;top:0;left:0;"></span>
   <div id="map" tabindex="0" role="application" aria-label="מפת ישראל האינטראקטיבית / Interactive map of Israel" style="position:absolute;inset:0;"></div>
+  <button id="btn-review-satellite" onclick="toggleMapLayer(true)" aria-label="Toggle satellite view">🛰️</button>
 </div>
 <div id="feedback"></div>
 
@@ -5866,6 +5891,8 @@ function toggleMapLayer(suppressBanner = false) {
     document.getElementById('mobile-tools-layer').innerHTML = t('layer_street');
   }
   updateArabVillageLabels();
+  const reviewSatBtn = document.getElementById('btn-review-satellite');
+  if (reviewSatBtn) reviewSatBtn.textContent = currentLayer === 'satellite' ? '🗺️' : '🛰️';
 }
 
 function isGameInProgress() {
@@ -7771,6 +7798,9 @@ function showResults() {
   if (currentLayer === 'satellite') {
     toggleMapLayer(true); // suppress banner - this is for review, not cheating
   }
+  // Sync review satellite button emoji (always starts in street view)
+  const reviewSatBtn = document.getElementById('btn-review-satellite');
+  if (reviewSatBtn) reviewSatBtn.textContent = currentLayer === 'satellite' ? '🗺️' : '🛰️';
 
 }
 
