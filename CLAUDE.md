@@ -71,6 +71,71 @@ Each entry in the `TOWNS` array:
 - **Firebase config is in index.html** — these are client-side keys (public by design, secured by Firestore rules + App Check)
 - **Ignore senior/** — do NOT read, edit, or modify anything under `senior/` unless explicitly asked. It is a separate copy maintained independently
 
+## UI Style Guide
+Match the existing visual language. Do not introduce new colors, fonts, or patterns.
+
+### Design Tokens (CSS variables in `:root`)
+```css
+--bg:      #f4f6f9      /* page background */
+--surface: #ffffff      /* card/modal background */
+--border:  rgba(0,0,0,0.10)
+--green:   #1a7f37      /* success, easy mode */
+--red:     #cf2316      /* error, hard mode */
+--gold:    #9a6700      /* warning, medium mode */
+--text:    #1a1e27      /* primary text */
+--muted:   #57606a      /* secondary/caption text */
+```
+Always use `var(--name)` — never hard-code these color values.
+
+### Typography
+- **Body**: `'Alef', sans-serif` (set on `body`)
+- **Headings / hero numbers**: `'Playfair Display', 'Alef', serif` — bold/900 weight
+- **Buttons / inputs / UI text**: `'Source Serif 4', 'Alef', serif`
+- Never introduce additional font families
+
+### Buttons (`.btn` base class, ~line 1083)
+```css
+.btn          /* border-radius: 50px; font: Source Serif 4; padding: 7px 16px */
+.btn-primary  /* gradient: #1a6fd4 → #7c3aed; white text; blue shadow */
+.btn-hint     /* transparent + dashed border; gold on hover */
+.btn-learn    /* transparent + solid #7c3aed border; purple text */
+.btn-mp-orange/* gradient: #f59e0b → #d97706; white text */
+```
+Reuse these classes. Don't create ad-hoc button styles.
+
+### Modals & Overlays
+All modals follow this pattern:
+```css
+/* Overlay backdrop */
+display: none; position: fixed; inset: 0; z-index: <see scale>;
+background: rgba(0,0,0,0.45);       /* semi-transparent backdrop */
+align-items: center; justify-content: center;
+
+/* Card inside */
+background: var(--surface); border-radius: 20px;  /* or 16px, 24px */
+box-shadow: 0 24px 60px rgba(0,0,0,0.25);         /* or 0 12px 48px */
+padding: 28px 24px;
+```
+- Show with `el.style.display = 'flex'`, hide with `el.style.display = 'none'`
+- Always add focus trap via `trapFocus(modal)` / `releaseFocus(modal)`
+
+### z-index Scale
+```
+100000  — splash screen
+20000   — confirm-home overlay
+10000+  — modal overlays (login: 10100, terms/privacy: 10200, results: 10000)
+9500–9800 — secondary modals (scoreboard, settings, share, challenge)
+8000–9000 — floating UI (confirm popup, HUD overlays)
+2000    — topbar, HUD elements
+```
+New modals should slot into existing ranges — don't invent new z-index values arbitrarily.
+
+### Spacing & Radius Conventions
+- **Card radius**: 20px (primary modals), 16px (smaller panels), 24px (hero cards like results/level-up)
+- **Button radius**: 50px (pill buttons), 10px (rectangular action buttons), 14px (menu items)
+- **Input radius**: 10px
+- **Gap/padding**: use multiples of 4px (4, 8, 12, 14, 16, 20, 24, 28)
+
 ## RTL / Hebrew UI Rules
 The app body is always `dir="ltr"`. Hebrew RTL is applied per-element, not globally. Follow these rules when touching Hebrew UI:
 
