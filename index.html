@@ -6584,7 +6584,7 @@ const REGION_VIEWS = { all: { center: [31.5, 34.9], zoom: 7 } };
   const towns = TOWNS.filter(t => rg.includes(t.region));
   if (!towns.length) return;
   const lats = towns.map(t => t.lat), lngs = towns.map(t => t.lng);
-  const latPad = 0.05, lngPad = 0.15;
+  const latPad = 0.05, lngPad = 0.25;
   REGION_VIEWS[r] = {
     bounds: L.latLngBounds(
       [Math.min(...lats) - latPad, Math.min(...lngs) - lngPad],
