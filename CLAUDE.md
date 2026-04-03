@@ -28,6 +28,15 @@ Each entry in the `TOWNS` array:
 - **Regions**: "Center", "North", "South", "Jerusalem"
 - `towns.js` defines a global `TOWNS` array (not a module, loaded via `<script>` tag)
 
+### Two town arrays in towns.js
+| Array | Used in |
+|-------|---------|
+| `TOWNS` | Quiz, Daily Challenge, Learning mode, Multiplayer — all game modes |
+| `CHALLENGE_ONLY_TOWNS` | WhatsApp Challenge mode only — not available in any other mode |
+
+`ALL_TOWNS = [...TOWNS, ...CHALLENGE_ONLY_TOWNS]` is the combined list used only for challenge town search.
+`CHALLENGE_ONLY_TOWNS` entries typically have empty `fact`/`factHe` fields. When adding a new town, put it in `TOWNS` unless it should be challenge-only.
+
 ## Key Architecture Decisions
 
 ### index.html Organization (~line numbers)
