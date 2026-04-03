@@ -6578,8 +6578,8 @@ const REGION_GROUPS = {
   south:  ['South', 'West Bank'],
 };
 const REGION_VIEWS = { all: { center: [31.5, 34.9], zoom: 7 } };
-// Compute region bounds from TOWNS data with ~10 km padding (~0.09°)
-const PAD = 0.09;
+// Compute region bounds from TOWNS data with ~5 km padding (~0.045°)
+const _RPAD = 0.045;
 ['north', 'center', 'south'].forEach(r => {
   const rg = REGION_GROUPS[r];
   const towns = TOWNS.filter(t => rg.includes(t.region));
@@ -6587,8 +6587,8 @@ const PAD = 0.09;
   const lats = towns.map(t => t.lat), lngs = towns.map(t => t.lng);
   REGION_VIEWS[r] = {
     bounds: L.latLngBounds(
-      [Math.min(...lats) - PAD, Math.min(...lngs) - PAD],
-      [Math.max(...lats) + PAD, Math.max(...lngs) + PAD]
+      [Math.min(...lats) - _RPAD, Math.min(...lngs) - _RPAD],
+      [Math.max(...lats) + _RPAD, Math.max(...lngs) + _RPAD]
     )
   };
 });
