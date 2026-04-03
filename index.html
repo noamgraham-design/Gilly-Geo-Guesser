@@ -6595,8 +6595,15 @@ const _RPAD = 0.045;
 
 function applyRegionView(r) {
   const v = REGION_VIEWS[r || 'all'];
-  if (v.bounds) map.fitBounds(v.bounds);
-  else map.setView(v.center, v.zoom);
+  if (v.bounds) {
+    // Temporarily lift maxBounds so fitBounds isn't constrained to ISRAEL_BOUNDS
+    map.setMaxBounds(null);
+    map.fitBounds(v.bounds);
+    map.setMaxBounds(v.bounds);
+  } else {
+    map.setMaxBounds(ISRAEL_BOUNDS);
+    map.setView(v.center, v.zoom);
+  }
 }
 
 function setRegion(r) {
