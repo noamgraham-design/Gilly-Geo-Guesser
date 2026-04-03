@@ -6578,17 +6578,17 @@ const REGION_GROUPS = {
   south:  ['South', 'West Bank'],
 };
 const REGION_VIEWS = { all: { center: [31.5, 34.9], zoom: 7 } };
-// Compute region bounds from TOWNS data with ~5 km padding (~0.045°)
-const _RPAD = 0.045;
+// Compute region bounds from TOWNS data with padding
 ['north', 'center', 'south'].forEach(r => {
   const rg = REGION_GROUPS[r];
   const towns = TOWNS.filter(t => rg.includes(t.region));
   if (!towns.length) return;
   const lats = towns.map(t => t.lat), lngs = towns.map(t => t.lng);
+  const latPad = 0.05, lngPad = 0.15;
   REGION_VIEWS[r] = {
     bounds: L.latLngBounds(
-      [Math.min(...lats) - _RPAD, Math.min(...lngs) - _RPAD],
-      [Math.max(...lats) + _RPAD, Math.max(...lngs) + _RPAD]
+      [Math.min(...lats) - latPad, Math.min(...lngs) - lngPad],
+      [Math.max(...lats) + latPad, Math.max(...lngs) + lngPad]
     )
   };
 });
@@ -6596,13 +6596,12 @@ const _RPAD = 0.045;
 function applyRegionView(r) {
   const v = REGION_VIEWS[r || 'all'];
   if (v.bounds) {
-    // Temporarily lift maxBounds so fitBounds isn't constrained to ISRAEL_BOUNDS
     map.setMaxBounds(null);
-    map.fitBounds(v.bounds);
+    map.fitBounds(v.bounds, { animate: false });
     map.setMaxBounds(v.bounds);
   } else {
     map.setMaxBounds(ISRAEL_BOUNDS);
-    map.setView(v.center, v.zoom);
+    map.setView(v.center, v.zoom, { animate: false });
   }
 }
 
