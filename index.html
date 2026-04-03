@@ -7311,7 +7311,7 @@ function startDailyChallenge() {
 
   // Preload at hint-style bounds with extra padding so tiles for the actual
   // game view are already cached. Use 2× the game radius for generous coverage.
-  const preRadiusKm = DIFF[difficulty].maxKm * 0.55 / 4;
+  const preRadiusKm = DIFF[difficulty].maxKm * 0.55 / 8;
   const prLatOff = (preRadiusKm * 2) / 111;
   const prLngOff = (preRadiusKm * 2) / (111 * Math.cos(_dcPreloadTown.lat * Math.PI / 180));
   const preBounds = L.latLngBounds(
@@ -7385,10 +7385,10 @@ function startDailyChallengeGame() {
   streetUsedThisRound = false;
   clearAllMarkers();
 
-  // Zoom to hint-style view: same radius logic as the quiz hint but 4× more
+  // Zoom to hint-style view: same radius logic as the quiz hint but 8× more
   // zoomed in.  The town is placed off-center so it's not at the dead centre.
   if (currentLayer !== 'street') toggleMapLayer(true);
-  const dcHintRadiusKm = DIFF[difficulty].maxKm * 0.55 / 4;
+  const dcHintRadiusKm = DIFF[difficulty].maxKm * 0.55 / 8;
   const dcOffsetFraction = 0.45 + Math.random() * 0.35;
   const dcAngle = Math.random() * 2 * Math.PI;
   const dcKmPerDegreeLat = 111;
