@@ -6743,6 +6743,8 @@ function showMenu() {
   document.querySelectorAll('#planes-layer .formation').forEach(f => f.remove());
   document.getElementById('results-panel').className = '';
   document.body.classList.remove('postgame');
+  document.getElementById('map').style.top = '';
+  document.getElementById('btn-review-satellite').style.top = '';
   document.getElementById('scoreboard-panel').className = '';
   document.body.classList.remove('sb-mobile-hide-play-again');
   document.getElementById('quiz-progress-popup').classList.remove('show');
@@ -7588,6 +7590,8 @@ async function startGame() {
   document.getElementById('overlay').style.display = 'none';
   document.getElementById('results-panel').className = '';
   document.body.classList.remove('postgame');
+  document.getElementById('map').style.top = '';
+  document.getElementById('btn-review-satellite').style.top = '';
   document.getElementById('scoreboard-panel').className = '';
   document.body.classList.remove('sb-mobile-hide-play-again');
   document.getElementById('btn-back').style.display = 'inline-block';
@@ -7801,6 +7805,17 @@ function showResults() {
   // Sync review satellite button emoji (always starts in street view)
   const reviewSatBtn = document.getElementById('btn-review-satellite');
   if (reviewSatBtn) reviewSatBtn.textContent = currentLayer === 'satellite' ? '🗺️' : '🛰️';
+  // On mobile, shift the map down so it starts below the results panel (not hidden behind it)
+  if (window.innerWidth <= 768) {
+    requestAnimationFrame(() => {
+      const panelH = document.getElementById('results-panel').offsetHeight;
+      const topbarH = document.getElementById('topbar').offsetHeight;
+      const extra = Math.max(0, panelH - topbarH);
+      document.getElementById('map').style.top = extra > 0 ? extra + 'px' : '';
+      if (reviewSatBtn) reviewSatBtn.style.top = (extra + 10) + 'px';
+      if (extra > 0) map.invalidateSize();
+    });
+  }
 
 }
 
