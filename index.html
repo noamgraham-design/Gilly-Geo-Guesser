@@ -6577,12 +6577,27 @@ const REGION_GROUPS = {
   center: ['Center', 'Jerusalem'],
   south:  ['South', 'West Bank'],
 };
-const REGION_VIEWS = {
-  all:    { center: [31.5,  34.9],  zoom: 7   },
-  north:  { center: [32.85, 35.35], zoom: 8   },
-  center: { center: [31.95, 34.95], zoom: 8.5 },
-  south:  { center: [30.7,  34.85], zoom: 7.5 },
-};
+const REGION_VIEWS = { all: { center: [31.5, 34.9], zoom: 7 } };
+// Compute region bounds from TOWNS data with ~10 km padding (~0.09°)
+const PAD = 0.09;
+['north', 'center', 'south'].forEach(r => {
+  const rg = REGION_GROUPS[r];
+  const towns = TOWNS.filter(t => rg.includes(t.region));
+  if (!towns.length) return;
+  const lats = towns.map(t => t.lat), lngs = towns.map(t => t.lng);
+  REGION_VIEWS[r] = {
+    bounds: L.latLngBounds(
+      [Math.min(...lats) - PAD, Math.min(...lngs) - PAD],
+      [Math.max(...lats) + PAD, Math.max(...lngs) + PAD]
+    )
+  };
+});
+
+function applyRegionView(r) {
+  const v = REGION_VIEWS[r || 'all'];
+  if (v.bounds) map.fitBounds(v.bounds);
+  else map.setView(v.center, v.zoom);
+}
 
 function setRegion(r) {
   region = r;
@@ -6830,8 +6845,7 @@ function endLearningPreview() {
   document.getElementById('learning-preview-bar').classList.remove('active');
   document.getElementById('learning-big-countdown').classList.remove('active');
   if (currentLayer === 'street') toggleMapLayer(true);
-  const v = REGION_VIEWS['all'];
-  map.setView(v.center, v.zoom);
+  applyRegionView('all');
 }
 
 function clearLearningPreview() {
@@ -7309,8 +7323,7 @@ function cancelDailyChallengeIntro() {
     }
     document.getElementById('town-name').classList.remove('blurred-location');
     document.querySelector('#mobile-topbar-town .mob-town-text').classList.remove('blurred-location');
-    const v = REGION_VIEWS['all'];
-    map.setView(v.center, v.zoom);
+    applyRegionView('all');
     _dcPreloadTown = null;
     _dcPreloadNearbyPt = null;
     _dcPreloadPrevLayer = null;
@@ -7440,8 +7453,7 @@ function endDailyChallengePreview(town) {
   if (currentLayer === 'street') toggleMapLayer(true);
 
   // Zoom back to full-Israel view so user can click the correct spot
-  const v = REGION_VIEWS['all'];
-  map.setView(v.center, v.zoom);
+  applyRegionView('all');
 
   // Reveal the location name by removing the blur (step 3d)
   const townName = lang === 'he' ? town.nameHe : town.name;
@@ -7518,8 +7530,7 @@ async function startLearning() {
   document.body.classList.remove('sb-mobile-hide-play-again');
   document.getElementById('btn-back').style.display = 'inline-block';
 
-  const v = REGION_VIEWS['all'];
-  map.setView(v.center, v.zoom);
+  applyRegionView('all');
 
   document.getElementById('hud').style.display = 'none';
   document.getElementById('learning-hud').classList.add('active');
@@ -7595,8 +7606,7 @@ async function startGame() {
   document.getElementById('scoreboard-panel').className = '';
   document.body.classList.remove('sb-mobile-hide-play-again');
   document.getElementById('btn-back').style.display = 'inline-block';
-  const v = REGION_VIEWS[region];
-  map.setView(v.center, v.zoom);
+  applyRegionView(region);
   loadTown();
 }
 
@@ -7753,8 +7763,7 @@ function _processMapClick(e) {
       else showResults();
     } else {
       // Zoom out to the same view the game started with
-      const v = REGION_VIEWS[region];
-      map.setView(v.center, v.zoom);
+      applyRegionView(region);
       loadTown();
     }
   }, 3500);
@@ -9533,8 +9542,7 @@ function startChallengeGame() {
   document.getElementById('scoreboard-panel').className = '';
   document.body.classList.remove('sb-mobile-hide-play-again');
 
-  const v = REGION_VIEWS['all'];
-  map.setView(v.center, v.zoom);
+  applyRegionView('all');
   loadTown();
 }
 
@@ -9857,8 +9865,7 @@ async function _mpJoinRoom(roomId) {
       document.getElementById('mp-players-bar').classList.add('active');
 
       if (currentLayer === 'street') toggleMapLayer(true);
-      const v = REGION_VIEWS[region];
-      map.setView(v.center, v.zoom);
+      applyRegionView(region);
       clearAllMarkers();
       _mpLoadRound(currentIdx);
     } else if (midGame) {
@@ -10200,8 +10207,7 @@ function _mpOnGameStart() {
   document.getElementById('mp-players-bar').classList.add('active');
 
   if (currentLayer === 'street') toggleMapLayer(true);
-  const v = REGION_VIEWS[region];
-  map.setView(v.center, v.zoom);
+  applyRegionView(region);
 
   clearAllMarkers();
   _mpLoadRound(0);
@@ -10374,8 +10380,7 @@ function _mpOnRoundAdvance(newRound) {
   // Brief pause then load next round
   clearMapFeedback();
   waiting = false;
-  const v = REGION_VIEWS[region];
-  map.setView(v.center, v.zoom);
+  applyRegionView(region);
   _mpLoadRound(newRound);
 }
 
