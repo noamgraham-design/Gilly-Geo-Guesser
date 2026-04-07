@@ -10324,9 +10324,7 @@ async function _mpSubmitAnswer(pts, hit, distKm, town) {
   waitEl.textContent = t('mp_round_wait');
   waitEl.dir = lang === 'he' ? 'rtl' : 'ltr';
   waitEl.classList.add('show');
-
-  results.push({ town, hit, distKm: distKm.toFixed(1), pts });
-  updateHUD();
+  // Note: results.push and updateHUD are already called by _processMapClick
 }
 
 // ── Host: Check All Answered ───────────────────────────────────────────────
@@ -10428,9 +10426,9 @@ async function _mpShowLeaderboard() {
     results.push({ town, hit: false, distKm: '999', pts: 0 });
   }
 
-  // ── Save score & check for personal best ──
+  // ── Save score & check for personal best (signed-in users only) ──
   let isNewRecord = false;
-  if (window._fbUser) {
+  if (window._fbUser && !window._fbUser.isAnonymous) {
     const hits = results.filter(r => r.pts >= 90).length;
     const result = await saveScore({ score, difficulty, region, rounds: roundCount, hits, results: [...results] });
     if (result?.ok && result.isNewRecord) {
