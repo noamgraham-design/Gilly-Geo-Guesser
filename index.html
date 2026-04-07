@@ -10324,9 +10324,7 @@ async function _mpSubmitAnswer(pts, hit, distKm, town) {
   waitEl.textContent = t('mp_round_wait');
   waitEl.dir = lang === 'he' ? 'rtl' : 'ltr';
   waitEl.classList.add('show');
-
-  results.push({ town, hit, distKm: distKm.toFixed(1), pts });
-  updateHUD();
+  // Note: results.push and updateHUD are already called by _processMapClick
 }
 
 // ── Host: Check All Answered ───────────────────────────────────────────────
