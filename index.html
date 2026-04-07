@@ -3895,6 +3895,10 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
     font-weight:700; color:var(--accent, #1a6fd4); white-space:nowrap;
     font-size:0.93rem; background:rgba(26,111,212,0.07); padding:4px 10px; border-radius:20px;
   }
+  .mp-lb-best-badge {
+    display:block; font-size:0.7rem; font-weight:600; color:#9a6700;
+    margin-top:2px;
+  }
   .mp-lb-actions { display:flex; flex-direction:column; gap:10px; margin-top:20px; flex-shrink:0; }
   .mp-lb-row:first-child { background:linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,193,7,0.08)); }
   .mp-lb-row:nth-child(2) { background:linear-gradient(135deg, rgba(192,192,192,0.15), rgba(176,176,176,0.06)); }
@@ -7176,6 +7180,7 @@ function shareLevelUpWhatsApp() {
 
 let _pendingLevelUp = null; // { newLevel } — set after quiz game if level-up occurred
 let _recordShareScore = null;
+let _mpPendingLeaderboard = false; // true when record popup is shown before MP leaderboard
 
 function shareRecordWhatsApp() {
   const score = _recordShareScore;
@@ -7194,6 +7199,13 @@ function shareRecordWhatsApp() {
 
 function closeRecordPopup() {
   document.getElementById('new-record-popup').classList.remove('show');
+  if (_mpPendingLeaderboard) {
+    _mpPendingLeaderboard = false;
+    setTimeout(() => {
+      document.getElementById('mp-leaderboard-panel').classList.add('show');
+    }, 300);
+    return;
+  }
   if (_pendingLevelUp !== null) {
     const lvl = _pendingLevelUp;
     _pendingLevelUp = null;
@@ -10402,7 +10414,7 @@ function _mpOnRoundAdvance(newRound) {
 }
 
 // ── Leaderboard ────────────────────────────────────────────────────────────
-function _mpShowLeaderboard() {
+async function _mpShowLeaderboard() {
   _mpStopCountdown();
   clearTimeout(_mpRoundTimer);
   clearTimeout(_mpWatchdogTimer);
@@ -10416,6 +10428,16 @@ function _mpShowLeaderboard() {
     results.push({ town, hit: false, distKm: '999', pts: 0 });
   }
 
+  // ── Save score & check for personal best ──
+  let isNewRecord = false;
+  if (window._fbUser) {
+    const hits = results.filter(r => r.pts >= 90).length;
+    const result = await saveScore({ score, difficulty, region, rounds: roundCount, hits, results: [...results] });
+    if (result?.ok && result.isNewRecord) {
+      isNewRecord = true;
+    }
+  }
+
   const uid = window._fbUser?.uid;
   // Exclude spectators (mid-game joiners) from the scoreboard
   const activePlayers = Object.entries(_mpPlayers)
@@ -10424,16 +10446,18 @@ function _mpShowLeaderboard() {
     .sort((a, b) => b.score - a.score);
 
   const medals = ['🥇', '🥈', '🥉'];
+  const newBestLabel = lang === 'he' ? 'שיא חדש!' : 'New Best!';
   const list = document.getElementById('mp-lb-list');
   list.innerHTML = activePlayers.map((p, i) => {
     const isMe = p.uid === uid;
     const rank = i < 3 ? medals[i] : `${i + 1}`;
     const lvl = p.level && PLAYER_LEVEL_NAMES[p.level];
     const levelHtml = lvl ? `<span class="mp-lb-level">${LEVEL_EMOJIS[p.level] || ''} ${lvl[lang] || lvl.en}</span>` : '';
+    const bestBadge = isMe && isNewRecord ? `<span class="mp-lb-best-badge">⭐ ${newBestLabel}</span>` : '';
     return `<div class="mp-lb-row ${isMe ? 'is-me' : ''}">
       <span class="mp-lb-rank">${rank}</span>
       <span class="mp-lb-name">${esc(p.nickname || 'Player')}${isMe ? ' ' + t('mp_you_label') : ''}${levelHtml}</span>
-      <span class="mp-lb-score">${Math.floor(p.score)} ${lang === 'he' ? 'נקודות' : 'pts'}</span>
+      <span class="mp-lb-score">${Math.floor(p.score)} ${lang === 'he' ? 'נקודות' : 'pts'}${bestBadge}</span>
     </div>`;
   }).join('');
 
@@ -10443,13 +10467,36 @@ function _mpShowLeaderboard() {
   document.getElementById('mp-lb-play-again-btn').textContent = t('mp_play_again');
   document.getElementById('mp-lb-share-btn').textContent = t('mp_share_results');
   document.getElementById('mp-lb-menu-btn').textContent = t('mp_back');
-  document.getElementById('mp-leaderboard-panel').classList.add('show');
 
   // Switch to street view for review
   if (currentLayer === 'satellite') toggleMapLayer(true);
 
+  // ── Show "New Personal Best!" popup before leaderboard if applicable ──
+  if (isNewRecord) {
+    const recPopup = document.getElementById('new-record-popup');
+    const recScore = document.getElementById('new-record-score');
+    const recSub   = document.getElementById('new-record-sub');
+    recScore.textContent = `${Math.floor(score)} ${lang === 'he' ? 'נקודות' : 'pts'}`;
+    recSub.textContent = lang === 'he'
+      ? `השגת שיא חדש של ${Math.floor(score)} נקודות!`
+      : `You beat your best with ${Math.floor(score)} pts!`;
+    _recordShareScore = score;
+    const waBtn = document.getElementById('new-record-wa');
+    const waLabel = document.getElementById('new-record-wa-label');
+    waBtn.dir = lang === 'he' ? 'rtl' : 'ltr';
+    waLabel.textContent = lang === 'he' ? 'שתפ/י' : 'Share';
+    _mpPendingLeaderboard = true;
+    recPopup.classList.add('show');
+    launchConfetti();
+    if (window._fbUser && !window._fbUser.isAnonymous && window._logEvent) {
+      window._logEvent('new_high_score', { score: Math.floor(score), difficulty, region: region || 'all', mode: 'multiplayer' });
+    }
+  } else {
+    document.getElementById('mp-leaderboard-panel').classList.add('show');
+  }
+
   if (window._logEvent) window._logEvent('mp_game_complete', {
-    players: players.length, score: Math.floor(score)
+    players: activePlayers.length, score: Math.floor(score)
   });
 }
 
