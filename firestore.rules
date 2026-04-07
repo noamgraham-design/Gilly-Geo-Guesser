@@ -256,7 +256,7 @@ service cloud.firestore {
           && request.auth.uid == playerId
           // Restrict allowed fields
           && request.resource.data.keys().hasOnly([
-            'nickname', 'score', 'answeredRound', 'joinedAt', 'level', 'spectator'
+            'nickname', 'score', 'answeredRound', 'joinedAt', 'level', 'spectator', 'newBest'
           ])
           // Validate nickname (1-15 chars)
           && request.resource.data.nickname is string
@@ -274,7 +274,10 @@ service cloud.firestore {
                   && request.resource.data.level <= 5))
           // Validate spectator if present (boolean)
           && (!('spectator' in request.resource.data)
-              || request.resource.data.spectator is bool);
+              || request.resource.data.spectator is bool)
+          // Validate newBest if present (boolean)
+          && (!('newBest' in request.resource.data)
+              || request.resource.data.newBest is bool);
 
         // Player can delete their own doc; host can also remove players
         allow delete: if request.auth != null

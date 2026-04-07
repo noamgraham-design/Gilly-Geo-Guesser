@@ -162,7 +162,7 @@ The app body is always `dir="ltr"`. Hebrew RTL is applied per-element, not globa
 1. **Inline `dir="rtl"`**: When generating HTML with Hebrew text, add `dir="rtl"` on the container element (e.g., `<div dir="rtl">...</div>`)
 2. **CSS `direction: rtl`**: For styled components that are always Hebrew (e.g., Hebrew-specific modals), use `direction: rtl; unicode-bidi: isolate;` in CSS
 3. **`[dir="rtl"]` selectors**: When a component needs different layout in Hebrew (flipped margins, text-align), use `[dir="rtl"] .my-class { ... }` CSS selectors — see PWA install card for examples (~line 3663)
-4. **Dynamic dir in JS**: When building HTML strings conditionally, use the pattern: `${lang === 'he' ? 'dir="rtl"' : ''}`
+4. **Dynamic dir in JS**: When building HTML strings conditionally, use the pattern: `${lang === 'he' ? 'dir="rtl"' : ''}`. **Every** `<span>`, `<div>`, or element containing Hebrew text in JS-generated HTML must get `dir="rtl"` (or use `unicode-bidi: isolate` in CSS) — otherwise Hebrew renders in wrong order when embedded in LTR containers. Also prefix standalone Hebrew string literals with RLM (`\u200F`) when they appear inside mixed-direction contexts
 5. **STRINGS object**: All new UI text must have both `en` and `he` keys in the `STRINGS` object and be accessed via `t('key')`
 6. **Town data**: Always provide both English (`name`, `desc`, `fact`) and Hebrew (`nameHe`, `descHe`, `factHe`) fields
 7. **Never set `document.body.dir = 'rtl'`** — the app explicitly keeps body LTR and handles RTL at the component level

@@ -3897,7 +3897,7 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch
   }
   .mp-lb-best-badge {
     display:block; font-size:0.7rem; font-weight:600; color:#9a6700;
-    margin-top:2px;
+    margin-top:2px; unicode-bidi:isolate;
   }
   .mp-lb-actions { display:flex; flex-direction:column; gap:10px; margin-top:20px; flex-shrink:0; }
   .mp-lb-row:first-child { background:linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,193,7,0.08)); }
@@ -10428,15 +10428,20 @@ async function _mpShowLeaderboard() {
 
   // ── Save score & check for personal best (signed-in users only) ──
   let isNewRecord = false;
+  const uid = window._fbUser?.uid;
   if (window._fbUser && !window._fbUser.isAnonymous) {
     const hits = results.filter(r => r.pts >= 90).length;
     const result = await saveScore({ score, difficulty, region, rounds: roundCount, hits, results: [...results] });
     if (result?.ok && result.isNewRecord) {
       isNewRecord = true;
+      // Write newBest flag to player doc so all clients can see the badge
+      if (uid && _mpRoomId) {
+        const { updateDoc, doc } = window._fbFns;
+        updateDoc(doc(window._fbDb, 'rooms', _mpRoomId, 'players', uid), { newBest: true }).catch(() => {});
+      }
     }
   }
 
-  const uid = window._fbUser?.uid;
   // Exclude spectators (mid-game joiners) from the scoreboard
   const activePlayers = Object.entries(_mpPlayers)
     .filter(([, p]) => !p.spectator)
@@ -10444,14 +10449,15 @@ async function _mpShowLeaderboard() {
     .sort((a, b) => b.score - a.score);
 
   const medals = ['🥇', '🥈', '🥉'];
-  const newBestLabel = lang === 'he' ? 'שיא חדש!' : 'New Best!';
+  const newBestLabel = lang === 'he' ? '\u200Fשיא חדש!' : 'New Best!';
   const list = document.getElementById('mp-lb-list');
   list.innerHTML = activePlayers.map((p, i) => {
     const isMe = p.uid === uid;
     const rank = i < 3 ? medals[i] : `${i + 1}`;
     const lvl = p.level && PLAYER_LEVEL_NAMES[p.level];
     const levelHtml = lvl ? `<span class="mp-lb-level">${LEVEL_EMOJIS[p.level] || ''} ${lvl[lang] || lvl.en}</span>` : '';
-    const bestBadge = isMe && isNewRecord ? `<span class="mp-lb-best-badge">⭐ ${newBestLabel}</span>` : '';
+    const hasBest = (isMe && isNewRecord) || p.newBest;
+    const bestBadge = hasBest ? `<span class="mp-lb-best-badge" dir="rtl">⭐ ${newBestLabel}</span>` : '';
     return `<div class="mp-lb-row ${isMe ? 'is-me' : ''}">
       <span class="mp-lb-rank">${rank}</span>
       <span class="mp-lb-name">${esc(p.nickname || 'Player')}${isMe ? ' ' + t('mp_you_label') : ''}${levelHtml}</span>
